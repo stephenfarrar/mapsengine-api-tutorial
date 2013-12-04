@@ -506,9 +506,8 @@ function getFeatures(addressString){
   });
 }
 
-function trimWhiteSpaces(string){
-  var trimmedString = string.replace(/^\s+/, '');
-  return trimmedString;
+function trimLeft(string){
+  return string.replace(/^\s+/, '');
 }
 //*****************THE INTRO FUNCTIONS**********************//
 function updateIntro() {
@@ -584,7 +583,7 @@ function updateListFeatures() {
 
 function executeListInput(){
   var string = document.getElementById("input" + activeIndex).value;
-  var address = trimWhiteSpaces(string);
+  var address = trimLeft(string);
   getFeatures(address);
   
 }
@@ -637,7 +636,7 @@ function updateOtherMethods(){
 
 function executeCurlInput(){
   var string = document.getElementById("input" + activeIndex).value;
-  var address = trimWhiteSpaces(string);
+  var address = trimLeft(string);
   getFeatures(address);
 
   /*
