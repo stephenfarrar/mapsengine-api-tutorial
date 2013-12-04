@@ -1,0 +1,51 @@
+<!--HTML file for tutorial-->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Introduction</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 80%;
+    }
+    #instructions {
+      position: absolute;
+      float: right;
+      height: 34%;
+      left: 180px;
+      border: 10px solid blue;
+      background-color: black;
+      color: white;
+      padding: 20px;
+      font-size: 17px;
+      overflow-y: scroll;
+    }
+    #buttons {
+      display: block;
+      position: absolute;
+      height: 100%;
+      padding: 10px;
+      top: 0px;
+      float: left;
+      background-color: green;
+      opacity:0.6;
+    }
+  </style>
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
+   <script type="text/javascript" src="tutorial.js"></script>
+</head>
+<body>
+    <div id="instructions"></div>
+    <div class="lesson" id="lesson0-intro"></div>
+    <div class="lesson" id="lesson1-gmeapi"></div>
+    <div class="lesson" id="lesson2-apikey"></div>
+    <div class="lesson" id="lesson3-gettable"></div>
+    <div class="lesson" id="lesson4-featureslist"></div>
+    <div class="lesson" id="lesson5-javascript"></div>
+    <div class="lesson" id="lesson6-othermethods"></div>
+    <div id="buttons"></div>
+</body>
+</html>
