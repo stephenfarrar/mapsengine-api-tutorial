@@ -548,15 +548,19 @@ function updateListFeatures() {
 
 function executeListInput(){
   var string = document.getElementById("input" + activeIndex).value;
+  /*
   for (var i = 0; i<string.length; i++){
     if(string[i]!== ' '){
       break;
     }
   }
-  var address = "";
+  */
+  var address = string.replace(/^\s+/, '');
+  /*
   for (; i<string.length; i++){
     address += string[i];
   }
+  */
   getFeatures(address);
   
 }
@@ -611,6 +615,7 @@ function updateOtherMethods(){
 
 function executeCurlInput(){
   var string = document.getElementById("input" + activeIndex).value;
+  /*
   for (var i = 0; i<string.length; i++){
     if(string[i]!== ' '){
       break;
@@ -620,6 +625,8 @@ function executeCurlInput(){
   for (; i<string.length; i++){
     address += string[i];
   }
+  */
+  var address = string.replace(/^\s+/, '');
   console.log(address);
   getFeatures(address);
 
