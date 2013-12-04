@@ -285,10 +285,6 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   //dynamically changing the divs
 
   document.getElementById('instructions').style.width = winWidth - 240 + 'px';
-  /*console.log('window height: ' + $( window ).height());
-  console.log('document height: ' + $(document).height());
-  console.log('window width: ' + $( window ).width());
-  console.log('document width: ' + $(document).width());*/
 
   //set the initial page to be the introduction
   lessonArray[activeIndex].update();
@@ -474,6 +470,45 @@ function submitbuttonStyle(submit, i) {
   }
 }
 
+function getFeatures(addressString){
+  var $data = $("#output" + activeIndex);
+  var data = document.getElementById("output" + activeIndex);
+  data.style.whiteSpace = 'pre';
+  
+  $data.empty();
+  jQuery.ajax({
+    url: addressString,
+    dataType: 'json',
+    success: function(resource) {
+      var resourceString = JSON.stringify(resource, null, 2);
+      $data.append("\n");
+      $data.append(resourceString);
+      $data.append("\n");
+    },
+    error: function(response) {
+      alert ("Oops! You've entered wrong URL! Try again!")
+      $data.append("Wrong URL\n");
+      response = JSON.parse(response.responseText);
+      var errorMess = response.error.errors[0];
+      if (errorMess.reason === "authError") {
+        $data.append("\nYour authorization token is invalid. \nPlease check that the table can be viewed by general public\n\n");
+      } else if (errorMess.reason === "invalid") {
+        var field = errorMess.location;
+        $data.append("\nInvalid value in the \""+field+"\" field.\nCheck whether you've given the right tableId\n\n");
+      } else {
+        $data.append("\nThe data cannot be processed. See the details below for the information regarding the error:\n\n");
+      }
+      var responseString = JSON.stringify(errorMess, null, 2);
+      $data.append(responseString);
+      $data.append("\n");
+    
+    }
+  });
+}
+
+function trimLeft(string){
+  return string.replace(/^\s+/, '');
+}
 //*****************THE INTRO FUNCTIONS**********************//
 function updateIntro() {
   activeIndex = 0;
@@ -548,19 +583,7 @@ function updateListFeatures() {
 
 function executeListInput(){
   var string = document.getElementById("input" + activeIndex).value;
-  /*
-  for (var i = 0; i<string.length; i++){
-    if(string[i]!== ' '){
-      break;
-    }
-  }
-  */
-  var address = string.replace(/^\s+/, '');
-  /*
-  for (; i<string.length; i++){
-    address += string[i];
-  }
-  */
+  var address = trimLeft(string);
   getFeatures(address);
   
 }
@@ -588,20 +611,18 @@ function testJQuery() {
   "\n  error: function(response) {" +
   "\n    console.log('Error: ', response.error.errors[0]);" +
   "\n  }\n});";
-console.log(expectedInput);
-if (userString == expectedInput) {
-  //user input is correct
-  getFeatures ("https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=" + userAPIKey);
-} else {
-  //user input is incorrect
-  $data.html("Sorry, your input is not correct. Please check that you have the following:<ul><li>Make sure you have entered a valid API Key in a previous exercise!</li>" +
-  "<li>Request is correctly indented using TWO spaces</li>" +
-  "<li>URL is:'https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=" + userAPIKey + 
-  "', including '' characters</li><li>There are no comments in your code.</li><li>For this exercise, make sure your success and error handling is the same as in the example.</li></ul>");
-}
-/*  if (userString == expectedInput) {
-    console.log("HUZZAH!");
-  }*/
+  console.log(expectedInput);
+  if (userString == expectedInput) {
+    //user input is correct
+    getFeatures ("https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=" + userAPIKey);
+  } else {
+    //user input is incorrect
+    $data.html("Sorry, your input is not correct. Please check that you have the following:<ul><li>Make sure you have entered a valid API Key in a previous exercise!</li>" +
+    "<li>Request is correctly indented using TWO spaces</li>" +
+    "<li>URL is:'https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=" + userAPIKey + 
+    "', including '' characters</li><li>There are no comments in your code.</li><li>For this exercise, make sure your success and error handling is the same as in the example.</li></ul>");
+  }
+
 }
 
 //*****************THE Other Methods FUNCTIONS**********************//
@@ -615,29 +636,10 @@ function updateOtherMethods(){
 
 function executeCurlInput(){
   var string = document.getElementById("input" + activeIndex).value;
-  /*
-  for (var i = 0; i<string.length; i++){
-    if(string[i]!== ' '){
-      break;
-    }
-  }
-  var address = "";
-  for (; i<string.length; i++){
-    address += string[i];
-  }
-  */
-  var address = string.replace(/^\s+/, '');
-  console.log(address);
+  var address = trimLeft(string);
   getFeatures(address);
 
   /*
-  var string = document.getElementById("input" + activeIndex).value;
-  for (var i = 0; i<string.length; i++){
-    if(string[i]!== ' '){
-      break;
-    }
-  }
-
   //the user has to type curl
   if (string.length<=(i+3) ||string[i]!== 'c' || string[i+1]!=='u' || string[i+2]!=='r' || string[i+3]!=='l'){
     alert("You entered wrong command-line. See the tutorial again.");
@@ -675,41 +677,5 @@ function executeCurlInput(){
     }
   }
   */
-}
-
-function getFeatures(addressString){
-  var $data = $("#output" + activeIndex);
-  var data = document.getElementById("output" + activeIndex);
-  data.style.whiteSpace = 'pre';
-  
-  $data.empty();
-  jQuery.ajax({
-    url: addressString,
-    dataType: 'json',
-    success: function(resource) {
-      var resourceString = JSON.stringify(resource, null, 2);
-      $data.append("\n");
-      $data.append(resourceString);
-      $data.append("\n");
-    },
-    error: function(response) {
-      alert ("Oops! You've entered wrong URL! Try again!")
-      $data.append("Wrong URL\n");
-      response = JSON.parse(response.responseText);
-      var errorMess = response.error.errors[0];
-      if (errorMess.reason === "authError") {
-        $data.append("\nYour authorization token is invalid. \nPlease check that the table can be viewed by general public\n\n");
-      } else if (errorMess.reason === "invalid") {
-        var field = errorMess.location;
-        $data.append("\nInvalid value in the \""+field+"\" field.\nCheck whether you've given the right tableId\n\n");
-      } else {
-        $data.append("\nThe data cannot be processed. See the details below for the information regarding the error:\n\n");
-      }
-      var responseString = JSON.stringify(errorMess, null, 2);
-      $data.append(responseString);
-      $data.append("\n");
-    
-    }
-  });
 }
 
