@@ -18,7 +18,7 @@ function Lesson(title, blurb, divID) {
 
 
 //THE LESSONS
-var lesson0 = new Lesson("Introduction", "Welcome to Google Maps API tutorial. <br> In this tutorial, we will teach you how to read public data from a Google map project."+
+var lesson0 = new Lesson("Introduction", "Welcome to Google Maps Engine API tutorial. <br> In this tutorial, we will teach you how to read public data from a Google map project."+
                         "<br>To begin the tutorial, you can click the tutorial menu on the left. Enjoy!", "lesson0-intro");
 lesson0.update = updateIntro;
 lesson0.submit = updateIntro;
@@ -62,6 +62,29 @@ var lesson4 = new Lesson("List Features", "Besides viewing a table's attribute, 
                          "<br>https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0" +
                          "<br>You can copy this URL and paste it in the white input box below, and click the submit button to see the output." +
                          " You can also try to create your own URL and submit it below!" +
+                         "<br><br>Before we take a look of other parameters that we can use, it is probably a good idea to learn about geometry functions in Maps Engine API, that might be useful for some of your parameters value (where and select parameters)." +
+                         "<br>Two main geometry functions in Maps Engine API are:"+
+                           "<ol>" +
+                             "<li>Constructors" +
+                               "<ul>"+
+                                 "<li>ST_POINT: creates a point from a longitude and latitude value."+
+                                   "<br>The syntax: ST_POINT(lng, lat)"+
+                                 "</li>"+
+                                 "<li>ST_GEOMFROMTEXT: Creates a geometry from a string specifying points and the geometry (polygon, linestring, etc.)"+
+                                 "</li>"+
+                               "</ul>"+
+                             "</li>" +
+                             "<li>Relationships functions" +
+                               "<ul>"+
+                                 "<li>ST_DISTANCE: Calculate shortest distance between two geometries. Accepts geometry column name and geometry value (might be the result of the constructors)"+
+                                   "<br>The syntax example: ST_DISTANCE(geometry, ST_POINT(1.23,4.56))"+
+                                 "</li>"+
+                                 "<li>ST_INTERSECTS: Returns all features that intersect the described polygon. Accepts geometry column name and geometry value (might be the result of the constructors)"+
+                                   "<br>The syntax example: ST_INTERSECTS(geometry, ST_GEOMFROMTEXT('POLYGON((1 3, 1 1, 4 1, 4 4, 1 3))'))"+
+                                 "</li>"+
+                               "</ul>"+
+                             "</li>" +
+                           "</ol>"+
                          "<br><br>There are several optional parameters for the list feature, including:" +
                          "<ul>"+
                            "<li>intersects" +
@@ -78,39 +101,131 @@ var lesson4 = new Lesson("List Features", "Besides viewing a table's attribute, 
                                    "</li>" +
                                    "<li>Example: https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&intersects=POLYGON((175 -41, 174 -41, 174 -42, 175 -41))"+
                                    "</li>" +
-                                  "</ul>" +
+                                 "</ul>" +
                                "</li>"+  
                                "<li>POINT"+
                                  "<ul>" +
                                    "<li>The syntax to specify a point: <br>intersects=POINT(lng lat)"+
-                                     "<br>Where lng:longitude of the vertex and lat:latitude of the vertex"+
+                                     "<br>Where lng:longitude of the point and lat:latitude of the point"+
                                    "</li>" +
-                                   "<li>The vertices must be specified in counter-clockwise order, and you can have up to 50 vertices" +
+                                   "<li>Example: https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&intersects=POINT(174.7928369177438 -41.29150501119897)"+
                                    "</li>" +
-                                   "<li>The first and last vertices has to be the same to close the polygon, hence you need to have at least 4 vertices(3 distinct points)"+
-                                   "</li>" +
-                                   "<li>Example: https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&intersects=POLYGON((175 -41, 174 -41, 174 -42, 175 -41))"+
-                                   "</li>" +
-                                  "</ul>" +
+                                 "</ul>" +
                                "</li>"+
                                "<li>CIRCLE"+
+                                "<ul>" +
+                                   "<li>The syntax to specify a circle: <br>intersects=CIRCLE(center_lng center_lat, radius)"+
+                                     "<br>Where lng:longitude of the center of the circle and lat:latitude of the center of the circle"+
+                                   "</li>" +
+                                   "<li>The radius is in meters" +
+                                   "</li>" +
+                                   "<li>Example: https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&intersects=CIRCLE(174.7928369177438 -41.29150501119897, 5000)"+
+                                   "</li>" +
+                                 "</ul>" +
                                "</li>"+
                                "<li>LINESTRING"+
+                                 "<ul>" +
+                                   "<li>The syntax to specify a linestring: <br>intersects=LINESTRING(pt1_lng pt1_lat, pt2_lng pt2_lat,...)"+
+                                     "<br>Where lng:longitude of the point and lat:latitude of the point"+
+                                   "</li>" +
+                                   "<li>May consist of up to 50 points" +
+                                   "</li>" +
+                                   "<li>Example: https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&intersects=LINESTRING(174.82994218881467 -41.312541307982784, 174.7928369177438 -41.29150501119897)"+
+                                   "</li>" +
+                                 "</ul>" +
                                "</li>"+
                              "</ul>"+
                            "</li>"+
                            "<li>limit"+
+                             "<ul>" +
+                               "<li>The value of this parameter will become the upper bound to the number of features returned. If there are more features than the limit, the number of features returned will be the value of the limit" +
+                                 " and the other features will not be shown." +
+                               "</li>" +
+                               "<li>Example(returning 3 results): https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&limit=3" +
+                               "</li>" +
+                               "<li>You can try to change the value of the limit in the URL and see the changes to the output! Try it!" +
+                               "</li>" +
+                             "</ul>" +
                            "</li>" +
                            "<li>maxResults"+
-                           "</li>" +
-                           "<li>orderBy"+
+                             "<ul>" +
+                               "<li>The value of this parameter will become the upper bound to the number of features shown in one page." +
+                               "</li>" +
+                               "<li>If there are more features results than the value of this parameter, we will find a nextPageToken at the bottom of the page." +
+                                 "<br>This token can be used to access the next page containing the other results, which can be used by using the pageToken parameter(see the details below)"+
+                               "</li>" +
+                               "<li>Example(returning 5 results each page): https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&maxResults=5" +
+                               "</li>" +
+                               "<li>You can try to change the value of the maxResults in the URL and see the changes to the output! Try it!" +
+                               "</li>" +
+                             "</ul>" +
                            "</li>" +
                            "<li>pageToken"+
+                             "<ul>" +
+                               "<li>The value of this parameter is the continuation token we get from the maxResults parameter." +
+                               "</li>" +
+                               "<li>This parameter will give you the next page results from the previous request.." +
+                               "</li>" +
+                               "<li>Example:" +
+                                 "<ol>"+
+                                   "<li>Create a request of features by limiting the number of results per page: https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&maxResults=5" +
+                                   "</li>"+
+                                   "<li>Use the nextPageToken from the bottom of the page and execute this link: https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&pageToken=<em>{put your nextPageToken here}</em>" +
+                                   "</li>"+
+                                 "</ol>"+
+                               "</li>" +
+                               "<li>You can try to change the value of the maxResults in the URL, get the token, update the URL, and see the changes to the output! Try it!" +
+                               "</li>" +
+                             "</ul>" + 
                            "</li>" +
                            "<li>select"+
+                             "<ul>" +
+                               "<li>This parameter will specify returned properties. It is an SQL-like projection clause. If we use it, the features returned will only have the property defined in the value of the parameter." +
+                               "</li>" +
+                               "<li>If not included, all properties are returned." +
+                               "</li>" +
+                               "<li>If you wanted to include more than 1 property, you can add commas(,) after each property." +
+                               "</li>" +
+                               "<li>If you have properties with other characters besides letters, numbers, and underscores; you have to enclosed it with \"\"" +
+                               "</li>" +
+                               "<li>If you have property names with quotation marks/backslashes, it must be escaped with a backslash." +
+                               "</li>" +
+                               "<li>Example: https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&select=location, disabled" +
+                               "</li>" +
+                               "<li>You can also add new properties by using the geometry functions defined above by using AS (creating column alias). The name of the new property must be enclosed in single quotes if it contains spaces/other special characters." +
+                                 "<br>For example: https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&select=geometry, ST_DISTANCE(geometry,ST_POINT(174.8,-41.3)) AS distance"+
+                               "</li>" +
+                             "</ul>" + 
                            "</li>" +
                            "<li>where"+
-                           "</li>"+
+                             "<ul>" +
+                               "<li>This parameter will filter the features, and returns the features with true condition. It is an SQL-like predicate." +
+                               "</li>" +
+                               "<li>If you wanted to include more than 1 condition, you can use AND and/or OR." +
+                               "</li>" +
+                               "<li>The supported operators are: >, <, >=, <=, =, <>" +
+                               "</li>" +
+                               "<li>Example: https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&where=ST_DISTANCE(geometry,ST_POINT(174.8,-41.3))<2200" +
+                               "</li>" +
+                             "</ul>" + 
+                           "</li>"+ 
+                           "<li>orderBy"+
+                             "<ul>" +
+                               "<li>This parameter will sort your features based on the key you put in. It is an SQL-like order by clause." +
+                               "</li>" +
+                               "<li>If not included, the order of the features is undefined." +
+                               "</li>" +
+                               "<li>You can only sorted with one order key, which must be defined in the select clause (either existing column or column alias)" +
+                               "</li>" +
+                               "<li>The default sort is in ascending order. If you want to do descending order, you can append DESC to the orderBy clause." +
+                               "</li>" +
+                               "<li>You <b>must</b> include limit parameter! The limit must be less than or equal to 75" +
+                               "</li>" +
+                               "<li>Example: https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&select=geometry, ST_DISTANCE(geometry,ST_POINT(174.8,-41.3)) AS distance&orderBy=distance DESC&limit=5"+
+                               "</li>" +
+                             "</ul>" + 
+                           "</li>" +
+                           
                          "</ul>","lesson4-featureslist");
 lesson4.update = updateListFeatures;
 lesson4.submit = executeListInput;
@@ -137,11 +252,12 @@ var lesson5 = new Lesson("Javascript", "So far, you have learned to generate a U
 lesson5.update = updateJavascript;
 lesson5.submit = testJQuery;
 var lesson6 = new Lesson("Other Methods", "Besides directly typing the URL into the browser or using Javascript, you can access the public data by using 'curL'." +
-	                       "<br>cURL is a command-line tool that can be used to make HTTP requests. Simply type into your console/terminal:" +
-	                       "<br>curl \"<em>your URL</em>\"" +
-	                       "<br><br>For example, the command line that you typed in your console/terminal should look like this: " +
-	                       "<br>curl \"https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0\""+
-                         "<br><br>You can try to put your command line in the white box below and see what data will be read and displayed in your console. Try it!:)", "lesson6-othermethods");
+                         "<br>cURL is a command-line tool that can be used to make HTTP requests. Simply type into your console/terminal:" +
+                         "<br>curl \"<em>your URL</em>\"" +
+                         "<br><br>For example, the command line that you typed in your console/terminal should look like this: " +
+                         "<br>curl \"https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0\""+
+                         "<br><br>To check whether you have the correct URL, you can submit it in the white box below. Then you can type the command line curl to your console and see if it works!" +
+                         "<br><br>PS: Don't forget the \"\" surrounding the URL in your command line :)", "lesson6-othermethods");
 
 lesson6.update = updateOtherMethods;
 lesson6.submit = executeCurlInput;
@@ -437,15 +553,11 @@ function executeListInput(){
       break;
     }
   }
-  if (i === string.length || string[i]!== 'h') {
-    alert ("Wrong URL! See the tutorial again."); 
-  } else {
-    var address = "";
-    for (; i<string.length; i++){
-      address += string[i];
-    }
-    getFeatures(address);
+  var address = "";
+  for (; i<string.length; i++){
+    address += string[i];
   }
+  getFeatures(address);
   
 }
 
@@ -498,7 +610,20 @@ function updateOtherMethods(){
 }
 
 function executeCurlInput(){
-  
+  var string = document.getElementById("input" + activeIndex).value;
+  for (var i = 0; i<string.length; i++){
+    if(string[i]!== ' '){
+      break;
+    }
+  }
+  var address = "";
+  for (; i<string.length; i++){
+    address += string[i];
+  }
+  console.log(address);
+  getFeatures(address);
+
+  /*
   var string = document.getElementById("input" + activeIndex).value;
   for (var i = 0; i<string.length; i++){
     if(string[i]!== ' '){
@@ -542,6 +667,7 @@ function executeCurlInput(){
       }
     }
   }
+  */
 }
 
 function getFeatures(addressString){
@@ -560,6 +686,7 @@ function getFeatures(addressString){
       $data.append("\n");
     },
     error: function(response) {
+      alert ("Oops! You've entered wrong URL! Try again!")
       $data.append("Wrong URL\n");
       response = JSON.parse(response.responseText);
       var errorMess = response.error.errors[0];
