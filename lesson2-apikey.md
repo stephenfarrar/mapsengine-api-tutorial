@@ -1,0 +1,3 @@
+For this tutorial you will need an API key in order to access the data. To obtain an API Key, go to the [Google Developers' Console](https://cloud.google.com/console). Click on APIs & Auth and turn the Google Maps Engine API to ON. Next, you will need to register your app as a Web Application through the Registered Apps tab. The API key can be found under the Server/Browser Key dropdown.
+
+Once you have the key, paste it in the input box below.
