@@ -294,14 +294,14 @@ function trimLeft(string){
 
 var inst = new Array();
 
-function updateInstruction (index){
+function updateInstruction (index, filename){
   if (needRefresh[index] == 1){
     //first time page loaded
-    $.get("lesson" + index + ".md", function(response){
+    $.get(filename+".md", function(response){
       //console.log(response);
       //preview.innerHTML = markdown.toHTML(response);
       document.getElementById("instructions").innerHTML = markdown.toHTML(response);
-      inst[activeIndex] = response;
+      inst[index] = response;
       needRefresh[index] = 0;
     } );    
   } else {
@@ -310,28 +310,28 @@ function updateInstruction (index){
   } 
 }
 
-function updateDisplay(index){
+function updateDisplay(index, filename){
   hideAll();
   document.title = lessonArray[index].title;
   document.getElementById(lessonArray[index].divID).style.display = "block";
-  updateInstruction(index);
+  updateInstruction(index, filename);
 }
 //*****************THE INTRO FUNCTIONS**********************//
 function updateIntro() {
   activeIndex = 0;
-  updateDisplay(activeIndex);
+  updateDisplay(activeIndex, lessonArray[activeIndex].divID);
 }
 
 //*****************THE GME API FUNCTIONS**********************//
 function updateGMEAPI() {
   activeIndex = 1;
-  updateDisplay(activeIndex);
+  updateDisplay(activeIndex, lessonArray[activeIndex].divID);
 }
 
 //*****************THE API Key FUNCTIONS**********************//
 function updateAPIKey() {
   activeIndex = 2;
-  updateDisplay(activeIndex);
+  updateDisplay(activeIndex, lessonArray[activeIndex].divID);
 }
 
 function testAPIKey() {
@@ -354,7 +354,7 @@ function testAPIKey() {
 //*****************THE Get Table FUNCTIONS**********************//
 function updateGetTable() {
   activeIndex = 3;
-  updateDisplay(activeIndex);
+  updateDisplay(activeIndex, lessonArray[activeIndex].divID);
 }
 
 function testGetTable() {
@@ -371,7 +371,7 @@ function testGetTable() {
 //*****************THE List Features FUNCTIONS**********************//
 function updateListFeatures() {
   activeIndex = 4;
-  updateDisplay(activeIndex);
+  updateDisplay(activeIndex, lessonArray[activeIndex].divID);
 }
 
 function executeListInput(){
@@ -384,7 +384,7 @@ function executeListInput(){
 //*****************THE Javascript FUNCTIONS**********************//
 function updateJavascript() {
   activeIndex = 5;
-  updateDisplay(activeIndex);
+  updateDisplay(activeIndex, lessonArray[activeIndex].divID);
 }
 
 function testJQuery() {
@@ -417,7 +417,7 @@ function testJQuery() {
 //*****************THE Other Methods FUNCTIONS**********************//
 function updateOtherMethods(){
   activeIndex = 6;
-  updateDisplay(activeIndex);
+  updateDisplay(activeIndex, lessonArray[activeIndex].divID);
 }
 
 function executeCurlInput(){
