@@ -10,46 +10,49 @@ var userAPIKey = "";
 function Lesson(title, divID) {
   this.title = title;
   this.divID = divID;
-  this.update = function() {};
-  this.submit = function() {};
 }
+
+Lesson.prototype.update = function() {
+  hideAll();
+  var me = this;
+  document.title = this.title;
+  document.getElementById(this.divID).style.display = "block";
+
+  if (!this.upToDate){
+    //first time page loaded
+    $.get(this.divID+".md", function(response){
+      //console.log(response);
+      //preview.innerHTML = markdown.toHTML(response);
+      document.getElementById("instructions").innerHTML = markdown.toHTML(response);
+      me.instructions = response;
+      me.upToDate = true;
+    } );    
+  } else {
+      //has been loaded before
+      document.getElementById("instructions").innerHTML = markdown.toHTML(this.instructions);
+  } 
+}
+
+Lesson.prototype.submit = function() {
+  this.update();
+};
 
 //THE LESSONS
 var lesson0 = new Lesson("Introduction", "lesson0-intro");
-lesson0.update = updateIntro;
-lesson0.submit = updateIntro;
 var lesson1 = new Lesson("GME API", "lesson1-gmeapi");
-lesson1.update = updateGMEAPI;
-lesson1.submit = updateGMEAPI;
 var lesson2 = new Lesson("API Key", "lesson2-apikey");
-lesson2.update = updateAPIKey;
 lesson2.submit = testAPIKey;
 var lesson3 = new Lesson("Get Table", "lesson3-gettable");
-lesson3.update = updateGetTable;
 lesson3.submit = testGetTable;
 var lesson4 = new Lesson("List Features", "lesson4-featureslist");
-lesson4.update = updateListFeatures;
 lesson4.submit = executeListInput;
 var lesson5 = new Lesson("Javascript", "lesson5-javascript");
-lesson5.update = updateJavascript;
 lesson5.submit = testJQuery;
 var lesson6 = new Lesson("Other Methods", "lesson6-othermethods");
-lesson6.update = updateOtherMethods;
 lesson6.submit = executeCurlInput;
 
 //The Lesson Array
 var lessonArray = [lesson0, lesson1, lesson2, lesson3, lesson4, lesson5, lesson6];
-
-//Update/refreshVariable
-
-var needRefresh = new Array();
-for (var i = 0; i<lessonArray.length; i++){
-  needRefresh[i] = 1;
-}
-
-//Active index
-var activeIndex = 0;
-
 
 //The color array
 var color = ['red', 'blue', 'purple'];
@@ -69,7 +72,7 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   document.getElementById('instructions').style.width = winWidth - 240 + 'px';
 
   //set the initial page to be the introduction
-  lessonArray[activeIndex].update();
+  lesson0.update();
 });
 
 function makeButton(string, i){
@@ -292,48 +295,7 @@ function trimLeft(string){
   return string.replace(/^\s+/, '');
 }
 
-var inst = new Array();
-
-function updateInstruction (index, filename){
-  if (needRefresh[index] == 1){
-    //first time page loaded
-    $.get(filename+".md", function(response){
-      //console.log(response);
-      //preview.innerHTML = markdown.toHTML(response);
-      document.getElementById("instructions").innerHTML = markdown.toHTML(response);
-      inst[index] = response;
-      needRefresh[index] = 0;
-    } );    
-  } else {
-      //has been loaded before
-      document.getElementById("instructions").innerHTML = markdown.toHTML(inst[index]);
-  } 
-}
-
-function updateDisplay(index, filename){
-  hideAll();
-  document.title = lessonArray[index].title;
-  document.getElementById(lessonArray[index].divID).style.display = "block";
-  updateInstruction(index, filename);
-}
-//*****************THE INTRO FUNCTIONS**********************//
-function updateIntro() {
-  activeIndex = 0;
-  updateDisplay(activeIndex, lessonArray[activeIndex].divID);
-}
-
-//*****************THE GME API FUNCTIONS**********************//
-function updateGMEAPI() {
-  activeIndex = 1;
-  updateDisplay(activeIndex, lessonArray[activeIndex].divID);
-}
-
 //*****************THE API Key FUNCTIONS**********************//
-function updateAPIKey() {
-  activeIndex = 2;
-  updateDisplay(activeIndex, lessonArray[activeIndex].divID);
-}
-
 function testAPIKey() {
   var userKey = document.getElementById("input" + activeIndex).value;
   var $data = $("#output" + activeIndex);
@@ -352,11 +314,6 @@ function testAPIKey() {
 }
 
 //*****************THE Get Table FUNCTIONS**********************//
-function updateGetTable() {
-  activeIndex = 3;
-  updateDisplay(activeIndex, lessonArray[activeIndex].divID);
-}
-
 function testGetTable() {
   var userURL = document.getElementById("input" + activeIndex).value;
   var $data = $("#output" + activeIndex);
@@ -369,11 +326,6 @@ function testGetTable() {
   }
 }
 //*****************THE List Features FUNCTIONS**********************//
-function updateListFeatures() {
-  activeIndex = 4;
-  updateDisplay(activeIndex, lessonArray[activeIndex].divID);
-}
-
 function executeListInput(){
   var string = document.getElementById("input" + activeIndex).value;
   var address = trimLeft(string);
@@ -382,11 +334,6 @@ function executeListInput(){
 }
 
 //*****************THE Javascript FUNCTIONS**********************//
-function updateJavascript() {
-  activeIndex = 5;
-  updateDisplay(activeIndex, lessonArray[activeIndex].divID);
-}
-
 function testJQuery() {
   activeIndex = 5;
   var userString = document.getElementById("input" + activeIndex).value;
@@ -415,11 +362,6 @@ function testJQuery() {
 }
 
 //*****************THE Other Methods FUNCTIONS**********************//
-function updateOtherMethods(){
-  activeIndex = 6;
-  updateDisplay(activeIndex, lessonArray[activeIndex].divID);
-}
-
 function executeCurlInput(){
   var string = document.getElementById("input" + activeIndex).value;
   var address = trimLeft(string);
