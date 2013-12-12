@@ -79,32 +79,11 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   $("#title").css('font-size', 0.031*($("#title").height()+$("#title").width()));
   //INSTRUCTIONS
   $("#instructions").css('font-size', 0.018*($("#instructions").height()+$("#instructions").width()));
-  //INPUT
-   $(".text-input").css('font-size', 0.015*($(".text-input").height()+$(".text-input").width()));
-  //OUTPUT
-  $(".text-output").css('font-size', 0.010*($(".text-output").height()+$(".text-output").width()));
-  //PREV NEXT BUTTON
-  console.log($("#prev-button1-0").height());
-  //$(".prev-button").css('font-size', 0.18*($(".prev-button").height()+0.55*$(".prev-button").width()));
-  //$(".next-button").css('font-size', 0.18*($(".next-button").height()+0.55*$(".next-button").width())); 
-  //SUBMIT AND CLEAR BUTTONS
-  //$(".submit-button").css('font-size', 0.18*($(".submit-button").height()+$(".submit-button").width()));
-  //$(".clear-button").css('font-size', 0.18*($(".clear-button").height()+$(".clear-button").width()));
-  //set the initial page to be the introduction
+
   chapters[0].lessons[0].update();
 });
 
 function makeLessonDivs(){
-  /*
-  var body = document.getElementById("body"); 
-  for (var i = 0; i<lessonArray.length; i++){
-    var newLessonDiv = document.createElement("div");
-    newLessonDiv.id = lessonArray[i].divID;
-    newLessonDiv.class = "lesson";
-    body.appendChild(newLessonDiv);
-  }
-  */
-  
   var body = document.getElementById("body");
   for (var i = 0; i<chapters.length; i++){
 
@@ -160,6 +139,10 @@ function createInputOutput() {
       newOutput.className = "text-output"
       newOutput.id = "output" + i + "-" + j;
       lesson.appendChild(newOutput);
+        //INPUT
+      $("#input"+i+"-"+j).css('font-size', 0.015*($("#input"+i+"-"+j).height()+$("#input"+i+"-"+j).width()));
+      //OUTPUT
+      $("#output"+i+"-"+j).css('font-size', 0.010*($("#output"+i+"-"+j).height()+$("#output"+i+"-"+j).width()));
     }
   }
 }
@@ -182,6 +165,9 @@ function createPrevNext() {
       newNextButton.className = "next-button";
       newNextButton.value = "Next Lesson >"
       lesson.appendChild(newNextButton);
+
+      $("#prev-button"+i+"-"+j).css('font-size', 0.18*($("#prev-button"+i+"-"+j).height()+0.55*$("#prev-button"+i+"-"+j).width()));
+      $("#next-button"+i+"-"+j).css('font-size', 0.18*($("#next-button"+i+"-"+j).height()+0.55*$("#next-button"+i+"-"+j).width()));
     }
   }
 }
@@ -204,6 +190,19 @@ function createSubmitClear(){
       newClearButton.className = "clear-button";
       newClearButton.value = "Clear"
       lesson.appendChild(newClearButton);
+      var input = document.getElementById("input"+i+"-"+j);
+      newClearButton.onclick = function(){
+        input.value='';
+      }
+      lesson.appendChild(newClearButton);
+
+      //style the areas
+      var submitButtonElement = document.getElementById("submit-button" + i + "-" + j);
+      submitButtonStyle(submitButtonElement);
+      var clearButtonElement = document.getElementById("clear-button" + i + "-" + j);
+      clearButtonStyle(clearButtonElement);
+      $("#submit-button"+i+"-"+j).css('font-size', 0.20*($("#submit-button"+i+"-"+j).height()+$("#submit-button"+i+"-"+j).width()));
+      $("#clear-button"+i+"-"+j).css('font-size', 0.20*($("#clear-button"+i+"-"+j).height()+$("#clear-button"+i+"-"+j).width()));
     }
   }
 }
