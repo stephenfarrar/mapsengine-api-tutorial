@@ -17,7 +17,6 @@ Lesson.prototype.update = function() {
   hideAll();
   var me = this;
   document.title = this.title;
-  console.log(this);
   document.getElementById(this.divID).style.display = "block";
 
   if (!this.upToDate){
@@ -42,6 +41,7 @@ function Chapter(divID, lessons) {
   this.lessons = lessons;
 }
 
+//ARRAY OF CHAPTERS
 var chapters = [
   new Chapter('0.Introduction', [
     new Lesson('lesson0-intro', {title: 'Introduction'}),
@@ -55,6 +55,14 @@ var chapters = [
     new Lesson("lesson4-featureslist", {title: "List Features", submit: executeListInput})
   ])
 ];
+
+//ARRAY OF LESSONS
+var lessonArray = new Array();
+for (var i = 0; i<chapters.length; i++){
+  for (var j = 0; j<chapters[i].lessons.length; j++){
+    lessonArray.push(chapters[i].lessons[j]);
+  }
+}
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 google.maps.event.addDomListener(window, 'load', function initialize(){
@@ -81,19 +89,18 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
 });
 
 function makeLessonDivs(){
-  var body = document.getElementById("body");
+  var body = $("#body");
   for (var i = 0; i<chapters.length; i++){
-
-    var newChapterDiv = document.createElement("div");
-    newChapterDiv.id = chapters[i].divID;
-    newChapterDiv.class = "chapter";
-    body.appendChild(newChapterDiv);
+    var newChapterDiv = $("<div>")
+        .attr("id", chapters[i].divID)
+        .addClass("chapter");
+    body.append(newChapterDiv);
     var chapterDiv = document.getElementById(chapters[i].divID);
     for (var j = 0; j<chapters[i].lessons.length; j++){
       
       var newLessonDiv = document.createElement("div");
       newLessonDiv.id = chapters[i].lessons[j].divID;
-      newLessonDiv.class = "lesson";
+      newLessonDiv.className = "lesson";
       chapterDiv.appendChild(newLessonDiv);
     }
   }
@@ -128,12 +135,7 @@ function buttonStyle(buttonProp){
 
 //BLOCKING ALL DIVS AUTOMATICALLY
 function hideAll() {
-  for (var i=0; i<chapters.length; i++){
-    for (var j=0; j<chapters[i].length; j++) {
-      document.getElementById(chapters[i].lessons[j].divID).style.display = "none";
-    }
-    //document.getElementById(chapters[i].divID).style.display = "none";
-  }
+  $(".lesson").hide();
 }
 
 //Should be called initially to dynamically create divs for each lesson
@@ -143,12 +145,12 @@ function createInputOutput() {
       var lesson = document.getElementById(chapters[i].lessons[j].divID);
       //add the text area
       var newInput = document.createElement("textarea");
-      newInput.class = "text-input";
+      newInput.className = "text-input";
       newInput.id = "input" + i + "-" + j;
       lesson.appendChild(newInput);
       //add the output area
       var newOutput = document.createElement("div");
-      newOutput.class = "text-output"
+      newOutput.className = "text-output"
       newOutput.id = "output" + i + "-" + j;
       lesson.appendChild(newOutput);
       //style the areas
@@ -197,23 +199,46 @@ function outputStyle(element) {
 }
 
 function createPrevNext() {
-  for (var i = 0; i < chapters.length; i++) {
-    for (var j = 0; j < chapters[i].lessons.length; j++) {
-      var lesson = document.getElementById(chapters[i].lessons[j].divID);
+  var lessonIndex = 0;
+  chapters.forEach(function(chapter, i){
+    chapter.lessons.forEach(function(lesson, j){
+      var lessonDiv = document.getElementById(lesson.divID);
       //add prev button
       var newPrevButton = document.createElement("input");
       newPrevButton.type = "button";
       newPrevButton.id = "prev-button" + i + "-" + j;
-      newPrevButton.class = "prev-button";
-      newPrevButton.value = "< Prev Lesson"
-      lesson.appendChild(newPrevButton);
-      //add the output area
+      newPrevButton.className = "prev-button";
+      newPrevButton.value = "< Prev Lesson";
+      
+      if(lessonIndex === 0){
+        newPrevButton.onclick = function(){
+          lesson.update();
+        }
+      } else {
+        var prevLesson = lessonArray[lessonIndex-1];
+        newPrevButton.onclick = function(){
+          prevLesson.update();
+        }
+      }
+      
+      lessonDiv.appendChild(newPrevButton);
+      //add next button
       var newNextButton = document.createElement("input");
       newNextButton.type = "button";
       newNextButton.id = "next-button" + i + "-" + j;
-      newNextButton.class = "next-button";
-      newNextButton.value = "Next Lesson >"
-      lesson.appendChild(newNextButton);
+      newNextButton.className = "next-button";
+      newNextButton.value = "Next Lesson >";
+      if(lessonIndex === (lessonArray.length-1)){
+        newNextButton.onclick = function(){
+         lesson.update();
+        }
+      } else {
+        var nextLesson = lessonArray[lessonIndex+1];
+        newNextButton.onclick = function(){
+          nextLesson.update();
+        }
+      }
+      lessonDiv.appendChild(newNextButton);
 
       //style the areas
       var prevButtonElement = document.getElementById("prev-button" + i + "-" + j);
@@ -223,10 +248,20 @@ function createPrevNext() {
 
       $("#prev-button"+i+"-"+j).css('font-size', 0.18*($("#prev-button"+i+"-"+j).height()+0.55*$("#prev-button"+i+"-"+j).width()));
       $("#next-button"+i+"-"+j).css('font-size', 0.18*($("#next-button"+i+"-"+j).height()+0.55*$("#next-button"+i+"-"+j).width()));
+      lessonIndex++;
+    });
+  });
+}
+function prevLink(button, index){
+  if (index===0){
+    button.onclick = function(){
+      lessonArray[0].update();
+      console.log("yes");
     }
+  } else{
+    button.onclick = lessonArray[index-1].update();
   }
 }
-
 function prevButtonStyle(element) {
   element.style.display = 'block'
   element.style.position = 'absolute';
@@ -258,27 +293,30 @@ function nextButtonStyle(element) {
 }
 
 function createSubmitClear(){
-  for (var i = 0; i < chapters.length; i++) {
-    for (var j = 0; j < chapters[i].lessons.length; j++) {
-      var lesson = document.getElementById(chapters[i].lessons[j].divID);
+  chapters.forEach(function(chapter, i){
+    chapter.lessons.forEach(function(lesson, j){
+      var lessonDiv = document.getElementById(lesson.divID);
       //add submit button
       var newSubmitButton = document.createElement("input");
       newSubmitButton.type = "button";
       newSubmitButton.id = "submit-button" + i + "-" + j;
-      newSubmitButton.class = "submit-button";
+      newSubmitButton.className = "submit-button";
       newSubmitButton.value = "Submit"
-      lesson.appendChild(newSubmitButton);
+      newSubmitButton.onclick = function(){
+        chapters[i].lessons[j].submit()
+      };
+      lessonDiv.appendChild(newSubmitButton);
       //add clear button
       var newClearButton = document.createElement("input");
       newClearButton.type = "button";
       newClearButton.id = "clear-button" + i + "-" + j;
-      newClearButton.class = "clear-button";
+      newClearButton.className = "clear-button";
       newClearButton.value = "Clear";
       var input = document.getElementById("input"+i+"-"+j);
       newClearButton.onclick = function(){
         input.value='';
       }
-      lesson.appendChild(newClearButton);
+      lessonDiv.appendChild(newClearButton);
 
       //style the areas
       var submitButtonElement = document.getElementById("submit-button" + i + "-" + j);
@@ -287,8 +325,8 @@ function createSubmitClear(){
       clearButtonStyle(clearButtonElement);
       $("#submit-button"+i+"-"+j).css('font-size', 0.20*($("#submit-button"+i+"-"+j).height()+$("#submit-button"+i+"-"+j).width()));
       $("#clear-button"+i+"-"+j).css('font-size', 0.20*($("#clear-button"+i+"-"+j).height()+$("#clear-button"+i+"-"+j).width()));
-    }
-  }
+    });
+  });
 }
 
 function submitButtonStyle(element) {
@@ -320,9 +358,9 @@ function clearButtonStyle(element) {
   element.style.border = "1px solid #1155CC";
   element.style.zIndex = 2;
 }
-function getFeatures(addressString){
-  var $data = $("#output" + activeIndex);
-  var data = document.getElementById("output" + activeIndex);
+function getFeatures(addressString, outputId){
+  var $data = $("#" + outputId);
+  var data = document.getElementById(outputId);
   data.style.whiteSpace = 'pre';
   
   $data.empty();
@@ -362,8 +400,8 @@ function trimLeft(string){
 
 //*****************THE API Key FUNCTIONS**********************//
 function testAPIKey() {
-  var userKey = document.getElementById("input" + activeIndex).value;
-  var $data = $("#output" + activeIndex);
+  var userKey = document.getElementById("input1-0").value;
+  var $data = $("#output1-0");
   jQuery.ajax({
   url: 'https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=' + userKey,
     dataType: 'json',
@@ -380,8 +418,8 @@ function testAPIKey() {
 
 //*****************THE Get Table FUNCTIONS**********************//
 function testGetTable() {
-  var userURL = document.getElementById("input" + activeIndex).value;
-  var $data = $("#output" + activeIndex);
+  var userURL = document.getElementById("input2-0").value;
+  var $data = $("#output2-0");
   var expectedURL = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/?version=published&key=" + userAPIKey;
   if (userURL == expectedURL) {
     alert("Huzzah! Great work!")
@@ -392,9 +430,10 @@ function testGetTable() {
 }
 //*****************THE List Features FUNCTIONS**********************//
 function executeListInput(){
-  var string = document.getElementById("input" + activeIndex).value;
+  var string = document.getElementById("input2-1").value;
   var address = trimLeft(string);
-  getFeatures(address);
+  var outputId = "output2-1";
+  getFeatures(address, outputId);
   
 }
 
