@@ -17,7 +17,6 @@ Lesson.prototype.update = function() {
   hideAll();
   var me = this;
   document.title = this.title;
-  console.log(this);
   document.getElementById(this.divID).style.display = "block";
 
   if (!this.upToDate){
@@ -130,24 +129,11 @@ function makeButton(object){
   newButton.type = "button";
   newButton.id = object.divID+"button";
   newButton.value = object.title;
+  newButton.className = 'menu-button';
   newButton.onclick = function(){
     object.update();
   };
   button.appendChild(newButton);
-  button.appendChild(document.createElement("br"));
-  var buttonElement = document.getElementById(object.divID+"button");
-  buttonStyle(buttonElement);
-}
-
-function buttonStyle(buttonProp){
-  buttonProp.style.display = ' ';
-  buttonProp.style.backgroundColor = 'yellow';
-  buttonProp.style.width = '160px';
-  buttonProp.style.height = '40px';
-  buttonProp.style.fontSize = '20px';
-  buttonProp.style.opacity = 0.8;
-  buttonProp.style.fontWeight = 'bold';
-  buttonProp.style.color = 'black';
 }
 
 //BLOCKING ALL DIVS AUTOMATICALLY
@@ -156,7 +142,6 @@ function hideAll() {
     for (var j=0; j<chapters[i].length; j++) {
       document.getElementById(chapters[i].lessons[j].divID).style.display = "none";
     }
-    //document.getElementById(chapters[i].divID).style.display = "none";
   }
 }
 
@@ -167,51 +152,16 @@ function createInputOutput() {
       var lesson = document.getElementById(chapters[i].lessons[j].divID);
       //add the text area
       var newInput = document.createElement("textarea");
-      newInput.class = "text-input";
+      newInput.className = "text-input";
       newInput.id = "input" + i + "-" + j;
       lesson.appendChild(newInput);
       //add the output area
       var newOutput = document.createElement("div");
-      newOutput.class = "text-output"
+      newOutput.className = "text-output"
       newOutput.id = "output" + i + "-" + j;
       lesson.appendChild(newOutput);
-      //style the areas
-      var inputElement = document.getElementById("input" + i + "-" + j);
-      inputStyle(inputElement);
-      var outputElement = document.getElementById("output" + i + "-" + j);
-      outputStyle(outputElement)
     }
   }
-}
-
-function inputStyle(element) {
-  element.style.display = 'block'
-  element.style.position = 'absolute';
-  element.style.backgroundColor = '#FFFFFF';
-  element.style.color = 'black';
-  element.style.width = '39.75%';
-  element.style.height = '39.5%';
-  element.style.left = '23%';
-  element.style.top = '56%';
-  element.style.resize = 'none';
-  element.style.overflowY = 'scroll';
-  element.style.fontFamily = 'monospace';
-}
-
-function outputStyle(element) {
-  element.style.display = 'block'
-  element.style.position = 'absolute';
-  element.style.backgroundColor = '#2D2D2D';
-  element.style.color = 'white';
-  element.style.resize = 'none';
-  element.style.fontFamily = 'monospace';
-  element.style.padding = '1%';
-  element.style.width = '35%';
-  element.style.height = '85.9%';
-  element.style.left = '63%';
-  element.style.top = '10.75%';
-  element.style.overflowY = 'scroll';
-  element.style.zIndex = 3;
 }
 
 function createPrevNext() {
@@ -222,54 +172,18 @@ function createPrevNext() {
       var newPrevButton = document.createElement("input");
       newPrevButton.type = "button";
       newPrevButton.id = "prev-button" + i + "-" + j;
-      newPrevButton.class = "prev-button";
+      newPrevButton.className = "prev-button";
       newPrevButton.value = "< Prev Lesson"
       lesson.appendChild(newPrevButton);
       //add the output area
       var newNextButton = document.createElement("input");
       newNextButton.type = "button";
       newNextButton.id = "next-button" + i + "-" + j;
-      newNextButton.class = "next-button";
+      newNextButton.className = "next-button";
       newNextButton.value = "Next Lesson >"
       lesson.appendChild(newNextButton);
-
-      //style the areas
-      var prevButtonElement = document.getElementById("prev-button" + i + "-" + j);
-      prevButtonStyle(prevButtonElement);
-      var nextButtonElement = document.getElementById("next-button" + i + "-" + j);
-      nextButtonStyle(nextButtonElement);
     }
   }
-}
-
-function prevButtonStyle(element) {
-  element.style.display = 'block'
-  element.style.position = 'absolute';
-  element.style.backgroundColor = '#4D90FE';
-  element.style.color = 'white';
-  element.style.width = '8%';
-  element.style.height = '3%';
-  element.style.left = '23.5%';
-  element.style.top = '11.25%';
-  element.style.fontWeight = 'bold';
-  element.style.fontFamily = 'Arial regular';
-  element.style.border = "1px solid #1155CC";
-  element.style.zIndex = 2;
-}
-
-function nextButtonStyle(element) {
-  element.style.display = 'block'
-  element.style.position = 'absolute';
-  element.style.backgroundColor = '#4D90FE';
-  element.style.color = 'white';
-  element.style.width = '8%';
-  element.style.height = '3%';
-  element.style.left = '54.5%';
-  element.style.top = '11.25%';
-  element.style.fontWeight = 'bold';
-  element.style.fontFamily = 'Arial regular';
-  element.style.border = "1px solid #1155CC";
-  element.style.zIndex = 2;
 }
 
 function createSubmitClear(){
@@ -280,55 +194,20 @@ function createSubmitClear(){
       var newSubmitButton = document.createElement("input");
       newSubmitButton.type = "button";
       newSubmitButton.id = "submit-button" + i + "-" + j;
-      newSubmitButton.class = "submit-button";
+      newSubmitButton.className = "submit-button";
       newSubmitButton.value = "Submit"
       lesson.appendChild(newSubmitButton);
       //add clear button
       var newClearButton = document.createElement("input");
       newClearButton.type = "button";
       newClearButton.id = "clear-button" + i + "-" + j;
-      newClearButton.class = "clear-button";
+      newClearButton.className = "clear-button";
       newClearButton.value = "Clear"
       lesson.appendChild(newClearButton);
-
-      //style the areas
-      var submitButtonElement = document.getElementById("submit-button" + i + "-" + j);
-      submitButtonStyle(submitButtonElement);
-      var clearButtonElement = document.getElementById("clear-button" + i + "-" + j);
-      clearButtonStyle(clearButtonElement);
     }
   }
 }
 
-function submitButtonStyle(element) {
-  element.style.display = 'block'
-  element.style.position = 'absolute';
-  element.style.backgroundColor = '#4D90FE';
-  element.style.color = 'white';
-  element.style.width = '4%';
-  element.style.height = '3.2%';
-  element.style.left = '23.5%';
-  element.style.top = '96.5%';
-  element.style.fontWeight = 'bold';
-  element.style.fontFamily = 'Arial regular';
-  element.style.border = "1px solid #1155CC";
-  element.style.zIndex = 2;
-}
-
-function clearButtonStyle(element) {
-  element.style.display = 'block'
-  element.style.position = 'absolute';
-  element.style.backgroundColor = '#4D90FE';
-  element.style.color = 'white';
-  element.style.width = '4%';
-  element.style.height = '3.2%';
-  element.style.left = '28%';
-  element.style.top = '96.5%';
-  element.style.fontWeight = 'bold';
-  element.style.fontFamily = 'Arial regular';
-  element.style.border = "1px solid #1155CC";
-  element.style.zIndex = 2;
-}
 function getFeatures(addressString){
   var $data = $("#output" + activeIndex);
   var data = document.getElementById("output" + activeIndex);
