@@ -17,18 +17,18 @@ Lesson.prototype.update = function() {
   hideAll();
   var me = this;
   document.title = this.title;
-  document.getElementById(this.divID).style.display = "block";
+  $("#"+this.divID).css({display : "block"});
 
   if (!this.upToDate){
     //first time page loaded
     $.get(this.divID+".md", function(response){
-      document.getElementById("instructions").innerHTML = markdown.toHTML(response);
+      $("#instructions").html(markdown.toHTML(response));
       me.instructions = response;
       me.upToDate = true;
     } );    
   } else {
       //has been loaded before
-      document.getElementById("instructions").innerHTML = markdown.toHTML(this.instructions);
+      $("#instructions").html(markdown.toHTML(this.instructions));
   } 
 }
 
@@ -63,11 +63,12 @@ var chapters = [
 
 //ARRAY OF LESSONS
 var lessonArray = new Array();
-for (var i = 0; i<chapters.length; i++){
-  for (var j = 0; j<chapters[i].lessons.length; j++){
-    lessonArray.push(chapters[i].lessons[j]);
-  }
-}
+
+chapters.forEach(function(chapter){
+  chapter.lessons.forEach(function(lesson){
+    lessonArray.push(lesson);
+  });
+});
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 google.maps.event.addDomListener(window, 'load', function initialize(){
@@ -77,36 +78,37 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   createPrevNext();
   createSubmitClear();
 
-  for (var i=0; i<chapters.length; i++){
-    makeButton(chapters[i]);
-    for (var j=0; j<chapters[i].lessons.length; j++) {
-      makeButton(chapters[i].lessons[j]);
-    }
-  }
+  chapters.forEach(function(chapter){
+    makeButton(chapter);
+    chapter.lessons.forEach(function(lesson){
+      makeButton(lesson);
+    });
+  });
+
   //LOADING THE FONT SIZE ACCORDING TO WINDOW SIZES
    //TITLE
-  $("#title").css('font-size', 0.031*($("#title").height()+$("#title").width()));
+  $("#title").css({fontSize: 0.031*($("#title").height()+$("#title").width())});
   //INSTRUCTIONS
-  $("#instructions").css('font-size', 0.018*($("#instructions").height()+$("#instructions").width()));
+  $("#instructions").css({fontSize: 0.018*($("#instructions").height()+$("#instructions").width())});
 
   chapters[0].lessons[0].update();
 });
 
 function makeLessonDivs(){
   var body = $("#body");
-  for (var i = 0; i<chapters.length; i++){
-    var newChapterDiv = $("<div>")
-        .attr("id", chapters[i].divID)
+  chapters.forEach(function(chapter){
+     var newChapterDiv = $("<div>")
+        .attr("id", chapter.divID)
         .addClass("chapter");
     body.append(newChapterDiv);
-    var chapterDiv = $("#"+chapters[i].divID);
-    for (var j = 0; j<chapters[i].lessons.length; j++){
+    var chapterDiv = $("#"+chapter.divID);
+    chapter.lessons.forEach(function(lesson){
       var newLessonDiv = $("<div>")
-        .attr("id", chapters[i].lessons[j].divID)
+        .attr("id", lesson.divID)
         .addClass("lesson");
       chapterDiv.append(newLessonDiv);
-    }
-  }
+    });
+  });
 }
 
 function makeButton(object){
@@ -145,9 +147,9 @@ function createInputOutput() {
       lessonDiv.append(newOutput);
 
         //INPUT
-      $("#input"+i+"-"+j).css('font-size', 0.015*($("#input"+i+"-"+j).height()+$("#input"+i+"-"+j).width()));
+      $("#input"+i+"-"+j).css({fontSize: 0.015*($("#input"+i+"-"+j).height()+$("#input"+i+"-"+j).width())});
       //OUTPUT
-      $("#output"+i+"-"+j).css('font-size', 0.010*($("#output"+i+"-"+j).height()+$("#output"+i+"-"+j).width()));
+      $("#output"+i+"-"+j).css({fontSize: 0.010*($("#output"+i+"-"+j).height()+$("#output"+i+"-"+j).width())});
     });
   });
 
@@ -195,8 +197,8 @@ function createPrevNext() {
         });
       }
       lessonDiv.append(newNextButton);
-      $("#prev-button"+i+"-"+j).css('font-size', 0.18*($("#prev-button"+i+"-"+j).height()+0.55*$("#prev-button"+i+"-"+j).width()));
-      $("#next-button"+i+"-"+j).css('font-size', 0.18*($("#next-button"+i+"-"+j).height()+0.55*$("#next-button"+i+"-"+j).width()));
+      $("#prev-button"+i+"-"+j).css({fontSize: 0.18*($("#prev-button"+i+"-"+j).height()+0.55*$("#prev-button"+i+"-"+j).width())});
+      $("#next-button"+i+"-"+j).css({fontSize: 0.18*($("#next-button"+i+"-"+j).height()+0.55*$("#next-button"+i+"-"+j).width())});
       lessonIndex++;
     });
   });
@@ -229,16 +231,15 @@ function createSubmitClear(){
           $("#input"+i+"-"+j).val("");
         });
       lessonDiv.append(newClearButton);
-      $("#submit-button"+i+"-"+j).css('font-size', 0.20*($("#submit-button"+i+"-"+j).height()+$("#submit-button"+i+"-"+j).width()));
-      $("#clear-button"+i+"-"+j).css('font-size', 0.20*($("#clear-button"+i+"-"+j).height()+$("#clear-button"+i+"-"+j).width()));
+      $("#submit-button"+i+"-"+j).css({fontSize: 0.20*($("#submit-button"+i+"-"+j).height()+$("#submit-button"+i+"-"+j).width())});
+      $("#clear-button"+i+"-"+j).css({fontSize: 0.20*($("#clear-button"+i+"-"+j).height()+$("#clear-button"+i+"-"+j).width())});
     });
   });
 }
 
 function getFeatures(addressString, outputId){
   var $data = $("#" + outputId);
-  var data = document.getElementById(outputId);
-  data.style.whiteSpace = 'pre';
+  $data.css({ whiteSpace: 'pre' });
   
   $data.empty();
   jQuery.ajax({
@@ -277,7 +278,7 @@ function trimLeft(string){
 
 //*****************THE API Key FUNCTIONS**********************//
 function testAPIKey(i,j) {
-  var userKey = document.getElementById("input"+i+"-"+j).value;
+  var userKey = $("#input"+i+"-"+j).val();
   var $data = $("#output"+i+"-"+j);
   jQuery.ajax({
   url: 'https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=' + userKey,
@@ -295,7 +296,7 @@ function testAPIKey(i,j) {
 
 //*****************THE Get Table FUNCTIONS**********************//
 function testGetTable(i,j) {
-  var userURL = document.getElementById("input"+i+"-"+j).value;
+  var userURL = $("#input"+i+"-"+j).val();;
   var outputId = "output"+i+"-"+j;
   var $data = $("#output"+i+"-"+j);
   var expectedURL = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/?version=published&key=" + userAPIKey;
@@ -309,7 +310,7 @@ function testGetTable(i,j) {
 }
 //*****************THE List Features FUNCTIONS**********************//
 function executeListInput(i,j){
-  var string = document.getElementById("input"+i+"-"+j).value;
+  var string = $("#input"+i+"-"+j).val();;
   var address = trimLeft(string);
   var outputId = "output"+i+"-"+j;
   getFeatures(address, outputId);
