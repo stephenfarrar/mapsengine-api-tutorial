@@ -42,6 +42,11 @@ function Chapter(divID, options) {
   this.title = options.title;
 }
 
+Chapter.prototype.update = function() {
+  this.lessons[0].update();
+}
+
+//ARRAY OF CHAPTERS
 var chapters = [
   new Chapter('chapter0-intro', {title: '0.Introduction', lessons: [
     new Lesson('lesson0-intro', {title: 'Introduction'}),
@@ -56,8 +61,12 @@ var chapters = [
   ]})
 ];
 
-Chapter.prototype.update = function() {
-  this.lessons[0].update();
+//ARRAY OF LESSONS
+var lessonArray = new Array();
+for (var i = 0; i<chapters.length; i++){
+  for (var j = 0; j<chapters[i].lessons.length; j++){
+    lessonArray.push(chapters[i].lessons[j]);
+  }
 }
 
 //*****************THE GLOBAL FUNCTIONS**********************//
@@ -84,116 +93,151 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
 });
 
 function makeLessonDivs(){
-  var body = document.getElementById("body");
+  var body = $("#body");
   for (var i = 0; i<chapters.length; i++){
-
-    var newChapterDiv = document.createElement("div");
-    newChapterDiv.id = chapters[i].divID;
-    newChapterDiv.class = "chapter";
-    body.appendChild(newChapterDiv);
-    var chapterDiv = document.getElementById(chapters[i].divID);
+    var newChapterDiv = $("<div>")
+        .attr("id", chapters[i].divID)
+        .addClass("chapter");
+    body.append(newChapterDiv);
+    var chapterDiv = $("#"+chapters[i].divID);
     for (var j = 0; j<chapters[i].lessons.length; j++){
-      
-      var newLessonDiv = document.createElement("div");
-      newLessonDiv.id = chapters[i].lessons[j].divID;
-      newLessonDiv.class = "lesson";
-      chapterDiv.appendChild(newLessonDiv);
+      var newLessonDiv = $("<div>")
+        .attr("id", chapters[i].lessons[j].divID)
+        .addClass("lesson");
+      chapterDiv.append(newLessonDiv);
     }
   }
 }
 
 function makeButton(object){
-  var button = document.getElementById("buttons");
-  var newButton = document.createElement("input");
-  newButton.type = "button";
-  newButton.id = object.divID+"button";
-  newButton.value = object.title;
-  newButton.className = 'menu-button';
-  newButton.onclick = function(){
-    object.update();
-  };
-  button.appendChild(newButton);
+
+  var button = $("#buttons");
+  var newButton = $("<input>")
+    .attr("type", "button")
+    .attr("id", object.divID+"button")
+    .attr("value", object.title)
+    .addClass('menu-button')
+    .click(function(){
+      object.update();
+    });
+  button.append(newButton);
 }
 
 //BLOCKING ALL DIVS AUTOMATICALLY
 function hideAll() {
-  for (var i=0; i<chapters.length; i++){
-    for (var j=0; j<chapters[i].length; j++) {
-      document.getElementById(chapters[i].lessons[j].divID).style.display = "none";
-    }
-  }
+  $(".lesson").hide();
 }
 
 //Should be called initially to dynamically create divs for each lesson
 function createInputOutput() {
-  for (var i = 0; i < chapters.length; i++) {
-    for (var j = 0; j < chapters[i].lessons.length; j++) {
-      var lesson = document.getElementById(chapters[i].lessons[j].divID);
+  chapters.forEach(function(chapter, i){
+    chapter.lessons.forEach(function(lesson, j){
+      var lessonDiv = $("#"+lesson.divID);
       //add the text area
-      var newInput = document.createElement("textarea");
-      newInput.className = "text-input";
-      newInput.id = "input" + i + "-" + j;
-      lesson.appendChild(newInput);
+      var newInput = $("<textarea>")
+        .attr("id", "input" + i + "-" + j)
+        .addClass("text-input");
+      lessonDiv.append(newInput);
       //add the output area
-      var newOutput = document.createElement("div");
-      newOutput.className = "text-output"
-      newOutput.id = "output" + i + "-" + j;
-      lesson.appendChild(newOutput);
-    }
-  }
+      var newOutput = $("<textarea>")
+        .attr("id", "output" + i + "-" + j)
+        .addClass("text-output");
+      lessonDiv.append(newOutput);
+
+        //INPUT
+      $("#input"+i+"-"+j).css('font-size', 0.015*($("#input"+i+"-"+j).height()+$("#input"+i+"-"+j).width()));
+      //OUTPUT
+      $("#output"+i+"-"+j).css('font-size', 0.010*($("#output"+i+"-"+j).height()+$("#output"+i+"-"+j).width()));
+    });
+  });
+
 }
 
 function createPrevNext() {
-  for (var i = 0; i < chapters.length; i++) {
-    for (var j = 0; j < chapters[i].lessons.length; j++) {
-      var lesson = document.getElementById(chapters[i].lessons[j].divID);
+  var lessonIndex = 0;
+  chapters.forEach(function(chapter, i){
+    chapter.lessons.forEach(function(lesson, j){
+      var lessonDiv = $("#"+lesson.divID);
       //add prev button
-      var newPrevButton = document.createElement("input");
-      newPrevButton.type = "button";
-      newPrevButton.id = "prev-button" + i + "-" + j;
-      newPrevButton.className = "prev-button";
-      newPrevButton.value = "< Prev Lesson"
-      lesson.appendChild(newPrevButton);
-      //add the output area
-      var newNextButton = document.createElement("input");
-      newNextButton.type = "button";
-      newNextButton.id = "next-button" + i + "-" + j;
-      newNextButton.className = "next-button";
-      newNextButton.value = "Next Lesson >"
-      lesson.appendChild(newNextButton);
-    }
-  }
+      var newPrevButton = $("<input>")
+        .attr("type", "button")
+        .attr("id", "prev-button" + i + "-" + j)
+        .attr("value", "< Prev Lesson")
+        .addClass("prev-button");
+
+      if(lessonIndex === 0){
+        newPrevButton.click(function(){
+          lesson.update();
+        });
+      } else {
+        var prevLesson = lessonArray[lessonIndex-1];
+        newPrevButton.click(function(){
+          prevLesson.update();
+        });
+      }
+      lessonDiv.append(newPrevButton);
+
+      //add next button
+      var newNextButton = $("<input>")
+        .attr("type", "button")
+        .attr("id", "next-button" + i + "-" + j)
+        .attr("value", "Next Lesson >")
+        .addClass("next-button");
+
+      if(lessonIndex === (lessonArray.length-1)){
+        newNextButton.click(function(){
+          lesson.update();
+        });
+      } else {
+        var nextLesson = lessonArray[lessonIndex+1];
+        newNextButton.click(function(){
+          nextLesson.update();
+        });
+      }
+      lessonDiv.append(newNextButton);
+      $("#prev-button"+i+"-"+j).css('font-size', 0.18*($("#prev-button"+i+"-"+j).height()+0.55*$("#prev-button"+i+"-"+j).width()));
+      $("#next-button"+i+"-"+j).css('font-size', 0.18*($("#next-button"+i+"-"+j).height()+0.55*$("#next-button"+i+"-"+j).width()));
+      lessonIndex++;
+    });
+  });
 }
+
 
 function createSubmitClear(){
-  for (var i = 0; i < chapters.length; i++) {
-    for (var j = 0; j < chapters[i].lessons.length; j++) {
-      var lesson = document.getElementById(chapters[i].lessons[j].divID);
+  chapters.forEach(function(chapter, i){
+    chapter.lessons.forEach(function(lesson, j){
+      var lessonDiv = $("#"+lesson.divID);
       //add submit button
-      var newSubmitButton = document.createElement("input");
-      newSubmitButton.type = "button";
-      newSubmitButton.id = "submit-button" + i + "-" + j;
-      newSubmitButton.className = "submit-button";
-      newSubmitButton.value = "Submit"
-      lesson.appendChild(newSubmitButton);
+
+      var newSubmitButton = $("<input>")
+        .attr("type", "button")
+        .attr("id", "submit-button" + i + "-" + j)
+        .attr("value", "Submit")
+        .addClass("submit-button")
+        .click(function(){
+          lesson.submit(i,j); 
+        });
+      lessonDiv.append(newSubmitButton);
+
       //add clear button
-      var newClearButton = document.createElement("input");
-      newClearButton.type = "button";
-      newClearButton.id = "clear-button" + i + "-" + j;
-      newClearButton.className = "clear-button";
-      newClearButton.value = "Clear";
-      var input = document.getElementById("input"+i+"-"+j);
-      newClearButton.onclick = function(){
-        input.value='';
-      }
-      lesson.appendChild(newClearButton);
-    }
-  }
+      var newClearButton = $("<input>")
+        .attr("type", "button")
+        .attr("id", "clear-button" + i + "-" + j)
+        .attr("value", "Clear")
+        .addClass("clear-button")
+        .click(function(){
+          $("#input"+i+"-"+j).val("");
+        });
+      lessonDiv.append(newClearButton);
+      $("#submit-button"+i+"-"+j).css('font-size', 0.20*($("#submit-button"+i+"-"+j).height()+$("#submit-button"+i+"-"+j).width()));
+      $("#clear-button"+i+"-"+j).css('font-size', 0.20*($("#clear-button"+i+"-"+j).height()+$("#clear-button"+i+"-"+j).width()));
+    });
+  });
 }
 
-function getFeatures(addressString){
-  var $data = $("#output" + activeIndex);
-  var data = document.getElementById("output" + activeIndex);
+function getFeatures(addressString, outputId){
+  var $data = $("#" + outputId);
+  var data = document.getElementById(outputId);
   data.style.whiteSpace = 'pre';
   
   $data.empty();
@@ -232,9 +276,9 @@ function trimLeft(string){
 }
 
 //*****************THE API Key FUNCTIONS**********************//
-function testAPIKey() {
-  var userKey = document.getElementById("input" + activeIndex).value;
-  var $data = $("#output" + activeIndex);
+function testAPIKey(i,j) {
+  var userKey = document.getElementById("input"+i+"-"+j).value;
+  var $data = $("#output"+i+"-"+j);
   jQuery.ajax({
   url: 'https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=' + userKey,
     dataType: 'json',
@@ -250,95 +294,23 @@ function testAPIKey() {
 }
 
 //*****************THE Get Table FUNCTIONS**********************//
-function testGetTable() {
-  var userURL = document.getElementById("input" + activeIndex).value;
-  var $data = $("#output" + activeIndex);
+function testGetTable(i,j) {
+  var userURL = document.getElementById("input"+i+"-"+j).value;
+  var outputId = "output"+i+"-"+j;
+  var $data = $("#output"+i+"-"+j);
   var expectedURL = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/?version=published&key=" + userAPIKey;
+  console.log(expectedURL);
   if (userURL == expectedURL) {
     alert("Huzzah! Great work!")
-    getFeatures("https://www.googleapis.com/mapsengine/search_tt/tables/15474835347274181123-16143158689603361093/?version=published&key=" + userAPIKey);
+    getFeatures("https://www.googleapis.com/mapsengine/search_tt/tables/15474835347274181123-16143158689603361093/?version=published&key=" + userAPIKey, outputId);
   } else {
     $data.html("Oh no! Something isn't quite right. Try again. Hint: Make sure you entered a valid API Key in the previous exercise!");
   }
 }
 //*****************THE List Features FUNCTIONS**********************//
-function executeListInput(){
-  var string = document.getElementById("input" + activeIndex).value;
+function executeListInput(i,j){
+  var string = document.getElementById("input"+i+"-"+j).value;
   var address = trimLeft(string);
-  getFeatures(address);
-  
-}
-
-//*****************THE Javascript FUNCTIONS**********************//
-function testJQuery() {
-  activeIndex = 5;
-  var userString = document.getElementById("input" + activeIndex).value;
-  var $data = $("#output" + activeIndex)
-  console.log(userString);
-  var expectedInput = "jQuery.ajax({\n  url: 'https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=" + userAPIKey + "'," +
-  "\n  dataType: 'json'," +
-  "\n  success: function(resource) {" +
-  "\n    console.log(JSON.stringify(resource, null, 4));" +
-  "\n  }," +
-  "\n  error: function(response) {" +
-  "\n    console.log('Error: ', response.error.errors[0]);" +
-  "\n  }\n});";
-  console.log(expectedInput);
-  if (userString == expectedInput) {
-    //user input is correct
-    getFeatures ("https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=" + userAPIKey);
-  } else {
-    //user input is incorrect
-    $data.html("Sorry, your input is not correct. Please check that you have the following:<ul><li>Make sure you have entered a valid API Key in a previous exercise!</li>" +
-    "<li>Request is correctly indented using TWO spaces</li>" +
-    "<li>URL is:'https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=" + userAPIKey + 
-    "', including '' characters</li><li>There are no comments in your code.</li><li>For this exercise, make sure your success and error handling is the same as in the example.</li></ul>");
-  }
-
-}
-
-//*****************THE Other Methods FUNCTIONS**********************//
-function executeCurlInput(){
-  var string = document.getElementById("input" + activeIndex).value;
-  var address = trimLeft(string);
-  getFeatures(address);
-
-  /*
-  //the user has to type curl
-  if (string.length<=(i+3) ||string[i]!== 'c' || string[i+1]!=='u' || string[i+2]!=='r' || string[i+3]!=='l'){
-    alert("You entered wrong command-line. See the tutorial again.");
-  } else {
-    i = i+4;
-    //there should be space after the curl
-    if (string.length == i || string[i]!== ' ') {
-      alert("You entered wrong command-line. See the tutorial again.");
-    } else {
-      i = i+1;
-      for (; i<string.length; i++){
-        if(string[i]!== ' '){
-          break;
-        }
-      }
-      //there should be " after the curl command, and there should be something after that
-      if(string.length == i || string.length == i+1 || string[i]!== '\"'){
-        alert("You entered wrong command-line. See the tutorial again.");
-      } else {
-        var address="";
-        i = i+1;
-        for(; i<string.length; i++){
-          if(string[i] == '\"' || string[i] == ' '){
-            break;
-          }
-          address += string[i];
-        }
-        //if not closing the "
-        if (string[i] !== '\"'){
-          alert("You entered wrong command-line. See the tutorial again.");
-        } else {
-          getFeatures(address);
-        }
-      }
-    }
-  }
-  */
+  var outputId = "output"+i+"-"+j;
+  getFeatures(address, outputId);
 }
