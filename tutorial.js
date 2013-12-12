@@ -38,32 +38,37 @@ Lesson.prototype.submit = function() {
   this.update();
 };
 
-function Chapter(divID, lessons) {
+function Chapter(divID, options) {
   this.divID = divID;
-  this.lessons = lessons;
+  this.lessons = options.lessons;
+  this.title = options.title;
 }
 
 var chapters = [
-  new Chapter('0.Introduction', [
+  new Chapter('chapter0-intro', {title: '0.Introduction', lessons: [
     new Lesson('lesson1-intro', {title: 'Introduction'}),
     new Lesson('lesson1-gmeapi', {title: 'GME API'})
-  ]),
-  new Chapter('I.Registration', [
+  ]}),
+  new Chapter('chapter1-registration', {title: 'I.Registration', lessons: [
     new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey})
-  ]),
-  new Chapter('II.Reading Public Data', [
+  ]}),
+  new Chapter('chapter2-read', {title: 'II.Reading Public Data', lessons: [
     new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable}),
     new Lesson("lesson4-featureslist", {title: "List Features", submit: executeListInput})
-  ])
+  ]})
 ];
+
+Chapter.prototype.update = function() {
+  this.lessons[0].update();
+}
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 google.maps.event.addDomListener(window, 'load', function initialize(){
   //CREATING BUTTONS
   for (var i=0; i<chapters.length; i++){
-    makeButton(chapters[i].divID, chapters[i].divID, chapters[i].lessons[0].update)
+    makeButton(chapters[i]);
     for (var j=0; j<chapters[i].length; j++) {
-      makeButton(chapters[i].lessons[j].divID, chapters[i].lessons[j].title, chapters[i].lessons[j].update);
+      makeButton(chapters[i].lessons[j]);
     }
   }
   makeLessonDivs();
@@ -114,18 +119,18 @@ function makeLessonDivs(){
 }
 
 
-function makeButton(id, title, update){
+function makeButton(object){
   var button = document.getElementById("buttons");
   var newButton = document.createElement("input");
   newButton.type = "button";
-  newButton.id = id+"button";
-  newButton.value = title;
+  newButton.id = object.divID+"button";
+  newButton.value = object.title;
   newButton.onclick = function(){
-    update();
+    object.update();
   };
   button.appendChild(newButton);
   button.appendChild(document.createElement("br"));
-  var buttonElement = document.getElementById(id+"button");
+  var buttonElement = document.getElementById(object.divID+"button");
   buttonStyle(buttonElement);
 }
 
