@@ -17,7 +17,6 @@ Lesson.prototype.update = function() {
   hideAll();
   var me = this;
   document.title = this.title;
-  console.log(this);
   document.getElementById(this.divID).style.display = "block";
 
   if (!this.upToDate){
@@ -37,38 +36,42 @@ Lesson.prototype.submit = function() {
   this.update();
 };
 
-function Chapter(divID, lessons) {
+function Chapter(divID, options) {
   this.divID = divID;
-  this.lessons = lessons;
+  this.lessons = options.lessons;
+  this.title = options.title;
 }
 
 var chapters = [
-  new Chapter('0.Introduction', [
+  new Chapter('chapter0-intro', {title: '0.Introduction', lessons: [
     new Lesson('lesson0-intro', {title: 'Introduction'}),
     new Lesson('lesson1-gmeapi', {title: 'GME API'})
-  ]),
-  new Chapter('I.Registration', [
+  ]}),
+  new Chapter('chapter1-registration', {title: 'I.Registration', lessons: [
     new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey})
-  ]),
-  new Chapter('II.Reading Public Data', [
+  ]}),
+  new Chapter('chapter2-read', {title: 'II.Reading Public Data', lessons: [
     new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable}),
     new Lesson("lesson4-featureslist", {title: "List Features", submit: executeListInput})
-  ])
+  ]})
 ];
+
+Chapter.prototype.update = function() {
+  this.lessons[0].update();
+}
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 google.maps.event.addDomListener(window, 'load', function initialize(){
   //CREATING BUTTONS
-  
   makeLessonDivs();
   createInputOutput();
   createPrevNext();
   createSubmitClear();
 
   for (var i=0; i<chapters.length; i++){
-    makeButton(chapters[i].divID, chapters[i].divID, chapters[i].lessons[0])
+    makeButton(chapters[i]);
     for (var j=0; j<chapters[i].lessons.length; j++) {
-      makeButton(chapters[i].lessons[j].divID, chapters[i].lessons[j].title, chapters[i].lessons[j]);
+      makeButton(chapters[i].lessons[j]);
     }
   }
   //LOADING THE FONT SIZE ACCORDING TO WINDOW SIZES
@@ -99,31 +102,17 @@ function makeLessonDivs(){
   }
 }
 
-
-function makeButton(id, title, lesson){
+function makeButton(object){
   var button = document.getElementById("buttons");
   var newButton = document.createElement("input");
   newButton.type = "button";
-  newButton.id = id+"button";
-  newButton.value = title;
+  newButton.id = object.divID+"button";
+  newButton.value = object.title;
+  newButton.className = 'menu-button';
   newButton.onclick = function(){
-    lesson.update();
+    object.update();
   };
   button.appendChild(newButton);
-  button.appendChild(document.createElement("br"));
-  var buttonElement = document.getElementById(id+"button");
-  buttonStyle(buttonElement);
-}
-
-function buttonStyle(buttonProp){
-  buttonProp.style.display = ' ';
-  buttonProp.style.backgroundColor = 'yellow';
-  buttonProp.style.width = '160px';
-  buttonProp.style.height = '40px';
-  buttonProp.style.fontSize = '20px';
-  buttonProp.style.opacity = 0.8;
-  buttonProp.style.fontWeight = 'bold';
-  buttonProp.style.color = 'black';
 }
 
 //BLOCKING ALL DIVS AUTOMATICALLY
@@ -132,7 +121,6 @@ function hideAll() {
     for (var j=0; j<chapters[i].length; j++) {
       document.getElementById(chapters[i].lessons[j].divID).style.display = "none";
     }
-    //document.getElementById(chapters[i].divID).style.display = "none";
   }
 }
 
@@ -143,57 +131,16 @@ function createInputOutput() {
       var lesson = document.getElementById(chapters[i].lessons[j].divID);
       //add the text area
       var newInput = document.createElement("textarea");
-      newInput.class = "text-input";
+      newInput.className = "text-input";
       newInput.id = "input" + i + "-" + j;
       lesson.appendChild(newInput);
       //add the output area
       var newOutput = document.createElement("div");
-      newOutput.class = "text-output"
+      newOutput.className = "text-output"
       newOutput.id = "output" + i + "-" + j;
       lesson.appendChild(newOutput);
-      //style the areas
-      var inputElement = document.getElementById("input" + i + "-" + j);
-      inputStyle(inputElement);
-      var outputElement = document.getElementById("output" + i + "-" + j);
-      outputStyle(outputElement)
-
-        //INPUT
-      $("#input"+i+"-"+j).css('font-size', 0.015*($("#input"+i+"-"+j).height()+$("#input"+i+"-"+j).width()));
-      //OUTPUT
-      $("#output"+i+"-"+j).css('font-size', 0.010*($("#output"+i+"-"+j).height()+$("#output"+i+"-"+j).width()));
-
     }
   }
-}
-
-function inputStyle(element) {
-  element.style.display = 'block'
-  element.style.position = 'absolute';
-  element.style.backgroundColor = '#FFFFFF';
-  element.style.color = 'black';
-  element.style.width = '39.75%';
-  element.style.height = '39.5%';
-  element.style.left = '23%';
-  element.style.top = '56%';
-  element.style.resize = 'none';
-  element.style.overflowY = 'scroll';
-  element.style.fontFamily = 'monospace';
-}
-
-function outputStyle(element) {
-  element.style.display = 'block'
-  element.style.position = 'absolute';
-  element.style.backgroundColor = '#2D2D2D';
-  element.style.color = 'white';
-  element.style.resize = 'none';
-  element.style.fontFamily = 'monospace';
-  element.style.padding = '1%';
-  element.style.width = '35%';
-  element.style.height = '85.9%';
-  element.style.left = '63%';
-  element.style.top = '10.75%';
-  element.style.overflowY = 'scroll';
-  element.style.zIndex = 3;
 }
 
 function createPrevNext() {
@@ -204,57 +151,18 @@ function createPrevNext() {
       var newPrevButton = document.createElement("input");
       newPrevButton.type = "button";
       newPrevButton.id = "prev-button" + i + "-" + j;
-      newPrevButton.class = "prev-button";
+      newPrevButton.className = "prev-button";
       newPrevButton.value = "< Prev Lesson"
       lesson.appendChild(newPrevButton);
       //add the output area
       var newNextButton = document.createElement("input");
       newNextButton.type = "button";
       newNextButton.id = "next-button" + i + "-" + j;
-      newNextButton.class = "next-button";
+      newNextButton.className = "next-button";
       newNextButton.value = "Next Lesson >"
       lesson.appendChild(newNextButton);
-
-      //style the areas
-      var prevButtonElement = document.getElementById("prev-button" + i + "-" + j);
-      prevButtonStyle(prevButtonElement);
-      var nextButtonElement = document.getElementById("next-button" + i + "-" + j);
-      nextButtonStyle(nextButtonElement);
-
-      $("#prev-button"+i+"-"+j).css('font-size', 0.18*($("#prev-button"+i+"-"+j).height()+0.55*$("#prev-button"+i+"-"+j).width()));
-      $("#next-button"+i+"-"+j).css('font-size', 0.18*($("#next-button"+i+"-"+j).height()+0.55*$("#next-button"+i+"-"+j).width()));
     }
   }
-}
-
-function prevButtonStyle(element) {
-  element.style.display = 'block'
-  element.style.position = 'absolute';
-  element.style.backgroundColor = '#4D90FE';
-  element.style.color = 'white';
-  element.style.width = '8%';
-  element.style.height = '3%';
-  element.style.left = '23.5%';
-  element.style.top = '11.25%';
-  element.style.fontWeight = 'bold';
-  element.style.fontFamily = 'Arial regular';
-  element.style.border = "1px solid #1155CC";
-  element.style.zIndex = 2;
-}
-
-function nextButtonStyle(element) {
-  element.style.display = 'block'
-  element.style.position = 'absolute';
-  element.style.backgroundColor = '#4D90FE';
-  element.style.color = 'white';
-  element.style.width = '8%';
-  element.style.height = '3%';
-  element.style.left = '54.5%';
-  element.style.top = '11.25%';
-  element.style.fontWeight = 'bold';
-  element.style.fontFamily = 'Arial regular';
-  element.style.border = "1px solid #1155CC";
-  element.style.zIndex = 2;
 }
 
 function createSubmitClear(){
@@ -265,61 +173,24 @@ function createSubmitClear(){
       var newSubmitButton = document.createElement("input");
       newSubmitButton.type = "button";
       newSubmitButton.id = "submit-button" + i + "-" + j;
-      newSubmitButton.class = "submit-button";
+      newSubmitButton.className = "submit-button";
       newSubmitButton.value = "Submit"
       lesson.appendChild(newSubmitButton);
       //add clear button
       var newClearButton = document.createElement("input");
       newClearButton.type = "button";
       newClearButton.id = "clear-button" + i + "-" + j;
-      newClearButton.class = "clear-button";
+      newClearButton.className = "clear-button";
       newClearButton.value = "Clear";
       var input = document.getElementById("input"+i+"-"+j);
       newClearButton.onclick = function(){
         input.value='';
       }
       lesson.appendChild(newClearButton);
-
-      //style the areas
-      var submitButtonElement = document.getElementById("submit-button" + i + "-" + j);
-      submitButtonStyle(submitButtonElement);
-      var clearButtonElement = document.getElementById("clear-button" + i + "-" + j);
-      clearButtonStyle(clearButtonElement);
-      $("#submit-button"+i+"-"+j).css('font-size', 0.20*($("#submit-button"+i+"-"+j).height()+$("#submit-button"+i+"-"+j).width()));
-      $("#clear-button"+i+"-"+j).css('font-size', 0.20*($("#clear-button"+i+"-"+j).height()+$("#clear-button"+i+"-"+j).width()));
     }
   }
 }
 
-function submitButtonStyle(element) {
-  element.style.display = 'block'
-  element.style.position = 'absolute';
-  element.style.backgroundColor = '#4D90FE';
-  element.style.color = 'white';
-  element.style.width = '4%';
-  element.style.height = '3.2%';
-  element.style.left = '23.5%';
-  element.style.top = '96.5%';
-  element.style.fontWeight = 'bold';
-  element.style.fontFamily = 'Arial regular';
-  element.style.border = "1px solid #1155CC";
-  element.style.zIndex = 2;
-}
-
-function clearButtonStyle(element) {
-  element.style.display = 'block'
-  element.style.position = 'absolute';
-  element.style.backgroundColor = '#4D90FE';
-  element.style.color = 'white';
-  element.style.width = '4%';
-  element.style.height = '3.2%';
-  element.style.left = '28%';
-  element.style.top = '96.5%';
-  element.style.fontWeight = 'bold';
-  element.style.fontFamily = 'Arial regular';
-  element.style.border = "1px solid #1155CC";
-  element.style.zIndex = 2;
-}
 function getFeatures(addressString){
   var $data = $("#output" + activeIndex);
   var data = document.getElementById("output" + activeIndex);
