@@ -195,12 +195,6 @@ function createSubmitClear(){
         input.value='';
       }
       lesson.appendChild(newClearButton);
-
-      //style the areas
-      var submitButtonElement = document.getElementById("submit-button" + i + "-" + j);
-      submitButtonStyle(submitButtonElement);
-      var clearButtonElement = document.getElementById("clear-button" + i + "-" + j);
-      clearButtonStyle(clearButtonElement);
       $("#submit-button"+i+"-"+j).css('font-size', 0.20*($("#submit-button"+i+"-"+j).height()+$("#submit-button"+i+"-"+j).width()));
       $("#clear-button"+i+"-"+j).css('font-size', 0.20*($("#clear-button"+i+"-"+j).height()+$("#clear-button"+i+"-"+j).width()));
     }
