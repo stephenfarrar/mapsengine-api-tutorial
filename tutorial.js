@@ -70,9 +70,9 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   createSubmitClear();
 
   for (var i=0; i<chapters.length; i++){
-    makeButton(chapters[i].divID, chapters[i].divID, chapters[i].lessons[0])
+    makeButton(chapters[i]);
     for (var j=0; j<chapters[i].lessons.length; j++) {
-      makeButton(chapters[i].lessons[j].divID, chapters[i].lessons[j].title, chapters[i].lessons[j]);
+      makeButton(chapters[i].lessons[j]);
     }
   }
   //LOADING THE FONT SIZE ACCORDING TO WINDOW SIZES
