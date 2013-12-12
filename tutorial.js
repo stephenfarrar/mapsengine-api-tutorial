@@ -139,10 +139,6 @@ function createInputOutput() {
       newOutput.className = "text-output"
       newOutput.id = "output" + i + "-" + j;
       lesson.appendChild(newOutput);
-        //INPUT
-      $("#input"+i+"-"+j).css('font-size', 0.015*($("#input"+i+"-"+j).height()+$("#input"+i+"-"+j).width()));
-      //OUTPUT
-      $("#output"+i+"-"+j).css('font-size', 0.010*($("#output"+i+"-"+j).height()+$("#output"+i+"-"+j).width()));
     }
   }
 }
@@ -165,9 +161,6 @@ function createPrevNext() {
       newNextButton.className = "next-button";
       newNextButton.value = "Next Lesson >"
       lesson.appendChild(newNextButton);
-
-      $("#prev-button"+i+"-"+j).css('font-size', 0.18*($("#prev-button"+i+"-"+j).height()+0.55*$("#prev-button"+i+"-"+j).width()));
-      $("#next-button"+i+"-"+j).css('font-size', 0.18*($("#next-button"+i+"-"+j).height()+0.55*$("#next-button"+i+"-"+j).width()));
     }
   }
 }
@@ -189,14 +182,11 @@ function createSubmitClear(){
       newClearButton.id = "clear-button" + i + "-" + j;
       newClearButton.className = "clear-button";
       newClearButton.value = "Clear"
-      lesson.appendChild(newClearButton);
       var input = document.getElementById("input"+i+"-"+j);
       newClearButton.onclick = function(){
         input.value='';
       }
       lesson.appendChild(newClearButton);
-      $("#submit-button"+i+"-"+j).css('font-size', 0.20*($("#submit-button"+i+"-"+j).height()+$("#submit-button"+i+"-"+j).width()));
-      $("#clear-button"+i+"-"+j).css('font-size', 0.20*($("#clear-button"+i+"-"+j).height()+$("#clear-button"+i+"-"+j).width()));
     }
   }
 }
