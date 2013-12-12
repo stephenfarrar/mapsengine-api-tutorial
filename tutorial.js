@@ -7,9 +7,12 @@ var winHeight = $(window).height();
 var userAPIKey = "";
 
 //object to store lesson information
-function Lesson(title, divID) {
-  this.title = title;
+function Lesson(divID, options) {
   this.divID = divID;
+  this.title = options.title;
+  if (options.submit) {
+    this.submit = options.submit;
+  }
 }
 
 Lesson.prototype.update = function() {
@@ -21,8 +24,6 @@ Lesson.prototype.update = function() {
   if (!this.upToDate){
     //first time page loaded
     $.get(this.divID+".md", function(response){
-      //console.log(response);
-      //preview.innerHTML = markdown.toHTML(response);
       document.getElementById("instructions").innerHTML = markdown.toHTML(response);
       me.instructions = response;
       me.upToDate = true;
@@ -37,34 +38,33 @@ Lesson.prototype.submit = function() {
   this.update();
 };
 
-//THE LESSONS
-var lesson0 = new Lesson("Introduction", "lesson0-intro");
-var lesson1 = new Lesson("GME API", "lesson1-gmeapi");
-var lesson2 = new Lesson("API Key", "lesson2-apikey");
-lesson2.submit = testAPIKey;
-var lesson3 = new Lesson("Get Table", "lesson3-gettable");
-lesson3.submit = testGetTable;
-var lesson4 = new Lesson("List Features", "lesson4-featureslist");
-lesson4.submit = executeListInput;
-var lesson5 = new Lesson("Javascript", "lesson5-javascript");
-lesson5.submit = testJQuery;
-var lesson6 = new Lesson("Other Methods", "lesson6-othermethods");
-lesson6.submit = executeCurlInput;
+function Chapter(divID, lessons) {
+  this.divID = divID;
+  this.lessons = lessons;
+}
 
-//The Lesson Array
-var lessonArray = [lesson0, lesson1, lesson2, lesson3, lesson4, lesson5, lesson6];
-
-//The color array
-var color = ['red', 'blue', 'purple'];
-
-//Finding objects with class "lesson"
-//var lessonsClass = document.getElementsByClassName("lesson");
+var chapters = [
+  new Chapter('0.Introduction', [
+    new Lesson('lesson1-intro', {title: 'Introduction'}),
+    new Lesson('lesson1-gmeapi', {title: 'GME API'})
+  ]),
+  new Chapter('I.Registration', [
+    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey})
+  ]),
+  new Chapter('II.Reading Public Data', [
+    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable}),
+    new Lesson("lesson4-featureslist", {title: "List Features", submit: executeListInput})
+  ])
+];
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 google.maps.event.addDomListener(window, 'load', function initialize(){
   //CREATING BUTTONS
-  for (var i=0; i<lessonArray.length; i++){
-    makeButton(lessonArray[i].divID, i);
+  for (var i=0; i<chapters.length; i++){
+    makeButton(chapters[i].divID, chapters[i].divID, chapters[i].lessons[0].update)
+    for (var j=0; j<chapters[i].length; j++) {
+      makeButton(chapters[i].lessons[j].divID, chapters[i].lessons[j].title, chapters[i].lessons[j].update);
+    }
   }
   makeLessonDivs();
   createInputOutput();
@@ -83,10 +83,11 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   $("#prev-button").css('font-size', 0.18*($("#prev-button").height()+0.55*$("#prev-button").width()));
   $("#next-button").css('font-size', 0.18*($("#next-button").height()+0.55*$("#next-button").width())); 
   //set the initial page to be the introduction
-  lesson0.update();
+  chapters[0].lessons[0].update();
 });
 
 function makeLessonDivs(){
+  /*
   var body = document.getElementById("body"); 
   for (var i = 0; i<lessonArray.length; i++){
     var newLessonDiv = document.createElement("div");
@@ -94,8 +95,8 @@ function makeLessonDivs(){
     newLessonDiv.class = "lesson";
     body.appendChild(newLessonDiv);
   }
-
-  /*
+  */
+  
   var body = document.getElementById("body");
   for (var i = 0; i<chapters.length; i++){
     var newChapterDiv = document.createElement("div");
@@ -110,25 +111,25 @@ function makeLessonDivs(){
       chapterDiv.appendChild(newLessonDiv);
     }
   }
-  */
 }
 
-function makeButton(string, i){
+
+function makeButton(id, title, update){
   var button = document.getElementById("buttons");
   var newButton = document.createElement("input");
   newButton.type = "button";
-  newButton.id = string+"button";
-  newButton.value = lessonArray[i].title;
+  newButton.id = id+"button";
+  newButton.value = title;
   newButton.onclick = function(){
-    lessonArray[i].update();
+    update();
   };
   button.appendChild(newButton);
   button.appendChild(document.createElement("br"));
-  var buttonElement = document.getElementById(string+"button");
-  buttonStyle(buttonElement, i);
+  var buttonElement = document.getElementById(id+"button");
+  buttonStyle(buttonElement);
 }
 
-function buttonStyle(buttonProp, i){
+function buttonStyle(buttonProp){
   buttonProp.style.display = ' ';
   buttonProp.style.backgroundColor = 'yellow';
   buttonProp.style.width = '160px';
@@ -137,70 +138,54 @@ function buttonStyle(buttonProp, i){
   buttonProp.style.opacity = 0.8;
   buttonProp.style.fontWeight = 'bold';
   buttonProp.style.color = 'black';
-  buttonProp.onmouseover = function(){  
-    buttonProp.style.backgroundColor = color[i%color.length];
-    buttonProp.style.color = 'white';
-  }
-  buttonProp.onmouseout = function(){
-    buttonProp.style.backgroundColor = 'yellow';
-    buttonProp.style.color = 'black';
-  }
 }
 
-/*
-function clear(){
-  for (var i=0; i<lessonArray.length; i++){
-    if(lessonArray[i].title === document.title){
-      break;
-    }
-  }
-  $("#output"+i).empty();
-}
-*/
 //BLOCKING ALL DIVS AUTOMATICALLY
 function hideAll() {
-  for (var i=0; i<lessonArray.length; i++){
-    document.getElementById(lessonArray[i].divID).style.display = "none";
+  for (var i=0; i<chapters.length; i++){
+    for (var j=0; j<chapters[i].length; j++) {
+      document.getElementById(chapters[i].lessons[j].divID).style.display = "none";
+    }
+    document.getElementById(chapters[i].divID).style.display = "none";
   }
 }
 
 //Should be called initially to dynamically create divs for each lesson
 function createInputOutput() {
-  for (var i = 0; i < lessonArray.length; i++) {
-    var lesson = document.getElementById(lessonArray[i].divID);
-    //add the text area
-    var newInput = document.createElement("textarea");
-    newInput.class = "text-input";
-    newInput.id = "input" + i;
-    lesson.appendChild(newInput);
-    //add the output area
-    var newOutput = document.createElement("div");
-    newOutput.class = "text-output"
-    newOutput.id = "output" + i;
-    lesson.appendChild(newOutput);
-    //create the divs of input output explanation
-    /*
-    var inputExp = document.createElement("div");
-    inputExp.id = "input-explanation" + i;
-    lesson.appendChild(inputExp);
-    var outputExp = document.createElement("div");
-    outputExp.id = "output-explanation" + i;
-    lesson.appendChild(outputExp);
-*/
-    //style the areas
-    var inputElement = document.getElementById("input" + i);
-    inputStyle(inputElement, i);
-    var outputElement = document.getElementById("output" + i);
-    outputStyle(outputElement, i)
-    /*
-    var inputExpElement = document.getElementById("input-explanation" + i);
-    inputExpElement.innerHTML = "Please type your input below. Press the submit button to see the output.";
-    inputExplanationStyle(inputExpElement, i);
-    var outputExpElement = document.getElementById("output-explanation" + i);
-    outputExpElement.innerHTML = "Output";
-    outputExplanationStyle(outputExpElement, i);
-    makeSubmit(i);
-    */
+  for (var i = 0; i < chapters.length; i++) {
+    for (var j = 0; j < chapters[i].length; j++) {
+      var lesson = document.getElementById(chapters[i].lessons[j].divID);
+      //add the text area
+      var newInput = document.createElement("textarea");
+      newInput.class = "text-input";
+      newInput.id = "input" + i;
+      lesson.appendChild(newInput);
+      //add the output area
+      var newOutput = document.createElement("div");
+      newOutput.class = "text-output"
+      newOutput.id = "output" + i;
+      lesson.appendChild(newOutput);
+      //create the divs of input output explanation
+      var inputExp = document.createElement("div");
+      inputExp.id = "input-explanation" + i;
+      lesson.appendChild(inputExp);
+      var outputExp = document.createElement("div");
+      outputExp.id = "output-explanation" + i;
+      lesson.appendChild(outputExp);
+
+      //style the areas
+      var inputElement = document.getElementById("input" + i);
+      inputStyle(inputElement, i);
+      var outputElement = document.getElementById("output" + i);
+      outputStyle(outputElement, i)
+      var inputExpElement = document.getElementById("input-explanation" + i);
+      inputExpElement.innerHTML = "Please type your input below. Press the submit button to see the output.";
+      inputExplanationStyle(inputExpElement, i);
+      var outputExpElement = document.getElementById("output-explanation" + i);
+      outputExpElement.innerHTML = "Output";
+      outputExplanationStyle(outputExpElement, i);
+      makeSubmit(i, j);
+    }
   }
 }
 
@@ -318,7 +303,7 @@ function outputExplanationStyle(element, i){
   element.style.overflowY = 'scroll';
 }
 
-function makeSubmit(i) {
+function makeSubmit(i, j) {
   //add a submit button
   var submit = document.createElement("input");
   submit.type = "submit";
@@ -326,14 +311,14 @@ function makeSubmit(i) {
   submit.id = "submitbutton" + i;
   submit.style.position = "absolute";
   submit.onclick = function() {
-    lessonArray[i].submit();
+    chapters[i].lessons[j].submit();
   };
-  submitbuttonStyle(submit, i)
+  submitbuttonStyle(submit)
   var button = document.getElementById("input-explanation" + i);
   button.appendChild(submit);
 }
 
-function submitbuttonStyle(submit, i) {
+function submitbuttonStyle(submit) {
   submit.style.display = ' ';
   submit.style.backgroundColor = 'black';
   submit.style.width = '160px';
