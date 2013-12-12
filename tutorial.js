@@ -81,16 +81,6 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
 });
 
 function makeLessonDivs(){
-  /*
-  var body = document.getElementById("body"); 
-  for (var i = 0; i<lessonArray.length; i++){
-    var newLessonDiv = document.createElement("div");
-    newLessonDiv.id = lessonArray[i].divID;
-    newLessonDiv.class = "lesson";
-    body.appendChild(newLessonDiv);
-  }
-  */
-  
   var body = document.getElementById("body");
   for (var i = 0; i<chapters.length; i++){
 
@@ -283,7 +273,11 @@ function createSubmitClear(){
       newClearButton.type = "button";
       newClearButton.id = "clear-button" + i + "-" + j;
       newClearButton.class = "clear-button";
-      newClearButton.value = "Clear"
+      newClearButton.value = "Clear";
+      var input = document.getElementById("input"+i+"-"+j);
+      newClearButton.onclick = function(){
+        input.value='';
+      }
       lesson.appendChild(newClearButton);
 
       //style the areas
