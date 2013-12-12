@@ -69,9 +69,9 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   createSubmitClear();
 
   for (var i=0; i<chapters.length; i++){
-    makeButton(chapters[i]);
+    makeButton(chapters[i], 'chapter-button');
     for (var j=0; j<chapters[i].lessons.length; j++) {
-      makeButton(chapters[i].lessons[j]);
+      makeButton(chapters[i].lessons[j], 'lesson-button');
     }
   }
   //LOADING THE FONT SIZE ACCORDING TO WINDOW SIZES
@@ -123,13 +123,13 @@ function makeLessonDivs(){
   }
 }
 
-function makeButton(object){
+function makeButton(object, objectClass){
   var button = document.getElementById("buttons");
   var newButton = document.createElement("input");
   newButton.type = "button";
   newButton.id = object.divID+"button";
   newButton.value = object.title;
-  newButton.className = 'menu-button';
+  newButton.className = objectClass;
   newButton.onclick = function(){
     object.update();
   };
