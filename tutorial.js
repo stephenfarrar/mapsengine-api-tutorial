@@ -150,6 +150,7 @@ function createInputOutput() {
       $("#output"+i+"-"+j).css('font-size', 0.010*($("#output"+i+"-"+j).height()+$("#output"+i+"-"+j).width()));
     });
   });
+
 }
 
 function createPrevNext() {
@@ -207,6 +208,7 @@ function createSubmitClear(){
     chapter.lessons.forEach(function(lesson, j){
       var lessonDiv = $("#"+lesson.divID);
       //add submit button
+
       var newSubmitButton = $("<input>")
         .attr("type", "button")
         .attr("id", "submit-button" + i + "-" + j)
@@ -311,78 +313,4 @@ function executeListInput(i,j){
   var address = trimLeft(string);
   var outputId = "output"+i+"-"+j;
   getFeatures(address, outputId);
-}
-
-//*****************THE Javascript FUNCTIONS**********************//
-function testJQuery() {
-  activeIndex = 5;
-  var userString = document.getElementById("input" + activeIndex).value;
-  var $data = $("#output" + activeIndex)
-  console.log(userString);
-  var expectedInput = "jQuery.ajax({\n  url: 'https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=" + userAPIKey + "'," +
-  "\n  dataType: 'json'," +
-  "\n  success: function(resource) {" +
-  "\n    console.log(JSON.stringify(resource, null, 4));" +
-  "\n  }," +
-  "\n  error: function(response) {" +
-  "\n    console.log('Error: ', response.error.errors[0]);" +
-  "\n  }\n});";
-  console.log(expectedInput);
-  if (userString == expectedInput) {
-    //user input is correct
-    getFeatures ("https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=" + userAPIKey);
-  } else {
-    //user input is incorrect
-    $data.html("Sorry, your input is not correct. Please check that you have the following:<ul><li>Make sure you have entered a valid API Key in a previous exercise!</li>" +
-    "<li>Request is correctly indented using TWO spaces</li>" +
-    "<li>URL is:'https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=" + userAPIKey + 
-    "', including '' characters</li><li>There are no comments in your code.</li><li>For this exercise, make sure your success and error handling is the same as in the example.</li></ul>");
-  }
-
-}
-
-//*****************THE Other Methods FUNCTIONS**********************//
-function executeCurlInput(){
-  var string = document.getElementById("input" + activeIndex).value;
-  var address = trimLeft(string);
-  getFeatures(address);
-
-  /*
-  //the user has to type curl
-  if (string.length<=(i+3) ||string[i]!== 'c' || string[i+1]!=='u' || string[i+2]!=='r' || string[i+3]!=='l'){
-    alert("You entered wrong command-line. See the tutorial again.");
-  } else {
-    i = i+4;
-    //there should be space after the curl
-    if (string.length == i || string[i]!== ' ') {
-      alert("You entered wrong command-line. See the tutorial again.");
-    } else {
-      i = i+1;
-      for (; i<string.length; i++){
-        if(string[i]!== ' '){
-          break;
-        }
-      }
-      //there should be " after the curl command, and there should be something after that
-      if(string.length == i || string.length == i+1 || string[i]!== '\"'){
-        alert("You entered wrong command-line. See the tutorial again.");
-      } else {
-        var address="";
-        i = i+1;
-        for(; i<string.length; i++){
-          if(string[i] == '\"' || string[i] == ' '){
-            break;
-          }
-          address += string[i];
-        }
-        //if not closing the "
-        if (string[i] !== '\"'){
-          alert("You entered wrong command-line. See the tutorial again.");
-        } else {
-          getFeatures(address);
-        }
-      }
-    }
-  }
-  */
 }
