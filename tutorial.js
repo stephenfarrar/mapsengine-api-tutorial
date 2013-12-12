@@ -58,22 +58,60 @@ var lessonArray = [lesson0, lesson1, lesson2, lesson3, lesson4, lesson5, lesson6
 var color = ['red', 'blue', 'purple'];
 
 //Finding objects with class "lesson"
-var lessonsClass = document.getElementsByClassName("lesson");
+//var lessonsClass = document.getElementsByClassName("lesson");
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 google.maps.event.addDomListener(window, 'load', function initialize(){
   //CREATING BUTTONS
-  for (var i=0; i<lessonsClass.length; i++){
-    makeButton(lessonsClass[i].id, i);
+  for (var i=0; i<lessonArray.length; i++){
+    makeButton(lessonArray[i].divID, i);
   }
+  makeLessonDivs();
   createInputOutput();
-  //dynamically changing the divs
+  createPrevNext();
 
-  document.getElementById('instructions').style.width = winWidth - 240 + 'px';
-
+  //LOADING THE FONT SIZE ACCORDING TO WINDOW SIZES
+   //TITLE
+  $("#title").css('font-size', 0.031*($("#title").height()+$("#title").width()));
+  //INSTRUCTIONS
+  $("#instructions").css('font-size', 0.020*($("#instructions").height()+$("#instructions").width()));
+  //INPUT
+   $(".text-input").css('font-size', 0.015*($(".text-input").height()+$(".text-input").width()));
+  //OUTPUT
+  $(".text-output").css('font-size', 0.010*($(".text-output").height()+$(".text-output").width()));
+  //PREV NEXT BUTTON
+  $("#prev-button").css('font-size', 0.18*($("#prev-button").height()+0.55*$("#prev-button").width()));
+  $("#next-button").css('font-size', 0.18*($("#next-button").height()+0.55*$("#next-button").width())); 
   //set the initial page to be the introduction
   lesson0.update();
 });
+
+function makeLessonDivs(){
+  var body = document.getElementById("body"); 
+  for (var i = 0; i<lessonArray.length; i++){
+    var newLessonDiv = document.createElement("div");
+    newLessonDiv.id = lessonArray[i].divID;
+    newLessonDiv.class = "lesson";
+    body.appendChild(newLessonDiv);
+  }
+
+  /*
+  var body = document.getElementById("body");
+  for (var i = 0; i<chapters.length; i++){
+    var newChapterDiv = document.createElement("div");
+    newChapterDiv.id = chapters[i].divID;
+    newChapterDiv.class = "chapter";
+    body.appendChild(newChapterDiv);
+    var chapterDiv = document.getElementById(chapters[i].divID);
+    for (var j = 0; j<chapters[i].length; i++){
+      var newLessonDiv = document.createElement("div");
+      newLessonDiv.id = chapters[i][j].divID;
+      newLessonDiv.class = "lesson";
+      chapterDiv.appendChild(newLessonDiv);
+    }
+  }
+  */
+}
 
 function makeButton(string, i){
   var button = document.getElementById("buttons");
@@ -121,8 +159,8 @@ function clear(){
 */
 //BLOCKING ALL DIVS AUTOMATICALLY
 function hideAll() {
-  for (var i=0; i<lessonsClass.length; i++){
-    document.getElementById(lessonsClass[i].id).style.display = "none";
+  for (var i=0; i<lessonArray.length; i++){
+    document.getElementById(lessonArray[i].divID).style.display = "none";
   }
 }
 
@@ -141,18 +179,20 @@ function createInputOutput() {
     newOutput.id = "output" + i;
     lesson.appendChild(newOutput);
     //create the divs of input output explanation
+    /*
     var inputExp = document.createElement("div");
     inputExp.id = "input-explanation" + i;
     lesson.appendChild(inputExp);
     var outputExp = document.createElement("div");
     outputExp.id = "output-explanation" + i;
     lesson.appendChild(outputExp);
-
+*/
     //style the areas
     var inputElement = document.getElementById("input" + i);
     inputStyle(inputElement, i);
     var outputElement = document.getElementById("output" + i);
     outputStyle(outputElement, i)
+    /*
     var inputExpElement = document.getElementById("input-explanation" + i);
     inputExpElement.innerHTML = "Please type your input below. Press the submit button to see the output.";
     inputExplanationStyle(inputExpElement, i);
@@ -160,37 +200,94 @@ function createInputOutput() {
     outputExpElement.innerHTML = "Output";
     outputExplanationStyle(outputExpElement, i);
     makeSubmit(i);
+    */
   }
 }
 
 function inputStyle(element, i) {
+  element.style.display = 'block'
   element.style.position = 'absolute';
-  element.style.backgroundColor = 'white';
+  element.style.backgroundColor = '#FFFFFF';
   element.style.color = 'black';
-  element.style.fontSize = '18px';
-  element.style.width = (winWidth - 180)/2 - 4 + 'px';
-  element.style.height = winHeight - ((winHeight * 34 / 100) + 103) + 'px';
-  element.style.left = '180px';
-  element.style.top = (winHeight * 34 / 100) + 100 + 'px'
+  element.style.width = '39.75%';
+  element.style.height = '39.5%';
+  element.style.left = '23%';
+  element.style.top = '56%';
   element.style.resize = 'none';
-  element.style.border = '2px solid black'
   element.style.overflowY = 'scroll';
+  element.style.fontFamily = 'monospace';
 }
 
 function outputStyle(element, i) {
+  element.style.display = 'block'
   element.style.position = 'absolute';
-  element.style.backgroundColor = 'black';
+  element.style.backgroundColor = '#2D2D2D';
   element.style.color = 'white';
-  element.style.fontSize = '18px';
-
-  element.style.width = (winWidth - 180)/2 - 10 + 'px';
-  element.style.height = winHeight - ((winHeight * 34 / 100) + 105) + 'px';
-  element.style.left = 180 + (winWidth - 180)/2 - 4 + 'px';
-  element.style.top = (winHeight * 34 / 100) + 100 + 'px'
-  element.style.border = '5px solid black'
+  element.style.resize = 'none';
+  element.style.fontFamily = 'monospace';
+  element.style.padding = '1%';
+  element.style.width = '35%';
+  element.style.height = '85.9%';
+  element.style.left = '63%';
+  element.style.top = '10.75%';
   element.style.overflowY = 'scroll';
+  element.style.zIndex = 2;
 }
 
+function createPrevNext() {
+  for (var i = 0; i < lessonArray.length; i++) {
+    var lesson = document.getElementById(lessonArray[i].divID);
+    //add prev button
+    var newPrevButton = document.createElement("button");
+    newPrevButton.id = "prev-button" + i;
+    newPrevButton.class = "prev-button";
+    newPrevButton.value = "< Prev Lesson"
+    lesson.appendChild(newPrevButton);
+    //add the output area
+    var newNextButton = document.createElement("button");
+    newNextButton.id = "next-button" + i;
+    newNextButton.class = "next-button";
+    newNextButton.value = "NextLesson >"
+    lesson.appendChild(newNextButton);
+
+    //style the areas
+    var prevButtonElement = document.getElementById("prev-button" + i);
+    prevButtonStyle(prevButtonElement, i);
+    var nextButtonElement = document.getElementById("next-button" + i);
+    nextButtonStyle(nexttButtonElement, i)
+  }
+}
+
+function prevButtonStyle(element, i) {
+  element.style.display = 'block'
+  element.style.position = 'absolute';
+  element.style.backgroundColor = '#4D90FE';
+  element.style.color = 'white';
+  element.style.width = '8%';
+  element.style.height = '3%';
+  element.style.left = '23.5%';
+  element.style.top = '11.25%';
+  element.style.fontWeight = 'bold';
+  element.style.fontFamily = 'Arial regular';
+  element.style.border = "1px solid #1155CC";
+  eleement.style.zIndex = 2;
+}
+
+function nextButtontStyle(element, i) {
+  element.style.display = 'block'
+  element.style.position = 'absolute';
+  element.style.backgroundColor = '#4D90FE';
+  element.style.color = 'white';
+  element.style.width = '8%';
+  element.style.height = '3%';
+  element.style.left = '54.5%';
+  element.style.top = '11.25%';
+  element.style.fontWeight = 'bold';
+  element.style.fontFamily = 'Arial regular';
+  element.style.border = "1px solid #1155CC";
+  eleement.style.zIndex = 2;
+}
+/*
 function inputExplanationStyle(element, i){
   element.style.position = 'absolute';
   element.style.backgroundColor = 'yellow';
@@ -254,7 +351,7 @@ function submitbuttonStyle(submit, i) {
     submit.style.color = 'white';
   }
 }
-
+*/
 function getFeatures(addressString){
   var $data = $("#output" + activeIndex);
   var data = document.getElementById("output" + activeIndex);
