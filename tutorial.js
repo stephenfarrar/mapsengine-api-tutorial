@@ -128,7 +128,7 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
 
   chapters.forEach(function(chapter){
     makeButton(chapter, "chapter-button");
-    chapter.lessons.forEach(function(lesson, chapter){
+    chapter.lessons.forEach(function(lesson){
       makeButton(lesson, "lesson-button");
     });
   });
