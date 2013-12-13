@@ -58,7 +58,12 @@ var chapters = [
 
 Chapter.prototype.update = function() {
   this.lessons[0].update();
+  var me = this.lessons;
+  me.forEach(function(me) {
+    $('#' + me.divID + 'button').toggle('medium');
+  })
 }
+
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 google.maps.event.addDomListener(window, 'load', function initialize(){
@@ -84,14 +89,14 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   //OUTPUT
   $(".text-output").css('font-size', 0.010*($(".text-output").height()+$(".text-output").width()));
   //PREV NEXT BUTTON
-  console.log($("#prev-button1-0").height());
   //$(".prev-button").css('font-size', 0.18*($(".prev-button").height()+0.55*$(".prev-button").width()));
   //$(".next-button").css('font-size', 0.18*($(".next-button").height()+0.55*$(".next-button").width())); 
   //SUBMIT AND CLEAR BUTTONS
   //$(".submit-button").css('font-size', 0.18*($(".submit-button").height()+$(".submit-button").width()));
   //$(".clear-button").css('font-size', 0.18*($(".clear-button").height()+$(".clear-button").width()));
   //set the initial page to be the introduction
-  chapters[0].lessons[0].update();
+  hideLessons();
+  chapters[0].update();
 });
 
 function makeLessonDivs(){
@@ -143,6 +148,17 @@ function hideAll() {
       document.getElementById(chapters[i].lessons[j].divID).style.display = "none";
     }
   }
+}
+
+//Hides the lesson buttons within the chapter
+function hideLessons() {
+  var ch  = chapters;
+  ch.forEach(function(ch) {
+    var le = ch.lessons;
+    le.forEach(function(le) {
+      $('#' + le.divID + 'button').hide();
+    })
+  })
 }
 
 //Should be called initially to dynamically create divs for each lesson
