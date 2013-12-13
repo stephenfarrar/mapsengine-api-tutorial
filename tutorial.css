@@ -3,21 +3,32 @@
       padding: 0;
       height: 100%;
     }
-    .menu-button {
+    .chapter-button {
       display: block;
       position: relative;
-      left: 10%;
-      background-color: transparent;
-      background-repeat: no-repeat;
       color: #DD4B39;
-      width: 80%;
+      width: 100%;
       height: 4.5%;
       font-size: 20px;
       font-weight: bold;
+      background-color: transparent;
+      background-repeat: no-repeat;
       background-position: 95% 20%;
-      /*
-      background-image: url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg);
-      */
+      background-size: 8% 80%;
+    }
+    .lesson-button {
+      display: block;
+      position: relative;
+      background-color: white;
+      color: #DD4B39;
+      width: 85%;
+      height: 30px;
+      left: 15%;
+      font-size: 16px;
+      font-weight: bold;
+      background-color: transparent;
+      background-repeat: no-repeat;
+      background-position: 95% 20%;
       background-size: 8% 80%;
     }
     .text-input {

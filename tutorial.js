@@ -96,6 +96,14 @@ var chapters = [
   ]})
 ];
 
+Chapter.prototype.update = function() {
+  this.lessons[0].update();
+  var me = this.lessons;
+  me.forEach(function(me) {
+    $('#' + me.divID + 'button').toggle('medium');
+  })
+}
+
 //ARRAY OF LESSONS
 var lessonArray = new Array();
 
@@ -114,9 +122,9 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   createSubmitClear();
 
   chapters.forEach(function(chapter){
-    makeButton(chapter);
+    makeButton(chapter, "chapter-button");
     chapter.lessons.forEach(function(lesson){
-      makeButton(lesson);
+      makeButton(lesson, "lesson-button");
     });
   });
 
@@ -124,9 +132,10 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
    //TITLE
   $("#title").css({fontSize: 0.031*($("#title").height()+$("#title").width())});
   //INSTRUCTIONS
-  $("#instructions").css({fontSize: 0.018*($("#instructions").height()+$("#instructions").width())});
+  $("#instructions").css('font-size', 0.018*($("#instructions").height()+$("#instructions").width()));
 
-  chapters[0].lessons[0].update();
+  hideLessons();
+  chapters[0].update();
 });
 
 function makeLessonDivs(){
@@ -146,14 +155,13 @@ function makeLessonDivs(){
   });
 }
 
-function makeButton(object){
-
+function makeButton(object, objectClass){
   var button = $("#buttons");
   var newButton = $("<input>")
     .attr("type", "button")
     .attr("id", object.divID+"button")
     .attr("value", object.title)
-    .addClass('menu-button')
+    .addClass(objectClass)
     .click(function(){
       object.update();
     });
@@ -163,6 +171,16 @@ function makeButton(object){
 //BLOCKING ALL DIVS AUTOMATICALLY
 function hideAll() {
   $(".lesson").hide();
+}
+
+//Hides the lesson buttons within the chapter
+function hideLessons() {
+  chapters.forEach(function(chapters) {
+    var lessons = chapters.lessons;
+    lessons.forEach(function(lessons) {
+      $('#' + lessons.divID + 'button').hide();
+    })
+  })
 }
 
 //Should be called initially to dynamically create divs for each lesson
