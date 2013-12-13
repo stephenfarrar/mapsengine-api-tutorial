@@ -6,13 +6,19 @@
     .menu-button {
       display: block;
       position: relative;
-      left: 20%;
-      background-color: white;
+      left: 10%;
+      background-color: transparent;
+      background-repeat: no-repeat;
       color: #DD4B39;
       width: 80%;
-      height: 40px;
+      height: 4.5%;
       font-size: 20px;
       font-weight: bold;
+      background-position: 95% 20%;
+      /*
+      background-image: url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg);
+      */
+      background-size: 8% 80%;
     }
     .text-input {
       display: block;
