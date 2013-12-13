@@ -11,6 +11,8 @@ function Lesson(divID, options) {
   if (options.submit) {
     this.submit = options.submit;
   }
+  this.correct = options.correct
+  this.done = false;
 }
 
 Lesson.prototype.update = function() {
@@ -29,7 +31,39 @@ Lesson.prototype.update = function() {
   } else {
       //has been loaded before
       $("#instructions").html(markdown.toHTML(this.instructions));
+  }
+
+  if(this.correct === true){
+    this.done = true;
   } 
+  updateTick();
+}
+
+function updateTick(){
+  var allChapterDone = true;
+  chapters.forEach(function(chapter){
+    var allLessonDone = true;
+    chapter.lessons.forEach(function(lesson){
+        if (lesson.done === true){
+          var lessonButton = $("#"+lesson.divID+"button");
+          lessonButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+        } else {
+          allLessonDone = false;
+        }
+    });
+    if(allLessonDone){
+      chapter.done = true;
+      var chapterButton  = $("#"+chapter.divID+"button");
+      chapterButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+    }
+    if(chapter.done === false){
+      allChapterDone = false;
+    }
+  });
+
+  if(allChapterDone){
+    alert("Congratulations, you have completed this tutorial!");
+  }
 }
 
 Lesson.prototype.submit = function() {
@@ -40,6 +74,7 @@ function Chapter(divID, options) {
   this.divID = divID;
   this.lessons = options.lessons;
   this.title = options.title;
+  this.done = false;
 }
 
 Chapter.prototype.update = function() {
@@ -49,15 +84,15 @@ Chapter.prototype.update = function() {
 //ARRAY OF CHAPTERS
 var chapters = [
   new Chapter('chapter0-intro', {title: '0.Introduction', lessons: [
-    new Lesson('lesson0-intro', {title: 'Introduction'}),
-    new Lesson('lesson1-gmeapi', {title: 'GME API'})
+    new Lesson('lesson0-intro', {title: 'Introduction', correct: true}),
+    new Lesson('lesson1-gmeapi', {title: 'GME API', correct: true})
   ]}),
   new Chapter('chapter1-registration', {title: 'I.Registration', lessons: [
-    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey})
+    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, correct: false})
   ]}),
   new Chapter('chapter2-read', {title: 'II.Reading Public Data', lessons: [
-    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable}),
-    new Lesson("lesson4-featureslist", {title: "List Features", submit: executeListInput})
+    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, correct: false}),
+    new Lesson("lesson4-featureslist", {title: "List Features", submit: executeListInput, correct: false})
   ]})
 ];
 
@@ -218,6 +253,7 @@ function createSubmitClear(){
         .addClass("submit-button")
         .click(function(){
           lesson.submit(i,j); 
+          updateTick();
         });
       lessonDiv.append(newSubmitButton);
 
@@ -237,8 +273,8 @@ function createSubmitClear(){
   });
 }
 
-function getFeatures(addressString, outputId){
-  var $data = $("#" + outputId);
+function getFeatures(addressString, i, j){
+  var $data = $("#output" + i + "-" + j);
   $data.css({ whiteSpace: 'pre' });
   
   $data.empty();
@@ -250,6 +286,9 @@ function getFeatures(addressString, outputId){
       $data.append("\n");
       $data.append(resourceString);
       $data.append("\n");
+      chapters[i].lessons[j].correct = true;
+      chapters[i].lessons[j].done = true;
+      updateTick();
     },
     error: function(response) {
       alert ("Oops! You've entered wrong URL! Try again!")
@@ -287,6 +326,9 @@ function testAPIKey(i,j) {
       $data.html("Congrats! Your API Key works. Now continue on to Get Table!");
       userAPIKey = userKey;
       console.log(userAPIKey);
+      chapters[i].lessons[j].correct = true;
+      chapters[i].lessons[j].done = true;
+      updateTick();
     },
     error: function(response) {
       $data.html("Sorry your API Key did not work. Try again!");
@@ -297,13 +339,12 @@ function testAPIKey(i,j) {
 //*****************THE Get Table FUNCTIONS**********************//
 function testGetTable(i,j) {
   var userURL = $("#input"+i+"-"+j).val();;
-  var outputId = "output"+i+"-"+j;
   var $data = $("#output"+i+"-"+j);
   var expectedURL = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/?version=published&key=" + userAPIKey;
   console.log(expectedURL);
   if (userURL == expectedURL) {
     alert("Huzzah! Great work!")
-    getFeatures("https://www.googleapis.com/mapsengine/search_tt/tables/15474835347274181123-16143158689603361093/?version=published&key=" + userAPIKey, outputId);
+    getFeatures("https://www.googleapis.com/mapsengine/search_tt/tables/15474835347274181123-16143158689603361093/?version=published&key=" + userAPIKey, i, j);
   } else {
     $data.html("Oh no! Something isn't quite right. Try again. Hint: Make sure you entered a valid API Key in the previous exercise!");
   }
@@ -312,6 +353,5 @@ function testGetTable(i,j) {
 function executeListInput(i,j){
   var string = $("#input"+i+"-"+j).val();;
   var address = trimLeft(string);
-  var outputId = "output"+i+"-"+j;
-  getFeatures(address, outputId);
+  getFeatures(address, i, j);
 }
