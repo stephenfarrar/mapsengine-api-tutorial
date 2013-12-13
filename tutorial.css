@@ -5,6 +5,8 @@
     }
     .menu-button {
       display: block;
+      position: relative;
+      left: 20%;
       background-color: white;
       color: #DD4B39;
       width: 80%;
@@ -39,6 +41,7 @@
       overflow-y: scroll;
       font-family: monospace;
       z-index: 3;
+      word-wrap: break-word;
     }
     .prev-button {
       display: block;
@@ -140,7 +143,8 @@
       width: 38.05%;
       color: black;
       font-family: Arial;
-      background-color: #FFFFFF
+      background-color: #FFFFFF;
+      word-wrap: break-word;
     }
     #prev-next-bar{
       display: block;
