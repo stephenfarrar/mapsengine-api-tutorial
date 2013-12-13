@@ -5,6 +5,8 @@
     }
     .chapter-button {
       display: block;
+      position: relative;
+      left: 20%;
       background-color: white;
       color: #DD4B39;
       width: 100%;
@@ -50,6 +52,7 @@
       overflow-y: scroll;
       font-family: monospace;
       z-index: 3;
+      word-wrap: break-word;
     }
     .prev-button {
       display: block;
