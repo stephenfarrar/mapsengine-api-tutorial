@@ -151,7 +151,8 @@
       width: 38.05%;
       color: black;
       font-family: Arial;
-      background-color: #FFFFFF
+      background-color: #FFFFFF;
+      word-wrap: break-word;
     }
     #prev-next-bar{
       display: block;
