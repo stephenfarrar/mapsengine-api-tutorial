@@ -88,13 +88,6 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
    $(".text-input").css('font-size', 0.015*($(".text-input").height()+$(".text-input").width()));
   //OUTPUT
   $(".text-output").css('font-size', 0.010*($(".text-output").height()+$(".text-output").width()));
-  //PREV NEXT BUTTON
-  //$(".prev-button").css('font-size', 0.18*($(".prev-button").height()+0.55*$(".prev-button").width()));
-  //$(".next-button").css('font-size', 0.18*($(".next-button").height()+0.55*$(".next-button").width())); 
-  //SUBMIT AND CLEAR BUTTONS
-  //$(".submit-button").css('font-size', 0.18*($(".submit-button").height()+$(".submit-button").width()));
-  //$(".clear-button").css('font-size', 0.18*($(".clear-button").height()+$(".clear-button").width()));
-  //set the initial page to be the introduction
   hideLessons();
   chapters[0].update();
 });
@@ -142,11 +135,10 @@ function hideAll() {
 
 //Hides the lesson buttons within the chapter
 function hideLessons() {
-  var ch  = chapters;
-  ch.forEach(function(ch) {
-    var le = ch.lessons;
-    le.forEach(function(le) {
-      $('#' + le.divID + 'button').hide();
+  chapters.forEach(function(chapters) {
+    var lessons = chapters.lessons;
+    lessons.forEach(function(lessons) {
+      $('#' + lessons.divID + 'button').hide();
     })
   })
 }
@@ -208,7 +200,7 @@ function createSubmitClear(){
       newClearButton.type = "button";
       newClearButton.id = "clear-button" + i + "-" + j;
       newClearButton.className = "clear-button";
-      newClearButton.value = "Clear"
+      newClearButton.value = "Clear";
       var input = document.getElementById("input"+i+"-"+j);
       newClearButton.onclick = function(){
         input.value='';
