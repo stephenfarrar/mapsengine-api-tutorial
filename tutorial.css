@@ -3,33 +3,28 @@
       padding: 0;
       height: 100%;
     }
-    .chapter-button {
+    .menu-button{
       display: block;
       position: relative;
+      font-weight: bold;
+      background-repeat: no-repeat;
+      background-position: 95% 20%;
+      background-size: 6% 80%;
+    }
+    .chapter-button {
+      background-color: white;
       color: #DD4B39;
       width: 100%;
       height: 4.5%;
       font-size: 20px;
-      font-weight: bold;
-      background-color: transparent;
-      background-repeat: no-repeat;
-      background-position: 95% 20%;
-      background-size: 8% 80%;
     }
     .lesson-button {
-      display: block;
-      position: relative;
       background-color: white;
       color: #DD4B39;
       width: 85%;
       height: 30px;
       left: 15%;
       font-size: 16px;
-      font-weight: bold;
-      background-color: transparent;
-      background-repeat: no-repeat;
-      background-position: 95% 20%;
-      background-size: 8% 80%;
     }
     .text-input {
       display: block;
