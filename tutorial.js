@@ -11,8 +11,9 @@ function Lesson(divID, options) {
   if (options.submit) {
     this.submit = options.submit;
   }
-  this.correct = options.correct
+  this.correct = options.correct;
   this.done = false;
+  this.chapter = options.chapter;
 }
 
 Lesson.prototype.update = function() {
@@ -21,6 +22,14 @@ Lesson.prototype.update = function() {
   document.title = this.title;
   $("#"+this.divID).css({display : "block"});
 
+  //update buttons
+  if ($("#"+this.divID+'button').is(":hidden")) {
+    hideLessons('medium');
+    var lesson = chapters[this.chapter].lessons;
+    lesson.forEach(function(lesson) {
+      $('#' + lesson.divID + 'button').show('medium');
+    })
+  }
   if (!this.upToDate){
     //first time page loaded
     $.get(this.divID+".md", function(response){
@@ -78,31 +87,27 @@ function Chapter(divID, options) {
 }
 
 Chapter.prototype.update = function() {
+  var lesson = this.lessons;
+  lesson.forEach(function(lesson) {
+    $('#' + lesson.divID + 'button').toggle('medium');
+  })
   this.lessons[0].update();
 }
 
 //ARRAY OF CHAPTERS
 var chapters = [
   new Chapter('chapter0-intro', {title: '0.Introduction', lessons: [
-    new Lesson('lesson0-intro', {title: 'Introduction', correct: true}),
-    new Lesson('lesson1-gmeapi', {title: 'GME API', correct: true})
+    new Lesson('lesson0-intro', {title: 'Introduction', correct: true, chapter: 0}),
+    new Lesson('lesson1-gmeapi', {title: 'GME API', correct: true, chapter: 0})
   ]}),
   new Chapter('chapter1-registration', {title: 'I.Registration', lessons: [
-    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, correct: false})
+    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, correct: false, chapter: 1})
   ]}),
   new Chapter('chapter2-read', {title: 'II.Reading Public Data', lessons: [
-    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, correct: false}),
-    new Lesson("lesson4-featureslist", {title: "List Features", submit: executeListInput, correct: false})
+    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, correct: false, chapter: 2}),
+    new Lesson("lesson4-featureslist", {title: "List Features", submit: executeListInput, correct: false, chapter: 2})
   ]})
 ];
-
-Chapter.prototype.update = function() {
-  this.lessons[0].update();
-  var me = this.lessons;
-  me.forEach(function(me) {
-    $('#' + me.divID + 'button').toggle('medium');
-  })
-}
 
 //ARRAY OF LESSONS
 var lessonArray = new Array();
@@ -134,7 +139,7 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   //INSTRUCTIONS
   $("#instructions").css('font-size', 0.018*($("#instructions").height()+$("#instructions").width()));
 
-  hideLessons();
+  hideLessons(0);
   chapters[0].update();
 });
 
@@ -174,11 +179,11 @@ function hideAll() {
 }
 
 //Hides the lesson buttons within the chapter
-function hideLessons() {
+function hideLessons(speed) {
   chapters.forEach(function(chapters) {
     var lessons = chapters.lessons;
     lessons.forEach(function(lessons) {
-      $('#' + lessons.divID + 'button').hide();
+      $('#' + lessons.divID + 'button').hide(speed);
     })
   })
 }
