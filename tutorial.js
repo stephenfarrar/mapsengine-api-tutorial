@@ -11,7 +11,10 @@ function Lesson(divID, options) {
   if (options.submit) {
     this.submit = options.submit;
   }
+  //correct is TRUE if the user does not need to submit anything to complete the lesson
+  //correct is FALSE if the user needs to pass an exercise and submit them in order to complete it
   this.correct = options.correct
+  //done is TRUE if: the user submit correctly OR the user has loaded the page that does not need submission
   this.done = false;
 }
 
@@ -37,33 +40,6 @@ Lesson.prototype.update = function() {
     this.done = true;
   } 
   updateTick();
-}
-
-function updateTick(){
-  var allChapterDone = true;
-  chapters.forEach(function(chapter){
-    var allLessonDone = true;
-    chapter.lessons.forEach(function(lesson){
-        if (lesson.done === true){
-          var lessonButton = $("#"+lesson.divID+"button");
-          lessonButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
-        } else {
-          allLessonDone = false;
-        }
-    });
-    if(allLessonDone){
-      chapter.done = true;
-      var chapterButton  = $("#"+chapter.divID+"button");
-      chapterButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
-    }
-    if(chapter.done === false){
-      allChapterDone = false;
-    }
-  });
-
-  if(allChapterDone){
-    alert("Congratulations, you have completed this tutorial!");
-  }
 }
 
 Lesson.prototype.submit = function() {
@@ -92,7 +68,11 @@ var chapters = [
   ]}),
   new Chapter('chapter2-read', {title: 'II.Reading Public Data', lessons: [
     new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, correct: false}),
-    new Lesson("lesson4-featureslist", {title: "List Features", submit: executeListInput, correct: false})
+    new Lesson("lesson4-listfeaturesbasic", {title: "List Features - Basic URL", submit: executeListInput, correct: false}),
+    new Lesson("lesson5-listfeaturesparameters1", {title: "List Features - Parameters I", submit: executeListInput, correct: false}),
+    new Lesson("lesson6-listfeaturesparameters2", {title: "List Features - Parameters II", submit: executeListInput, correct: false}),
+    new Lesson("lesson7-listfeaturesparameters3", {title: "List Features - Parameters III", submit: executeListInput, correct: false}),
+    new Lesson("lesson8-listfeaturesparameters4", {title: "List Features - Parameters IV", submit: executeListInput, correct: false})
   ]})
 ];
 
@@ -161,6 +141,7 @@ function makeButton(object, objectClass){
     .attr("type", "button")
     .attr("id", object.divID+"button")
     .attr("value", object.title)
+    .addClass("menu-button")
     .addClass(objectClass)
     .click(function(){
       object.update();
@@ -332,6 +313,34 @@ function getFeatures(addressString, i, j){
 function trimLeft(string){
   return string.replace(/^\s+/, '');
 }
+
+function updateTick(){
+  var allChapterDone = true;
+  chapters.forEach(function(chapter){
+    var allLessonDone = true;
+    chapter.lessons.forEach(function(lesson){
+        if (lesson.done === true){
+          var lessonButton = $("#"+lesson.divID+"button");
+          lessonButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+        } else {
+          allLessonDone = false;
+        }
+    });
+    if(allLessonDone){
+      chapter.done = true;
+      var chapterButton  = $("#"+chapter.divID+"button");
+      chapterButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+    }
+    if(chapter.done === false){
+      allChapterDone = false;
+    }
+  });
+
+  if(allChapterDone){
+    alert("Congratulations, you have completed this tutorial!");
+  }
+}
+
 
 //*****************THE API Key FUNCTIONS**********************//
 function testAPIKey(i,j) {
