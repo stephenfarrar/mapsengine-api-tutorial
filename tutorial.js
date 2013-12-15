@@ -13,7 +13,6 @@ function Lesson(divID, options) {
   }
   this.correct = options.correct;
   this.done = false;
-  this.chapter = options.chapter;
 }
 
 Lesson.prototype.update = function() {
@@ -97,26 +96,33 @@ Chapter.prototype.update = function() {
 //ARRAY OF CHAPTERS
 var chapters = [
   new Chapter('chapter0-intro', {title: '0.Introduction', lessons: [
-    new Lesson('lesson0-intro', {title: 'Introduction', correct: true, chapter: 0}),
-    new Lesson('lesson1-gmeapi', {title: 'GME API', correct: true, chapter: 0})
+    new Lesson('lesson0-intro', {title: 'Introduction', correct: true}),
+    new Lesson('lesson1-gmeapi', {title: 'GME API', correct: true})
   ]}),
   new Chapter('chapter1-registration', {title: 'I.Registration', lessons: [
-    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, correct: false, chapter: 1})
+    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, correct: false})
   ]}),
   new Chapter('chapter2-read', {title: 'II.Reading Public Data', lessons: [
-    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, correct: false, chapter: 2}),
-    new Lesson("lesson4-featureslist", {title: "List Features", submit: executeListInput, correct: false, chapter: 2})
+    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, correct: false}),
+    new Lesson("lesson4-featureslist", {title: "List Features", submit: executeListInput, correct: false})
   ]})
 ];
 
 //ARRAY OF LESSONS
+//!!TODO: Remove lessonArray once code is changed to use prev/next information.
 var lessonArray = new Array();
-
+var prevLesson = chapters[0].lessons[0]; //first lesson
 chapters.forEach(function(chapter){
   chapter.lessons.forEach(function(lesson){
+    lesson.chapter = chapter;
+    lesson.prev = prevLesson;
+    prevLesson.next = lesson;
+    prevLesson = lesson;
     lessonArray.push(lesson);
   });
 });
+//last lesson
+prevLesson.next = prevLesson;
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 google.maps.event.addDomListener(window, 'load', function initialize(){
@@ -125,7 +131,6 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   createInputOutput();
   createPrevNext();
   createSubmitClear();
-
   chapters.forEach(function(chapter){
     makeButton(chapter, "chapter-button");
     chapter.lessons.forEach(function(lesson){
