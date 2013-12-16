@@ -26,6 +26,41 @@
       left: 15%;
       font-size: 16px;
     }
+    /* .button is for prev, next, submit, clear i.e. not menu buttons */
+    .button {
+      display: block;
+      position: absolute;
+      background-color: #4D90FE;
+      color: white;
+      font-family: Arial regular;
+      font-weight: bold;
+      z-index: 2;
+      border: 1px solid #1155CC;
+    }
+    .prev-button {
+      width: 8%;
+      height: 3%;
+      left: 23.5%;
+      top: 11.25%;
+    }
+    .next-button {
+      width: 8%;
+      height: 3%;
+      left: 54.5%;
+      top: 11.25%;
+    }
+    .submit-button {
+      width: 4%;
+      height: 3.2%;
+      left: 23.5%;
+      top: 96.5%;
+    }
+    .clear-button {
+      width: 4%;
+      height: 3.2%;
+      left: 28%;
+      top: 96.5%;
+    }
     .text-input {
       display: block;
       position: absolute;
@@ -54,62 +89,6 @@
       font-family: monospace;
       z-index: 3;
       word-wrap: break-word;
-    }
-    .prev-button {
-      display: block;
-      position: absolute;
-      background-color: #4D90FE;
-      color: white;
-      width: 8%;
-      height: 3%;
-      left: 23.5%;
-      top: 11.25%;
-      font-family: Arial regular;
-      font-weight: bold;
-      z-index: 2;
-      border: 1px solid #1155CC;
-    }
-    .next-button {
-      display: block;
-      position: absolute;
-      background-color: #4D90FE;
-      color: white;
-      width: 8%;
-      height: 3%;
-      left: 54.5%;
-      top: 11.25%;
-      font-family: Arial regular;
-      font-weight: bold;
-      z-index: 2;
-      border: 1px solid #1155CC;
-    }
-    .submit-button {
-      display: block;
-      position: absolute;
-      background-color: #4D90FE;
-      color: white;
-      width: 4%;
-      height: 3.2%;
-      left: 23.5%;
-      top: 96.5%;
-      font-family: Arial regular;
-      font-weight: bold;
-      z-index: 2;
-      border: 1px solid #1155CC;
-    }
-    .clear-button {
-      display: block;
-      position: absolute;
-      background-color: #4D90FE;
-      color: white;
-      width: 4%;
-      height: 3.2%;
-      left: 28%;
-      top: 96.5%;
-      font-family: Arial regular;
-      font-weight: bold;
-      z-index: 2;
-      border: 1px solid #1155CC;
     }
     #title {
       position: absolute;
