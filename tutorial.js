@@ -16,6 +16,7 @@ function Lesson(divID, options) {
   this.correct = options.correct
   //done is TRUE if: the user submit correctly OR the user has loaded the page that does not need submission
   this.done = false;
+  this.chapter = options.chapter;
 }
 
 Lesson.prototype.update = function() {
@@ -24,6 +25,14 @@ Lesson.prototype.update = function() {
   document.title = this.title;
   $("#"+this.divID).css({display : "block"});
 
+  //update buttons
+  if ($("#"+this.divID+'button').is(":hidden")) {
+    hideLessons('medium');
+    var lesson = chapters[this.chapter].lessons;
+    lesson.forEach(function(lesson) {
+      $('#' + lesson.divID + 'button').show('medium');
+    })
+  }
   if (!this.upToDate){
     //first time page loaded
     $.get(this.divID+".md", function(response){
@@ -54,35 +63,31 @@ function Chapter(divID, options) {
 }
 
 Chapter.prototype.update = function() {
+  var lesson = this.lessons;
+  lesson.forEach(function(lesson) {
+    $('#' + lesson.divID + 'button').toggle('medium');
+  })
   this.lessons[0].update();
 }
 
 //ARRAY OF CHAPTERS
 var chapters = [
   new Chapter('chapter0-intro', {title: '0.Introduction', lessons: [
-    new Lesson('lesson0-intro', {title: 'Introduction', correct: true}),
-    new Lesson('lesson1-gmeapi', {title: 'GME API', correct: true})
+    new Lesson('lesson0-intro', {title: 'Introduction', correct: true, chapter: 0}),
+    new Lesson('lesson1-gmeapi', {title: 'GME API', correct: true, chapter: 0})
   ]}),
   new Chapter('chapter1-registration', {title: 'I.Registration', lessons: [
-    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, correct: false})
+    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, correct: false, chapter: 1})
   ]}),
   new Chapter('chapter2-read', {title: 'II.Reading Public Data', lessons: [
-    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, correct: false}),
-    new Lesson("lesson4-listfeaturesbasic", {title: "List Features - Basic URL", submit: executeListInput, correct: false}),
-    new Lesson("lesson5-listfeaturesparameters1", {title: "List Features - Parameters I", submit: executeListInput, correct: false}),
-    new Lesson("lesson6-listfeaturesparameters2", {title: "List Features - Parameters II", submit: executeListInput, correct: false}),
-    new Lesson("lesson7-listfeaturesparameters3", {title: "List Features - Parameters III", submit: executeListInput, correct: false}),
-    new Lesson("lesson8-listfeaturesparameters4", {title: "List Features - Parameters IV", submit: executeListInput, correct: false})
+    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, correct: false, chapter: 2}),
+    new Lesson("lesson4-listfeaturesbasic", {title: "List Features - Basic URL", submit: executeListInputBasic, correct: false, chapter: 2}),
+    new Lesson("lesson5-listfeaturesparameters1", {title: "List Features - Parameters I", submit: executeListInputParam1, correct: false, chapter: 2}),
+    new Lesson("lesson6-listfeaturesparameters2", {title: "List Features - Parameters II", submit: executeListInputParam2, correct: false, chapter: 2}),
+    new Lesson("lesson7-listfeaturesparameters3", {title: "List Features - Parameters III", submit: executeListInputParam3, correct: false, chapter: 2}),
+    new Lesson("lesson8-listfeaturesparameters4", {title: "List Features - Parameters IV", submit: executeListInputParam4, correct: false, chapter: 2})
   ]})
 ];
-
-Chapter.prototype.update = function() {
-  this.lessons[0].update();
-  var me = this.lessons;
-  me.forEach(function(me) {
-    $('#' + me.divID + 'button').toggle('medium');
-  })
-}
 
 //ARRAY OF LESSONS
 var lessonArray = new Array();
@@ -112,9 +117,9 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
    //TITLE
   $("#title").css({fontSize: 0.031*($("#title").height()+$("#title").width())});
   //INSTRUCTIONS
-  $("#instructions").css('font-size', 0.018*($("#instructions").height()+$("#instructions").width()));
+  $("#instructions").css('font-size', 0.015*($("#instructions").height()+$("#instructions").width()));
 
-  hideLessons();
+  hideLessons(0);
   chapters[0].update();
 });
 
@@ -155,11 +160,11 @@ function hideAll() {
 }
 
 //Hides the lesson buttons within the chapter
-function hideLessons() {
+function hideLessons(speed) {
   chapters.forEach(function(chapters) {
     var lessons = chapters.lessons;
     lessons.forEach(function(lessons) {
-      $('#' + lessons.divID + 'button').hide();
+      $('#' + lessons.divID + 'button').hide(speed);
     })
   })
 }
@@ -282,9 +287,7 @@ function getFeatures(addressString, i, j){
     dataType: 'json',
     success: function(resource) {
       var resourceString = JSON.stringify(resource, null, 2);
-      $data.append("\n");
       $data.append(resourceString);
-      $data.append("\n");
       chapters[i].lessons[j].correct = true;
       chapters[i].lessons[j].done = true;
       updateTick();
@@ -303,9 +306,7 @@ function getFeatures(addressString, i, j){
         $data.append("\nThe data cannot be processed. See the details below for the information regarding the error:\n\n");
       }
       var responseString = JSON.stringify(errorMess, null, 2);
-      $data.append(responseString);
-      $data.append("\n");
-    
+      $data.append(responseString);    
     }
   });
 }
@@ -377,8 +378,82 @@ function testGetTable(i,j) {
   }
 }
 //*****************THE List Features FUNCTIONS**********************//
-function executeListInput(i,j){
+function executeListInputBasic(i,j){
   var string = $("#input"+i+"-"+j).val();;
   var address = trimLeft(string);
-  getFeatures(address, i, j);
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
+  checkCorrectness(address, i, j, correctAns);
+}
+
+function executeListInputParam1(i,j){
+  var string = $("#input"+i+"-"+j).val();;
+  var address = trimLeft(string);
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&intersects=CIRCLE(174.7928369177438 -41.29150501119897, 5000)";
+  checkCorrectness(address, i, j, correctAns);
+}
+
+function executeListInputParam2(i,j){
+  var string = $("#input"+i+"-"+j).val();;
+  var address = trimLeft(string);
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&limit=3";
+  checkCorrectness(address, i, j, correctAns);
+}
+
+function executeListInputParam3(i,j){
+  var string = $("#input"+i+"-"+j).val();;
+  var address = trimLeft(string);
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&select=location, disabled, ST_DISTANCE(geometry,ST_POINT(175,-41)) AS distance";
+  checkCorrectness(address, i, j, correctAns);
+}
+
+function executeListInputParam4(i,j){
+  var string = $("#input"+i+"-"+j).val();;
+  var address = trimLeft(string);
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&select=geometry, ST_DISTANCE(geometry,ST_POINT(174.8,-41.3)) AS distance&orderBy=distance DESC&limit=5";
+  checkCorrectness(address, i, j, correctAns);
+}
+
+function checkCorrectness(addressString, i, j, correctAns){
+  var $data = $("#output" + i + "-" + j);
+  $data.css({ whiteSpace: 'pre' });
+  $data.empty();
+  jQuery.ajax({
+    url: correctAns,
+    dataType: 'json',
+    success: function(resource) {
+      var correctResourceString = JSON.stringify(resource, null, 2);
+      jQuery.ajax({
+        url: addressString,
+        dataType: 'json',
+        success: function(resource2) {
+          var resourceString = JSON.stringify(resource2, null, 2);
+          $data.append(resourceString);
+          if(resourceString === correctResourceString){
+            alert("Great work! You can move on to the next lesson.");
+            chapters[i].lessons[j].correct = true;
+            chapters[i].lessons[j].done = true;
+            updateTick();
+          } else {
+            alert("Oops! You've entered wrong URL! Try again!");
+          }
+        },
+        error: function(response) {
+          alert ("Oops! You've entered wrong URL! Try again!");
+          $data.append("Wrong URL\n");
+          response = JSON.parse(response.responseText);
+          var errorMess = response.error.errors[0];
+          if (errorMess.reason === "authError") {
+            $data.append("\nYour authorization token is invalid. \nPlease check that the table can be viewed by general public\n\n");
+          } else if (errorMess.reason === "invalid") {
+            var field = errorMess.location;
+            $data.append("\nInvalid value in the \""+field+"\" field.\nCheck whether you've given the right tableId\n\n");
+          } else {
+            $data.append("\nThe data cannot be processed. See the details below for the information regarding the error:\n\n");
+          }
+          var responseString = JSON.stringify(errorMess, null, 2);
+          $data.append(responseString);
+        }
+      });
+    }
+  });
 }
