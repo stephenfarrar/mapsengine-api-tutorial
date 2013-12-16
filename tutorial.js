@@ -1,9 +1,9 @@
 //Javascript file for tutorial
 //THE GLOBAL VARIABLES
 
-//global window size variables used in dynamic sizing
 var userAPIKey = "";
 var activeLesson;
+var isTutorialFinished = false;
 
 //object to store lesson information
 function Lesson(divID, options) {
@@ -12,9 +12,9 @@ function Lesson(divID, options) {
   if (options.submit) {
     this.submit = options.submit;
   }
-  //correct is TRUE if the user does not need to submit anything to complete the lesson
-  //correct is FALSE if the user needs to pass an exercise and submit them in order to complete it
-  this.correct = options.correct
+  //noSubmitRequired is TRUE if the user does not need to submit anything to complete the lesson
+  //noSubmitRequired is FALSE if the user needs to pass an exercise and submit them in order to complete it
+  this.noSubmitRequired = options.noSubmitRequired
   //done is TRUE if: the user submit correctly OR the user has loaded the page that does not need submission
   this.done = false;
 }
@@ -46,7 +46,7 @@ Lesson.prototype.update = function() {
       $("#instructions").html(markdown.toHTML(this.instructions));
   }
 
-  if(this.correct === true){
+  if(this.noSubmitRequired === true){
     this.done = true;
   } 
   updateTick();
@@ -74,16 +74,16 @@ Chapter.prototype.update = function() {
 //ARRAY OF CHAPTERS
 var chapters = [
   new Chapter('chapter0-intro', {title: '0.Introduction', lessons: [
-    new Lesson('lesson0-intro', {title: 'Introduction', correct: true}),
-    new Lesson('lesson1-gmeapi', {title: 'GME API', correct: true})
+    new Lesson('lesson0-intro', {title: 'Introduction', noSubmitRequired: true}),
+    new Lesson('lesson1-gmeapi', {title: 'GME API', noSubmitRequired: true})
   ]}),
   new Chapter('chapter1-registration', {title: 'I.Registration', lessons: [
-    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, correct: false})
+    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, noSubmitRequired: false})
   ]}),
   new Chapter('chapter2-read', {title: 'II.Reading Public Data', lessons: [
-    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, correct: false, chapter: 2}),
-    new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput, correct: false}),
-    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, correct: false}),
+    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, noSubmitRequired: false}),
+    new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput, noSubmitRequired: false}),
+    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, noSubmitRequired: false}),
   ]})
 ];
 
@@ -226,40 +226,6 @@ function createSubmitClear(){
   });
 }
 
-function getFeatures(addressString, i, j){
-  var $data = $("#output" + i + "-" + j);
-  $data.css({ whiteSpace: 'pre' });
-  
-  $data.empty();
-  jQuery.ajax({
-    url: addressString,
-    dataType: 'json',
-    success: function(resource) {
-      var resourceString = JSON.stringify(resource, null, 2);
-      $data.append(resourceString);
-      chapters[i].lessons[j].correct = true;
-      chapters[i].lessons[j].done = true;
-      updateTick();
-    },
-    error: function(response) {
-      alert ("Oops! You've entered wrong URL! Try again!")
-      $data.append("Wrong URL\n");
-      response = JSON.parse(response.responseText);
-      var errorMess = response.error.errors[0];
-      if (errorMess.reason === "authError") {
-        $data.append("\nYour authorization token is invalid. \nPlease check that the table can be viewed by general public\n\n");
-      } else if (errorMess.reason === "invalid") {
-        var field = errorMess.location;
-        $data.append("\nInvalid value in the \""+field+"\" field.\nCheck whether you've given the right tableId\n\n");
-      } else {
-        $data.append("\nThe data cannot be processed. See the details below for the information regarding the error:\n\n");
-      }
-      var responseString = JSON.stringify(errorMess, null, 2);
-      $data.append(responseString);    
-    }
-  });
-}
-
 function trimLeft(string){
   return string.replace(/^\s+/, '');
 }
@@ -286,8 +252,9 @@ function updateTick(){
     }
   });
 
-  if(allChapterDone){
+  if(allChapterDone && isTutorialFinished===false){
     alert("Congratulations, you have completed this tutorial!");
+    isTutorialFinished = true;
   }
 }
 
@@ -303,7 +270,6 @@ function testAPIKey(i,j) {
       $data.html("Congrats! Your API Key works. Now continue on to Get Table!");
       userAPIKey = userKey;
       console.log(userAPIKey);
-      chapters[i].lessons[j].correct = true;
       chapters[i].lessons[j].done = true;
       updateTick();
     },
@@ -315,16 +281,13 @@ function testAPIKey(i,j) {
 
 //*****************THE Get Table FUNCTIONS**********************//
 function testGetTable(i,j) {
-  var userURL = $("#input"+i+"-"+j).val();;
-  var $data = $("#output"+i+"-"+j);
-  var expectedURL = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/?version=published&key=" + userAPIKey;
-  console.log(expectedURL);
-  if (userURL == expectedURL) {
-    alert("Huzzah! Great work!")
-    getFeatures("https://www.googleapis.com/mapsengine/search_tt/tables/15474835347274181123-16143158689603361093/?version=published&key=" + userAPIKey, i, j);
-  } else {
-    $data.html("Oh no! Something isn't quite right. Try again. Hint: Make sure you entered a valid API Key in the previous exercise!");
-  }
+  var string = $("#input"+i+"-"+j).val();;
+  var address = trimLeft(string);
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16555504137828543390?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
+  //the Get Table is currently NOT AVAILABLE in v1, will someday be available and this 2 line codes needs to be removed
+  address = address.replace("v1","search_tt");
+  correctAns = correctAns.replace("v1","search_tt");
+  checkCorrectness(address, i, j, correctAns);
 }
 //*****************THE List Features FUNCTIONS**********************//
 function executeListInput(i,j){
@@ -337,7 +300,7 @@ function executeListInput(i,j){
 function executeQueries(i,j){
   var string = $("#input"+i+"-"+j).val();;
   var address = trimLeft(string);
-  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16555504137828543390/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&where=population<2000000";
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16555504137828543390/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&limit=3";
   checkCorrectness(address, i, j, correctAns);
 }
 
@@ -358,7 +321,6 @@ function checkCorrectness(addressString, i, j, correctAns){
           $data.append(resourceString);
           if(resourceString === correctResourceString){
             alert("Great work! You can move on to the next lesson.");
-            chapters[i].lessons[j].correct = true;
             chapters[i].lessons[j].done = true;
             updateTick();
           } else {
