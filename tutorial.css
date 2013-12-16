@@ -36,6 +36,7 @@
       font-weight: bold;
       z-index: 2;
       border: 1px solid #1155CC;
+      font-size: 16px;
     }
     .prev-button {
       width: 8%;
@@ -73,6 +74,7 @@
       resize: none;
       overflow-y: scroll;
       font-family: monospace;
+      font-size: 16px;
     }
     .text-output {
       display: block;
@@ -89,6 +91,7 @@
       font-family: monospace;
       z-index: 3;
       word-wrap: break-word;
+      font-size: 16px;
     }
     #title {
       position: absolute;

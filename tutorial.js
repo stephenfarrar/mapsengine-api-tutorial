@@ -183,11 +183,12 @@ function createInputOutput() {
         .addClass("text-output");
       lessonDiv.append(newOutput);
       lesson.outputDiv = newOutput;
-
+      /*
         //INPUT
       $("#input"+i+"-"+j).css({fontSize: 0.015*($("#input"+i+"-"+j).height()+$("#input"+i+"-"+j).width())});
       //OUTPUT
       $("#output"+i+"-"+j).css({fontSize: 0.010*($("#output"+i+"-"+j).height()+$("#output"+i+"-"+j).width())});
+      */
     });
   });
 }
