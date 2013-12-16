@@ -3,6 +3,7 @@
 
 //global window size variables used in dynamic sizing
 var userAPIKey = "";
+var activeLesson;
 
 //object to store lesson information
 function Lesson(divID, options) {
@@ -16,11 +17,11 @@ function Lesson(divID, options) {
   this.correct = options.correct
   //done is TRUE if: the user submit correctly OR the user has loaded the page that does not need submission
   this.done = false;
-  this.chapter = options.chapter;
 }
 
 Lesson.prototype.update = function() {
   hideAll();
+  activeLesson = this;
   var me = this;
   document.title = this.title;
   $("#"+this.divID).css({display : "block"});
@@ -28,7 +29,7 @@ Lesson.prototype.update = function() {
   //update buttons
   if ($("#"+this.divID+'button').is(":hidden")) {
     hideLessons('medium');
-    var lesson = chapters[this.chapter].lessons;
+    var lesson = this.chapter.lessons;
     lesson.forEach(function(lesson) {
       $('#' + lesson.divID + 'button').show('medium');
     })
@@ -73,39 +74,38 @@ Chapter.prototype.update = function() {
 //ARRAY OF CHAPTERS
 var chapters = [
   new Chapter('chapter0-intro', {title: '0.Introduction', lessons: [
-    new Lesson('lesson0-intro', {title: 'Introduction', correct: true, chapter: 0}),
-    new Lesson('lesson1-gmeapi', {title: 'GME API', correct: true, chapter: 0})
+    new Lesson('lesson0-intro', {title: 'Introduction', correct: true}),
+    new Lesson('lesson1-gmeapi', {title: 'GME API', correct: true})
   ]}),
   new Chapter('chapter1-registration', {title: 'I.Registration', lessons: [
-    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, correct: false, chapter: 1})
+    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, correct: false})
   ]}),
   new Chapter('chapter2-read', {title: 'II.Reading Public Data', lessons: [
     new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, correct: false, chapter: 2}),
-    new Lesson("lesson4-listfeaturesbasic", {title: "List Features - Basic URL", submit: executeListInputBasic, correct: false, chapter: 2}),
-    new Lesson("lesson5-listfeaturesparameters1", {title: "List Features - Parameters I", submit: executeListInputParam1, correct: false, chapter: 2}),
-    new Lesson("lesson6-listfeaturesparameters2", {title: "List Features - Parameters II", submit: executeListInputParam2, correct: false, chapter: 2}),
-    new Lesson("lesson7-listfeaturesparameters3", {title: "List Features - Parameters III", submit: executeListInputParam3, correct: false, chapter: 2}),
-    new Lesson("lesson8-listfeaturesparameters4", {title: "List Features - Parameters IV", submit: executeListInputParam4, correct: false, chapter: 2})
+    new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput, correct: false}),
+    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, correct: false}),
   ]})
 ];
 
 //ARRAY OF LESSONS
-var lessonArray = new Array();
-
+var prevLesson = chapters[0].lessons[0]; //first lesson
 chapters.forEach(function(chapter){
   chapter.lessons.forEach(function(lesson){
-    lessonArray.push(lesson);
+    lesson.chapter = chapter;
+    lesson.prev = prevLesson;
+    prevLesson.next = lesson;
+    prevLesson = lesson;
   });
 });
+//last lesson
+prevLesson.next = prevLesson;
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 google.maps.event.addDomListener(window, 'load', function initialize(){
   //CREATING BUTTONS
   makeLessonDivs();
   createInputOutput();
-  createPrevNext();
   createSubmitClear();
-
   chapters.forEach(function(chapter){
     makeButton(chapter, "chapter-button");
     chapter.lessons.forEach(function(lesson){
@@ -191,58 +191,7 @@ function createInputOutput() {
       $("#output"+i+"-"+j).css({fontSize: 0.010*($("#output"+i+"-"+j).height()+$("#output"+i+"-"+j).width())});
     });
   });
-
 }
-
-function createPrevNext() {
-  var lessonIndex = 0;
-  chapters.forEach(function(chapter, i){
-    chapter.lessons.forEach(function(lesson, j){
-      var lessonDiv = $("#"+lesson.divID);
-      //add prev button
-      var newPrevButton = $("<input>")
-        .attr("type", "button")
-        .attr("id", "prev-button" + i + "-" + j)
-        .attr("value", "< Prev Lesson")
-        .addClass("prev-button");
-
-      if(lessonIndex === 0){
-        newPrevButton.click(function(){
-          lesson.update();
-        });
-      } else {
-        var prevLesson = lessonArray[lessonIndex-1];
-        newPrevButton.click(function(){
-          prevLesson.update();
-        });
-      }
-      lessonDiv.append(newPrevButton);
-
-      //add next button
-      var newNextButton = $("<input>")
-        .attr("type", "button")
-        .attr("id", "next-button" + i + "-" + j)
-        .attr("value", "Next Lesson >")
-        .addClass("next-button");
-
-      if(lessonIndex === (lessonArray.length-1)){
-        newNextButton.click(function(){
-          lesson.update();
-        });
-      } else {
-        var nextLesson = lessonArray[lessonIndex+1];
-        newNextButton.click(function(){
-          nextLesson.update();
-        });
-      }
-      lessonDiv.append(newNextButton);
-      $("#prev-button"+i+"-"+j).css({fontSize: 0.18*($("#prev-button"+i+"-"+j).height()+0.55*$("#prev-button"+i+"-"+j).width())});
-      $("#next-button"+i+"-"+j).css({fontSize: 0.18*($("#next-button"+i+"-"+j).height()+0.55*$("#next-button"+i+"-"+j).width())});
-      lessonIndex++;
-    });
-  });
-}
-
 
 function createSubmitClear(){
   chapters.forEach(function(chapter, i){
@@ -378,38 +327,17 @@ function testGetTable(i,j) {
   }
 }
 //*****************THE List Features FUNCTIONS**********************//
-function executeListInputBasic(i,j){
+function executeListInput(i,j){
   var string = $("#input"+i+"-"+j).val();;
   var address = trimLeft(string);
-  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16555504137828543390/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
   checkCorrectness(address, i, j, correctAns);
 }
 
-function executeListInputParam1(i,j){
+function executeQueries(i,j){
   var string = $("#input"+i+"-"+j).val();;
   var address = trimLeft(string);
-  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&intersects=CIRCLE(174.7928369177438 -41.29150501119897, 5000)";
-  checkCorrectness(address, i, j, correctAns);
-}
-
-function executeListInputParam2(i,j){
-  var string = $("#input"+i+"-"+j).val();;
-  var address = trimLeft(string);
-  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&limit=3";
-  checkCorrectness(address, i, j, correctAns);
-}
-
-function executeListInputParam3(i,j){
-  var string = $("#input"+i+"-"+j).val();;
-  var address = trimLeft(string);
-  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&select=location, disabled, ST_DISTANCE(geometry,ST_POINT(175,-41)) AS distance";
-  checkCorrectness(address, i, j, correctAns);
-}
-
-function executeListInputParam4(i,j){
-  var string = $("#input"+i+"-"+j).val();;
-  var address = trimLeft(string);
-  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&select=geometry, ST_DISTANCE(geometry,ST_POINT(174.8,-41.3)) AS distance&orderBy=distance DESC&limit=5";
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16555504137828543390/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&where=population<2000000";
   checkCorrectness(address, i, j, correctAns);
 }
 
