@@ -128,7 +128,6 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   //CREATING BUTTONS
   makeLessonDivs();
   createInputOutput();
-  //createSubmitClear();
   chapters.forEach(function(chapter){
     makeButton(chapter, "chapter-button");
     chapter.lessons.forEach(function(lesson){
