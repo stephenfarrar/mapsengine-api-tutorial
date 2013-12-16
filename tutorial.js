@@ -117,7 +117,7 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
    //TITLE
   $("#title").css({fontSize: 0.031*($("#title").height()+$("#title").width())});
   //INSTRUCTIONS
-  $("#instructions").css('font-size', 0.015*($("#instructions").height()+$("#instructions").width()));
+  $("#instructions").css('font-size', 0.018*($("#instructions").height()+$("#instructions").width()));
 
   hideLessons(0);
   chapters[0].update();
