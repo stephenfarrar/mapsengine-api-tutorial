@@ -38,12 +38,11 @@ Lesson.prototype.update = function() {
       $('#' + lesson.divID + 'button').show('medium');
     })
   }
-  if (!this.upToDate){
+  if (!this.instructions){
     //first time page loaded, updating the instruction blurb
     $.get(this.divID+".md", function(response){
       $("#instructions").html(markdown.toHTML(response));
       me.instructions = response;
-      me.upToDate = true;
     } );    
   } else {
       //has been loaded before, the blurb has been stored and need to be shown
