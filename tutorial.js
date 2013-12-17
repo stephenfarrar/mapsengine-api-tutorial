@@ -17,39 +17,43 @@ function Lesson(divID, options) {
   this.noSubmitRequired = options.noSubmitRequired
   //done is TRUE if: the user submit correctly OR the user has loaded the page that does not need submission
   this.done = false;
+  this.unlock = false;
 }
 
 Lesson.prototype.update = function() {
-  hideAll();
-  activeLesson = this;
-  var me = this;
-  document.title = this.title;
-  $("#"+this.divID).css({display : "block"});
+  if(this.unlock === true) {
+    hideAll();
+    activeLesson = this;
+    var me = this;
+    document.title = this.title;
+    $("#"+this.divID).css({display : "block"});
 
-  //update buttons
-  if ($("#"+this.divID+'button').is(":hidden")) {
-    hideLessons('medium');
-    var lesson = this.chapter.lessons;
-    lesson.forEach(function(lesson) {
-      $('#' + lesson.divID + 'button').show('medium');
-    })
-  }
-  if (!this.upToDate){
-    //first time page loaded
-    $.get(this.divID+".md", function(response){
-      $("#instructions").html(markdown.toHTML(response));
-      me.instructions = response;
-      me.upToDate = true;
-    } );    
-  } else {
-      //has been loaded before
-      $("#instructions").html(markdown.toHTML(this.instructions));
-  }
+    //update buttons
+    if ($("#"+this.divID+'button').is(":hidden")) {
+      hideLessons('medium');
+      var lesson = this.chapter.lessons;
+      lesson.forEach(function(lesson) {
+        $('#' + lesson.divID + 'button').show('medium');
+      })
+    }
+    if (!this.upToDate){
+      //first time page loaded
+      $.get(this.divID+".md", function(response){
+        $("#instructions").html(markdown.toHTML(response));
+        me.instructions = response;
+        me.upToDate = true;
+      } );    
+    } else {
+        //has been loaded before
+        $("#instructions").html(markdown.toHTML(this.instructions));
+    }
 
-  if(this.noSubmitRequired === true){
-    this.done = true;
-  } 
-  updateTick();
+    if(this.noSubmitRequired === true){
+      this.done = true;
+      this.next.unlock = true;
+    } 
+    updateTick();
+  }
 }
 
 Lesson.prototype.submit = function() {
@@ -119,6 +123,7 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   $("#instructions").css('font-size', 0.018*($("#instructions").height()+$("#instructions").width()));
 
   hideLessons(0);
+  chapters[0].lessons[0].unlock = true;
   chapters[0].update();
 });
 
@@ -243,6 +248,7 @@ function testAPIKey() {
       console.log(userAPIKey);
       activeLesson.done = true;
       updateTick();
+      activeLesson.next.unlock = true;
     },
     error: function(response) {
       $data.html("Sorry your API Key did not work. Try again!");
@@ -296,6 +302,7 @@ function checkCorrectness(addressString, correctAns){
             alert("Great work! You can move on to the next lesson.");
             activeLesson.done = true;
             updateTick();
+            activeLesson.next.unlock = true;
           } else {
             alert("Oops! You've entered wrong URL! Try again!");
           }
