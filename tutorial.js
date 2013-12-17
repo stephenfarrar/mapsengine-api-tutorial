@@ -5,6 +5,17 @@ var userAPIKey = "";
 var activeLesson;
 var isTutorialFinished = false;
 
+var Storage = {
+  set: function(key, value) {
+    localStorage[key] = JSON.stringify(value);
+  },
+  get: function(key) {
+    return localStorage[key] ? JSON.parse(localStorage[key]) : null;
+  }
+};
+
+//localStorage.clear();
+
 //object to store lesson information
 function Lesson(divID, options) {
   this.divID = divID;
@@ -45,11 +56,14 @@ Lesson.prototype.update = function() {
       //has been loaded before
       $("#instructions").html(markdown.toHTML(this.instructions));
   }
-  
+
   if(this.noSubmitRequired === true){
     this.done = true;
   } 
   updateTick();
+
+  var info = {currentLesson: activeLesson.divID}
+  Storage.set('state', info);
 }
 
 Lesson.prototype.submit = function() {
@@ -119,8 +133,23 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   $("#instructions").css('font-size', 0.018*($("#instructions").height()+$("#instructions").width()));
 
   hideLessons(0);
-  chapters[0].update();
+  var load = Storage.get('state');
+  if (load) {
+    loadState(load);
+  } else {
+    chapters[0].update();
+  }
 });
+
+function loadState(load) {
+  chapters.forEach(function(chapter) {
+    chapter.lessons.forEach(function(lesson) {
+      if (lesson.divID === load.currentLesson) {
+        lesson.update();
+      }
+    });
+  });
+}
 
 function makeLessonDivs(){
   var body = $("#body");
