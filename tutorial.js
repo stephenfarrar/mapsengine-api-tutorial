@@ -45,7 +45,7 @@ Lesson.prototype.update = function() {
       //has been loaded before
       $("#instructions").html(markdown.toHTML(this.instructions));
   }
-
+  
   if(this.noSubmitRequired === true){
     this.done = true;
   } 
@@ -235,7 +235,7 @@ function testAPIKey() {
   var userKey = activeLesson.inputDiv.val();
   var $data = activeLesson.outputDiv;
   jQuery.ajax({
-  url: 'https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/features?version=published&key=' + userKey,
+  url: 'https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=' + userKey,
     dataType: 'json',
     success: function(resource) {
       $data.html("Congrats! Your API Key works. Now continue on to Get Table!");
@@ -256,7 +256,7 @@ function testGetTable() {
   var string = activeLesson.inputDiv.val();;
   var $data = activeLesson.outputDiv;
   var address = trimLeft(string);
-  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16555504137828543390?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
   //the Get Table is currently NOT AVAILABLE in v1, will someday be available and this 2 line codes needs to be removed
   address = address.replace("v1","search_tt");
   correctAns = correctAns.replace("v1","search_tt");
@@ -266,14 +266,14 @@ function testGetTable() {
 function executeListInput(){
   var string = activeLesson.inputDiv.val();
   var address = trimLeft(string);
-  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16555504137828543390/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
   checkCorrectness(address, correctAns);
 }
 
 function executeQueries(){
   var string = activeLesson.inputDiv.val();;
   var address = trimLeft(string);
-  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16555504137828543390/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&limit=3";
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&limit=3";
   checkCorrectness(address, correctAns);
 }
 
@@ -303,6 +303,7 @@ function checkCorrectness(addressString, correctAns){
         error: function(response) {
           alert ("Oops! You've entered wrong URL! Try again!");
           $data.append("Wrong URL\n");
+          $data.append("HTTP Status: "+response.status);
           response = JSON.parse(response.responseText);
           var errorMess = response.error.errors[0];
           if (errorMess.reason === "authError") {
