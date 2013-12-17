@@ -49,7 +49,7 @@ Lesson.prototype.update = function() {
       //has been loaded before, the blurb has been stored and need to be shown
       $("#instructions").html(markdown.toHTML(this.instructions));
   }
-
+  localStorage['currentLesson'] = activeLesson.divID;
   //if no submission required, the user automatically unlock the next page
   if(this.noSubmitRequired){
     this.unlock();
@@ -66,6 +66,7 @@ Lesson.prototype.submit = function() {
 Lesson.prototype.unlock = function(){
   this.done = true;
   this.next.unlocked = true;
+  localStorage[this.divID] = true;
   updateTick();
 };
 
@@ -135,9 +136,26 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
 
   //The first page shown is the first lesson
   hideLessons(0);
-  chapters[0].lessons[0].unlocked = true;
-  chapters[0].update();
+  loadState();
 });
+
+function loadState() {
+  chapters[0].lessons[0].unlocked = true;
+  var activeLessonId = localStorage['currentLesson'] || 'lesson0-intro';
+  chapters.forEach(function(chapter) {
+    chapter.lessons.forEach(function(lesson) {
+      //if lesson is completed, stored as 'true'
+      if (localStorage[lesson.divID]) {
+        lesson.done = true;
+        lesson.next.unlocked = true;
+      }
+      if (lesson.divID === activeLessonId) {
+        lesson.update();
+      }
+    });
+  });
+  updateTick();
+}
 
 //Create the divs for each lesson
 function makeLessonDivs(){
