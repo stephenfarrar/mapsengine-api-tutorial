@@ -41,13 +41,12 @@ Lesson.prototype.update = function() {
   if (!this.instructions){
     //first time page loaded, updating the instruction blurb
     $.get(this.divID+".md", function(response){
-      $("#instructions").html(markdown.toHTML(response));
       me.instructions = response;
     } );    
-  } else {
-      //has been loaded before, the blurb has been stored and need to be shown
-      $("#instructions").html(markdown.toHTML(this.instructions));
-  }
+  } 
+
+  //Shown the instruction blurb
+  $("#instructions").html(markdown.toHTML(this.instructions));
 
   //if no submission required, the user automatically unlock the next page
   if(this.noSubmitRequired){
