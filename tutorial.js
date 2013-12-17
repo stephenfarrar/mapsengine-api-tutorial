@@ -144,17 +144,17 @@ function loadState() {
   var activeLessonId = localStorage['currentLesson'] || 'lesson0-intro';
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
+      //if lesson is completed, stored as 'true'
       if (localStorage[lesson.divID]) {
         lesson.done = true;
-        lesson.unlocked = true;
         lesson.next.unlocked = true;
       }
       if (lesson.divID === activeLessonId) {
         lesson.update();
-        updateTick();
       }
     });
   });
+  updateTick();
 }
 
 //Create the divs for each lesson
