@@ -5,15 +5,6 @@ var userAPIKey = "";
 var activeLesson;
 var isTutorialFinished = false;
 
-var jsonLocalStorage = {
-  set: function(key, value) {
-    localStorage[key] = JSON.stringify(value);
-  },
-  get: function(key) {
-    return localStorage[key] ? JSON.parse(localStorage[key]) : null;
-  }
-};
-
 //object to store lesson information
 function Lesson(divID, options) {
   this.divID = divID;
@@ -60,7 +51,7 @@ Lesson.prototype.update = function() {
   } 
   updateTick();
 
-  jsonLocalStorage.set('state', {currentLesson: activeLesson.divID});
+  localStorage['currentLesson'] = activeLesson.divID;
 }
 
 Lesson.prototype.submit = function() {
@@ -134,8 +125,7 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
 });
 
 function loadState() {
-  var load = jsonLocalStorage.get('state');
-  var activeLessonId = load.currentLesson || 'lesson0-intro';
+  var activeLessonId = localStorage['currentLesson'] || 'lesson0-intro';
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
       if (lesson.divID === activeLessonId) {
