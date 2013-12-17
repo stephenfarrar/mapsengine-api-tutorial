@@ -1,9 +1,9 @@
 //Javascript file for tutorial
 //THE GLOBAL VARIABLES
 
-//global window size variables used in dynamic sizing
 var userAPIKey = "";
 var activeLesson;
+var isTutorialFinished = false;
 
 //object to store lesson information
 function Lesson(divID, options) {
@@ -12,7 +12,10 @@ function Lesson(divID, options) {
   if (options.submit) {
     this.submit = options.submit;
   }
-  this.correct = options.correct;
+  //noSubmitRequired is TRUE if the user does not need to submit anything to complete the lesson
+  //noSubmitRequired is FALSE if the user needs to pass an exercise and submit them in order to complete it
+  this.noSubmitRequired = options.noSubmitRequired
+  //done is TRUE if: the user submit correctly OR the user has loaded the page that does not need submission
   this.done = false;
 }
 
@@ -43,37 +46,10 @@ Lesson.prototype.update = function() {
       $("#instructions").html(markdown.toHTML(this.instructions));
   }
 
-  if(this.correct === true){
+  if(this.noSubmitRequired === true){
     this.done = true;
   } 
   updateTick();
-}
-
-function updateTick(){
-  var allChapterDone = true;
-  chapters.forEach(function(chapter){
-    var allLessonDone = true;
-    chapter.lessons.forEach(function(lesson){
-        if (lesson.done === true){
-          var lessonButton = $("#"+lesson.divID+"button");
-          lessonButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
-        } else {
-          allLessonDone = false;
-        }
-    });
-    if(allLessonDone){
-      chapter.done = true;
-      var chapterButton  = $("#"+chapter.divID+"button");
-      chapterButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
-    }
-    if(chapter.done === false){
-      allChapterDone = false;
-    }
-  });
-
-  if(allChapterDone){
-    alert("Congratulations, you have completed this tutorial!");
-  }
 }
 
 Lesson.prototype.submit = function() {
@@ -98,15 +74,16 @@ Chapter.prototype.update = function() {
 //ARRAY OF CHAPTERS
 var chapters = [
   new Chapter('chapter0-intro', {title: '0.Introduction', lessons: [
-    new Lesson('lesson0-intro', {title: 'Introduction', correct: true}),
-    new Lesson('lesson1-gmeapi', {title: 'GME API', correct: true})
+    new Lesson('lesson0-intro', {title: 'Introduction', noSubmitRequired: true}),
+    new Lesson('lesson1-gmeapi', {title: 'GME API', noSubmitRequired: true})
   ]}),
   new Chapter('chapter1-registration', {title: 'I.Registration', lessons: [
-    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, correct: false})
+    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, noSubmitRequired: false})
   ]}),
   new Chapter('chapter2-read', {title: 'II.Reading Public Data', lessons: [
-    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, correct: false}),
-    new Lesson("lesson4-featureslist", {title: "List Features", submit: executeListInput, correct: false})
+    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, noSubmitRequired: false}),
+    new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput, noSubmitRequired: false}),
+    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, noSubmitRequired: false}),
   ]})
 ];
 
@@ -168,6 +145,7 @@ function makeButton(object, objectClass){
     .attr("type", "button")
     .attr("id", object.divID+"button")
     .attr("value", object.title)
+    .addClass("menu-button")
     .addClass(objectClass)
     .click(function(){
       object.update();
@@ -205,11 +183,12 @@ function createInputOutput() {
         .addClass("text-output");
       lessonDiv.append(newOutput);
       lesson.outputDiv = newOutput;
-
+      /*
         //INPUT
       $("#input"+i+"-"+j).css({fontSize: 0.015*($("#input"+i+"-"+j).height()+$("#input"+i+"-"+j).width())});
       //OUTPUT
       $("#output"+i+"-"+j).css({fontSize: 0.010*($("#output"+i+"-"+j).height()+$("#output"+i+"-"+j).width())});
+      */
     });
   });
 }
@@ -218,46 +197,38 @@ function clearInput() {
   activeLesson.inputDiv.val("");
 }
 
-function getFeatures(addressString){
-  var $data = activeLesson.outputDiv;
-  $data.css({ whiteSpace: 'pre' });
-  
-  $data.empty();
-  jQuery.ajax({
-    url: addressString,
-    dataType: 'json',
-    success: function(resource) {
-      var resourceString = JSON.stringify(resource, null, 2);
-      $data.append("\n");
-      $data.append(resourceString);
-      $data.append("\n");
-      activeLesson.correct = true;
-      activeLesson.done = true;
-      updateTick();
-    },
-    error: function(response) {
-      alert ("Oops! You've entered wrong URL! Try again!")
-      $data.append("Wrong URL\n");
-      response = JSON.parse(response.responseText);
-      var errorMess = response.error.errors[0];
-      if (errorMess.reason === "authError") {
-        $data.append("\nYour authorization token is invalid. \nPlease check that the table can be viewed by general public\n\n");
-      } else if (errorMess.reason === "invalid") {
-        var field = errorMess.location;
-        $data.append("\nInvalid value in the \""+field+"\" field.\nCheck whether you've given the right tableId\n\n");
-      } else {
-        $data.append("\nThe data cannot be processed. See the details below for the information regarding the error:\n\n");
-      }
-      var responseString = JSON.stringify(errorMess, null, 2);
-      $data.append(responseString);
-      $data.append("\n");
-    }
-  });
-}
-
 function trimLeft(string){
   return string.replace(/^\s+/, '');
 }
+
+function updateTick(){
+  var allChapterDone = true;
+  chapters.forEach(function(chapter){
+    var allLessonDone = true;
+    chapter.lessons.forEach(function(lesson){
+        if (lesson.done === true){
+          var lessonButton = $("#"+lesson.divID+"button");
+          lessonButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+        } else {
+          allLessonDone = false;
+        }
+    });
+    if(allLessonDone){
+      chapter.done = true;
+      var chapterButton  = $("#"+chapter.divID+"button");
+      chapterButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+    }
+    if(chapter.done === false){
+      allChapterDone = false;
+    }
+  });
+
+  if(allChapterDone && isTutorialFinished===false){
+    alert("Congratulations, you have completed this tutorial!");
+    isTutorialFinished = true;
+  }
+}
+
 
 //*****************THE API Key FUNCTIONS**********************//
 function testAPIKey() {
@@ -270,7 +241,6 @@ function testAPIKey() {
       $data.html("Congrats! Your API Key works. Now continue on to Get Table!");
       userAPIKey = userKey;
       console.log(userAPIKey);
-      activeLesson.correct = true;
       activeLesson.done = true;
       updateTick();
     },
@@ -281,21 +251,72 @@ function testAPIKey() {
 }
 
 //*****************THE Get Table FUNCTIONS**********************//
+  
 function testGetTable() {
-  var userURL = activeLesson.inputDiv.val();;
+  var string = activeLesson.inputDiv.val();;
   var $data = activeLesson.outputDiv;
-  var expectedURL = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16143158689603361093/?version=published&key=" + userAPIKey;
-  console.log(expectedURL);
-  if (userURL == expectedURL) {
-    alert("Huzzah! Great work!")
-    getFeatures("https://www.googleapis.com/mapsengine/search_tt/tables/15474835347274181123-16143158689603361093/?version=published&key=" + userAPIKey);
-  } else {
-    $data.html("Oh no! Something isn't quite right. Try again. Hint: Make sure you entered a valid API Key in the previous exercise!");
-  }
+  var address = trimLeft(string);
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16555504137828543390?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
+  //the Get Table is currently NOT AVAILABLE in v1, will someday be available and this 2 line codes needs to be removed
+  address = address.replace("v1","search_tt");
+  correctAns = correctAns.replace("v1","search_tt");
+  checkCorrectness(address, correctAns);
 }
 //*****************THE List Features FUNCTIONS**********************//
 function executeListInput(){
   var string = activeLesson.inputDiv.val();
   var address = trimLeft(string);
-  getFeatures(address);
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16555504137828543390/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
+  checkCorrectness(address, correctAns);
+}
+
+function executeQueries(){
+  var string = activeLesson.inputDiv.val();;
+  var address = trimLeft(string);
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-16555504137828543390/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&limit=3";
+  checkCorrectness(address, correctAns);
+}
+
+function checkCorrectness(addressString, correctAns){
+  var $data = activeLesson.outputDiv;
+  $data.css({ whiteSpace: 'pre' });
+  $data.empty();
+  jQuery.ajax({
+    url: correctAns,
+    dataType: 'json',
+    success: function(resource) {
+      var correctResourceString = JSON.stringify(resource, null, 2);
+      jQuery.ajax({
+        url: addressString,
+        dataType: 'json',
+        success: function(resource2) {
+          var resourceString = JSON.stringify(resource2, null, 2);
+          $data.append(resourceString);
+          if(resourceString === correctResourceString){
+            alert("Great work! You can move on to the next lesson.");
+            activeLesson.done = true;
+            updateTick();
+          } else {
+            alert("Oops! You've entered wrong URL! Try again!");
+          }
+        },
+        error: function(response) {
+          alert ("Oops! You've entered wrong URL! Try again!");
+          $data.append("Wrong URL\n");
+          response = JSON.parse(response.responseText);
+          var errorMess = response.error.errors[0];
+          if (errorMess.reason === "authError") {
+            $data.append("\nYour authorization token is invalid. \nPlease check that the table can be viewed by general public\n\n");
+          } else if (errorMess.reason === "invalid") {
+            var field = errorMess.location;
+            $data.append("\nInvalid value in the \""+field+"\" field.\nCheck whether you've given the right tableId\n\n");
+          } else {
+            $data.append("\nThe data cannot be processed. See the details below for the information regarding the error:\n\n");
+          }
+          var responseString = JSON.stringify(errorMess, null, 2);
+          $data.append(responseString);
+        }
+      });
+    }
+  });
 }
