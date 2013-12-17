@@ -1,3 +1,3 @@
-For this tutorial you will need an API key in order to access the data. To obtain an API Key, go to the [Google Developers' Console](https://cloud.google.com/console). Click on APIs & Auth and turn the Google Maps Engine API to ON. Next, you will need to register your app as a Web Application through the Registered Apps tab. The API key can be found under the Server/Browser Key dropdown.
+Before you can get started you will need an API key. The Google Maps Engine API requires each user to have a unique API key in order to access data stored in GME projects. To obtain an API key, go to the [Google Developers' Console](https://cloud.google.com/console-canary#/flows/enableapi?apiid=mapsengine) and follow the prompts to create a project and a browser key.  
 
-Once you have the key, paste it in the input box below.
+Once you have a key, paste it in the input box.
