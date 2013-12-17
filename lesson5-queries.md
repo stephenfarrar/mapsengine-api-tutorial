@@ -1,6 +1,7 @@
 If you want to query a table for specific data, you can add additional parameters to a List Features request including:  
 
 * intersects: get features which intersect with a geometry (point, polygon, circle, linestring)
+* limit: create an upper bound of the number of features returned.
 * select: specifies which properties of the features will be shown in the result, equivalent to SQL projection clause. It can also be used to create a new property (column alias).
 * where: create a condition that must be fulfilled by the features returned. Equivalent to SQL predicate.
 * orderBy: specified the ordering of the features returned (ascending/descending). It is equivalent to SQL order and it is ascending by default.  
