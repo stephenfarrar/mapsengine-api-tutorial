@@ -183,12 +183,6 @@ function createInputOutput() {
         .addClass("text-output");
       lessonDiv.append(newOutput);
       lesson.outputDiv = newOutput;
-      /*
-        //INPUT
-      $("#input"+i+"-"+j).css({fontSize: 0.015*($("#input"+i+"-"+j).height()+$("#input"+i+"-"+j).width())});
-      //OUTPUT
-      $("#output"+i+"-"+j).css({fontSize: 0.010*($("#output"+i+"-"+j).height()+$("#output"+i+"-"+j).width())});
-      */
     });
   });
 }
@@ -229,7 +223,6 @@ function updateTick(){
   }
 }
 
-
 //*****************THE API Key FUNCTIONS**********************//
 function testAPIKey() {
   var userKey = activeLesson.inputDiv.val();
@@ -238,14 +231,13 @@ function testAPIKey() {
   url: 'https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=' + userKey,
     dataType: 'json',
     success: function(resource) {
-      $data.html("Congrats! Your API Key works. Now continue on to Get Table!");
+      alert("Congrats! Your API Key works. Now continue on to Get Table!");
       userAPIKey = userKey;
-      console.log(userAPIKey);
       activeLesson.done = true;
       updateTick();
     },
     error: function(response) {
-      $data.html("Sorry your API Key did not work. Try again!");
+      alert("Sorry your API Key did not work. Try again!");
     }
   });
 }
