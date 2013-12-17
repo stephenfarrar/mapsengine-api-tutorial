@@ -1,4 +1,3 @@
-The Google Maps Engine API (Application Programming Interface) is a RESTful API where resources are represented as JavaScript Object Notation (JSON). This makes it simple for developers to create, share and publish their own custom Google maps and develop applications for a number of platforms.  
-The interface allows users to Create, Read, Upload, Update and Delete data from custom tables using simple HTTP requests.
+Great! Now, some more things you need to know. The Google Maps Engine API is a RESTful API that allows users to manage data using simple HTTP requests. Reading data requires a GET request which returns a standard HTTP response as well as other information about the map data.   
 
-As stated in the introduction, this tutorial will focus on reading public data and customising the JSON resources returned. If you want to make your data public, you can follow the steps in this [link](https://support.google.com/mapsengine/answer/3164737?hl=en).
+This is achieved using structured URLs just the same as you would enter into your browser. Why don't you try this here? Enter this URL: [http://www.gutenberg.org/cache/epub/11/pg11.txt](http://www.gutenberg.org/cache/epub/11/pg11.txt) into the box below and click "Submit" and see the response!
