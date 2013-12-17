@@ -254,7 +254,7 @@ function testGetTable() {
   var string = activeLesson.inputDiv.val();;
   var $data = activeLesson.outputDiv;
   var address = trimLeft(string);
-  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
   //the Get Table is currently NOT AVAILABLE in v1, will someday be available and this 2 line codes needs to be removed
   address = address.replace("v1","search_tt");
   correctAns = correctAns.replace("v1","search_tt");
