@@ -60,8 +60,7 @@ Lesson.prototype.update = function() {
   } 
   updateTick();
 
-  var info = {currentLesson: activeLesson.divID}
-  jsonLocalStorage.set('state', info);
+  jsonLocalStorage.set('state', {currentLesson: activeLesson.divID});
 }
 
 Lesson.prototype.submit = function() {
