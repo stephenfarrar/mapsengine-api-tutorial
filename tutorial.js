@@ -17,9 +17,13 @@ function Lesson(divID, options) {
   this.noSubmitRequired = options.noSubmitRequired
   //done is TRUE if: the user submit correctly OR the user has loaded the page that does not need submission
   this.done = false;
+  this.unlocked = false;
 }
 
 Lesson.prototype.update = function() {
+  //if the lesson is still unlocked, it can't be accessed
+  if (!this.unlocked) return;
+  //else, the lesson can be accessed
   hideAll();
   activeLesson = this;
   var me = this;
@@ -35,29 +39,38 @@ Lesson.prototype.update = function() {
     })
   }
   if (!this.upToDate){
-    //first time page loaded
+    //first time page loaded, updating the instruction blurb
     $.get(this.divID+".md", function(response){
       $("#instructions").html(markdown.toHTML(response));
       me.instructions = response;
       me.upToDate = true;
     } );    
   } else {
-      //has been loaded before
+      //has been loaded before, the blurb has been stored and need to be shown
       $("#instructions").html(markdown.toHTML(this.instructions));
   }
-
-  if(this.noSubmitRequired === true){
-    this.done = true;
-  } 
-  updateTick();
-
   localStorage['currentLesson'] = activeLesson.divID;
+  //if no submission required, the user automatically unlock the next page
+  if(this.noSubmitRequired){
+    this.unlock();
+  } 
 }
 
+//Give the submit prototype for the lessons that does not have submission function
+//the submit button will call the update function for those lessons
 Lesson.prototype.submit = function() {
   this.update();
 };
 
+//Marked the current lesson as done, update the completion tick, and unlock the next lesson
+Lesson.prototype.unlock = function(){
+  this.done = true;
+  this.next.unlocked = true;
+  localStorage[this.divID] = true;
+  updateTick();
+};
+
+//Object to store chapter information
 function Chapter(divID, options) {
   this.divID = divID;
   this.lessons = options.lessons;
@@ -65,6 +78,7 @@ function Chapter(divID, options) {
   this.done = false;
 }
 
+//Chapter update, call update for the first lesson in the chapter
 Chapter.prototype.update = function() {
   var lesson = this.lessons;
   lesson.forEach(function(lesson) {
@@ -89,7 +103,7 @@ var chapters = [
   ]})
 ];
 
-//ARRAY OF LESSONS
+//Determining the prev, next, and chapter for each lesson
 var prevLesson = chapters[0].lessons[0]; //first lesson
 chapters.forEach(function(chapter){
   chapter.lessons.forEach(function(lesson){
@@ -104,7 +118,7 @@ prevLesson.next = prevLesson;
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 google.maps.event.addDomListener(window, 'load', function initialize(){
-  //CREATING BUTTONS
+  //create the HTML elements
   makeLessonDivs();
   createInputOutput();
   chapters.forEach(function(chapter){
@@ -120,21 +134,30 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   //INSTRUCTIONS
   $("#instructions").css('font-size', 0.018*($("#instructions").height()+$("#instructions").width()));
 
+  //The first page shown is the first lesson
   hideLessons(0);
   loadState();
 });
 
 function loadState() {
+  chapters[0].lessons[0].unlocked = true;
   var activeLessonId = localStorage['currentLesson'] || 'lesson0-intro';
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
+      if (localStorage[lesson.divID]) {
+        lesson.done = true;
+        lesson.unlocked = true;
+        lesson.next.unlocked = true;
+      }
       if (lesson.divID === activeLessonId) {
         lesson.update();
+        updateTick();
       }
     });
   });
 }
 
+//Create the divs for each lesson
 function makeLessonDivs(){
   var body = $("#body");
   chapters.forEach(function(chapter){
@@ -152,6 +175,7 @@ function makeLessonDivs(){
   });
 }
 
+//Create the menu button for each lesson & chapter
 function makeButton(object, objectClass){
   var button = $("#buttons");
   var newButton = $("<input>")
@@ -181,7 +205,7 @@ function hideLessons(speed) {
   })
 }
 
-//Should be called initially to dynamically create divs for each lesson
+//Create the input and output area for each lesson
 function createInputOutput() {
   chapters.forEach(function(chapter, i){
     chapter.lessons.forEach(function(lesson, j){
@@ -200,37 +224,48 @@ function createInputOutput() {
   });
 }
 
+//Clear the input area 
 function clearInput() {
   activeLesson.inputDiv.val("");
 }
 
+//Trim the pre white spaces in the user input
 function trimLeft(string){
   return string.replace(/^\s+/, '');
 }
 
+//update the completion tick
 function updateTick(){
+  //set the tutorial to be in completed stage
   var allChapterDone = true;
   chapters.forEach(function(chapter){
+    //set the chapter to be in completed stage
     var allLessonDone = true;
     chapter.lessons.forEach(function(lesson){
-        if (lesson.done === true){
+        if (lesson.done){
+          //create green tick for lesson
           var lessonButton = $("#"+lesson.divID+"button");
           lessonButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
         } else {
+          //the chapter is not completed since there is an incomplete lesson
           allLessonDone = false;
         }
     });
+    //if the chapter is done
     if(allLessonDone){
+      //create green tick for chapter
+      //set the chapter object "done" property to true
       chapter.done = true;
       var chapterButton  = $("#"+chapter.divID+"button");
       chapterButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
     }
-    if(chapter.done === false){
+    //if there is a not done chapter, the tutorial is not complete
+    if(!chapter.done){
       allChapterDone = false;
     }
   });
-
-  if(allChapterDone && isTutorialFinished===false){
+  //if the tutorial is complete and it is the first time user completed it, send a congratulatory message
+  if(allChapterDone && !isTutorialFinished){
     alert("Congratulations, you have completed this tutorial!");
     isTutorialFinished = true;
   }
@@ -238,16 +273,17 @@ function updateTick(){
 
 //*****************THE API Key FUNCTIONS**********************//
 function testAPIKey() {
+  //get user input
   var userKey = activeLesson.inputDiv.val();
   var $data = activeLesson.outputDiv;
+  //use user's API Key to do a HTTP request, if it works then it is a valid API Key
   jQuery.ajax({
   url: 'https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=' + userKey,
     dataType: 'json',
     success: function(resource) {
       alert("Congrats! Your API Key works. Now continue on to Get Table!");
       userAPIKey = userKey;
-      activeLesson.done = true;
-      updateTick();
+      activeLesson.unlock();
     },
     error: function(response) {
       alert("Sorry your API Key did not work. Try again!");
@@ -258,49 +294,59 @@ function testAPIKey() {
 //*****************THE Get Table FUNCTIONS**********************//
   
 function testGetTable() {
+  //get user input and trim it
   var string = activeLesson.inputDiv.val();;
   var $data = activeLesson.outputDiv;
   var address = trimLeft(string);
-  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
   //the Get Table is currently NOT AVAILABLE in v1, will someday be available and this 2 line codes needs to be removed
   address = address.replace("v1","search_tt");
   correctAns = correctAns.replace("v1","search_tt");
   checkCorrectness(address, correctAns);
 }
+
 //*****************THE List Features FUNCTIONS**********************//
 function executeListInput(){
+  //get user input and trim it
   var string = activeLesson.inputDiv.val();
   var address = trimLeft(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
   checkCorrectness(address, correctAns);
 }
 
+//*****************THE Query FUNCTIONS**********************//
+
 function executeQueries(){
+  //get user input and trim it
   var string = activeLesson.inputDiv.val();;
   var address = trimLeft(string);
-  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&limit=3";
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&where=Population<2000000";
   checkCorrectness(address, correctAns);
 }
 
+//*****************CHECKING CORRECT INPUT*******************//
 function checkCorrectness(addressString, correctAns){
   var $data = activeLesson.outputDiv;
+  //style the output div
   $data.css({ whiteSpace: 'pre' });
   $data.empty();
+  //Get the response with the correct URL
   jQuery.ajax({
     url: correctAns,
     dataType: 'json',
     success: function(resource) {
       var correctResourceString = JSON.stringify(resource, null, 2);
+      //Get the response with users's input
       jQuery.ajax({
         url: addressString,
         dataType: 'json',
         success: function(resource2) {
           var resourceString = JSON.stringify(resource2, null, 2);
           $data.append(resourceString);
+          //if the response user got is the correct response, then the user is right!
           if(resourceString === correctResourceString){
             alert("Great work! You can move on to the next lesson.");
-            activeLesson.done = true;
-            updateTick();
+            activeLesson.unlock();
           } else {
             alert("Oops! You've entered wrong URL! Try again!");
           }
@@ -308,9 +354,11 @@ function checkCorrectness(addressString, correctAns){
         error: function(response) {
           alert ("Oops! You've entered wrong URL! Try again!");
           $data.append("Wrong URL\n");
+          //Output the HTTP status
           $data.append("HTTP Status: "+response.status);
           response = JSON.parse(response.responseText);
           var errorMess = response.error.errors[0];
+          //Giving messages for different error reasons
           if (errorMess.reason === "authError") {
             $data.append("\nYour authorization token is invalid. \nPlease check that the table can be viewed by general public\n\n");
           } else if (errorMess.reason === "invalid") {
