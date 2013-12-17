@@ -220,27 +220,34 @@ function updateTick(){
   //set the tutorial to be in completed stage
   var allChapterDone = true;
   chapters.forEach(function(chapter){
-    //set the chapter to be in completed stage
-    var allLessonDone = true;
-    chapter.lessons.forEach(function(lesson){
-        if (lesson.done){
-          //create green tick for lesson
-          var lessonButton = $("#"+lesson.divID+"button");
-          lessonButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
-        } else {
-          //the chapter is not completed since there is an incomplete lesson
-          allLessonDone = false;
-        }
-    });
-    //if the chapter is done
-    if(allLessonDone){
-      //create green tick for chapter
-      //set the chapter object "done" property to true
-      chapter.done = true;
-      var chapterButton  = $("#"+chapter.divID+"button");
-      chapterButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+    //if there is a not done chapter, look through the lessons to check if the chapter is completed
+    if (!chapter.done){
+      //set the chapter to be in completed stage
+      var allLessonDone = true;
+      //Go through each lesson to see whether it is done or not
+      chapter.lessons.forEach(function(lesson){
+          if (lesson.done){
+            var lessonButton = $("#"+lesson.divID+"button");
+            //if the green tick is not set up yet
+            if (lessonButton.css('background-image') === "none"){
+              //create the green tick for the lesson
+              lessonButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+            }
+          } else {
+            //the chapter is not completed since there is an incomplete lesson
+            allLessonDone = false;
+          }
+      });
+      //if the chapter is done
+      if(allLessonDone){
+        //create green tick for chapter
+        //set the chapter object "done" property to true
+        chapter.done = true;
+        var chapterButton  = $("#"+chapter.divID+"button");
+        chapterButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+      }
     }
-    //if there is a not done chapter, the tutorial is not complete
+    //if there is still a not done chapter, the tutorial is not complete
     if(!chapter.done){
       allChapterDone = false;
     }
