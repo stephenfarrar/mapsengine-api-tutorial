@@ -37,7 +37,13 @@ Lesson.prototype.update = function() {
       $('#' + lesson.divID + 'button').show('medium');
     })
   }
-
+  //make text on button for active lesson red, and all others black
+  chapters.forEach(function(chapter) {
+    chapter.lessons.forEach(function(lesson) {
+    $("#"+lesson.divID+'button').css('color', '#000000');
+    });
+  });
+  $("#"+this.divID+'button').css('color', '#DD4B39');
   //display the instruction blurb
   this.displayInstructions();
 
@@ -46,7 +52,7 @@ Lesson.prototype.update = function() {
   //if no submission required, the user automatically unlock the next page
   if(this.noSubmitRequired){
     this.unlock();
-  } 
+  }
 }
 
 // Displays the instructions, possibly loading them from the markdown file.
@@ -99,14 +105,14 @@ Chapter.prototype.update = function() {
 
 //ARRAY OF CHAPTERS
 var chapters = [
-  new Chapter('chapter0-intro', {title: '0.Introduction', lessons: [
+  new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
     new Lesson('lesson0-intro', {title: 'Introduction', noSubmitRequired: true}),
     new Lesson('lesson1-gmeapi', {title: 'GME API', noSubmitRequired: true})
   ]}),
-  new Chapter('chapter1-registration', {title: 'I.Registration', lessons: [
+  new Chapter('chapter1-registration', {title: 'Registration', lessons: [
     new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, noSubmitRequired: false})
   ]}),
-  new Chapter('chapter2-read', {title: 'II.Reading Public Data', lessons: [
+  new Chapter('chapter2-read', {title: 'Reading Public Data', lessons: [
     new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, noSubmitRequired: false}),
     new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput, noSubmitRequired: false}),
     new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, noSubmitRequired: false}),
