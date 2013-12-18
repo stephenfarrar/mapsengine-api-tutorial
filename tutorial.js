@@ -308,12 +308,12 @@ function getText() {
   url: address,
     dataType: 'html',
     success: function(resource) {
-      alert("Nice work!");
+      alert("Nice work! You sent a successful request!");
       $data.append(resource);
       activeLesson.unlock();
     },
     error: function(response) {
-      alert("Sorry that was unsuccessful");
+      alert("Sorry that was unsuccessful, try typing 'alice-in-wonderland.txt'.");
     }
   });
 }
