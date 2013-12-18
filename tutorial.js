@@ -236,7 +236,7 @@ function createInputOutput() {
       lesson.inputDiv = newInput;
       //add the output area
       var newOutput = $("<textarea>")
-        .addClass("text-output")
+        .addClass("text-output");
       lessonDiv.append(newOutput);
       lesson.outputDiv = newOutput;
     });
