@@ -152,6 +152,7 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
 function loadState() {
   chapters[0].lessons[0].unlocked = true;
   var activeLessonId = localStorage['currentLesson'] || 'lesson0-intro';
+  isTutorialFinished = localStorage['isTutorialFinished'] || false;
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
       //if lesson is completed, stored as 'true'
@@ -285,6 +286,7 @@ function updateTick(){
   if(allChapterDone && !isTutorialFinished){
     alert("Congratulations, you have completed this tutorial!");
     isTutorialFinished = true;
+    localStorage['isTutorialFinished'] = true;
   }
 }
 
