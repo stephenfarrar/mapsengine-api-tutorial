@@ -101,7 +101,7 @@ Chapter.prototype.update = function() {
 var chapters = [
   new Chapter('chapter0-intro', {title: '0.Introduction', lessons: [
     new Lesson('lesson0-intro', {title: 'Introduction', noSubmitRequired: true}),
-    new Lesson('lesson1-gmeapi', {title: 'GME API', noSubmitRequired: true})
+    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText, noSubmitRequired: false})
   ]}),
   new Chapter('chapter1-registration', {title: 'I.Registration', lessons: [
     new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, noSubmitRequired: false})
@@ -286,6 +286,25 @@ function updateTick(){
     alert("Congratulations, you have completed this tutorial!");
     isTutorialFinished = true;
   }
+}
+
+//*****************THE GME API FUNCTIONS**********************//
+function getText() {
+  var string = activeLesson.inputDiv.val();
+  var address = trimLeft(string);
+  var $data = activeLesson.outputDiv;
+  jQuery.ajax({
+  url: address,
+    dataType: 'html',
+    success: function(resource) {
+      alert("Nice work!");
+      $data.append(resource);
+      activeLesson.unlock();
+    },
+    error: function(response) {
+      alert("Sorry that was unsuccessful");
+    }
+  });
 }
 
 //*****************THE API Key FUNCTIONS**********************//
