@@ -26,7 +26,6 @@ Lesson.prototype.update = function() {
   //else, the lesson can be accessed
   hideAll();
   activeLesson = this;
-  var me = this;
   document.title = this.title;
   $("#"+this.divID).css({display : "block"});
 
@@ -38,15 +37,9 @@ Lesson.prototype.update = function() {
       $('#' + lesson.divID + 'button').show('medium');
     })
   }
-  if (!this.instructions){
-    //first time page loaded, updating the instruction blurb
-    $.get(this.divID+".md", function(response){
-      me.instructions = response;
-    } );    
-  } 
 
-  //Shown the instruction blurb
-  $("#instructions").html(markdown.toHTML(this.instructions));
+  //display the instruction blurb
+  this.displayInstructions();
 
   localStorage['currentLesson'] = activeLesson.divID;
 
@@ -54,6 +47,23 @@ Lesson.prototype.update = function() {
   if(this.noSubmitRequired){
     this.unlock();
   } 
+}
+
+// Displays the instructions, possibly loading them from the markdown file.
+Lesson.prototype.displayInstructions = function() {
+  var me = this;
+
+  // If the instructions aren't loaded, load them.
+  if (!this.instructions){
+    $.get(this.divID+".md", function(response){
+      me.instructions = response;
+      me.displayInstructions();
+    });
+  }
+
+  if (this.instructions) {
+    $("#instructions").html(markdown.toHTML(this.instructions));
+  }
 }
 
 //Give the submit prototype for the lessons that does not have submission function
