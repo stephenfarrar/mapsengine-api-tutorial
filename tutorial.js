@@ -152,6 +152,7 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
 function loadState() {
   chapters[0].lessons[0].unlocked = true;
   var activeLessonId = localStorage['currentLesson'] || 'lesson0-intro';
+  isTutorialFinished = localStorage['isTutorialFinished'] || false;
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
       //if lesson is completed, stored as 'true'
@@ -161,6 +162,12 @@ function loadState() {
       }
       if (lesson.divID === activeLessonId) {
         lesson.update();
+      }
+      if (localStorage[lesson.divID+'input']){
+        lesson.inputDiv.val(localStorage[lesson.divID+'input']);
+      }
+      if (localStorage[lesson.divID+'output']){
+        lesson.outputDiv.html(localStorage[lesson.divID+'output']);
       }
     });
   });
@@ -222,7 +229,10 @@ function createInputOutput() {
       var lessonDiv = $("#"+lesson.divID);
       //add the text area
       var newInput = $("<textarea>")
-        .addClass("text-input");
+        .addClass("text-input")
+        .change(function(){
+          localStorage[lesson.divID+'input'] = newInput.val();
+        });
       lessonDiv.append(newInput);
       lesson.inputDiv = newInput;
       //add the output area
@@ -285,6 +295,7 @@ function updateTick(){
   if(allChapterDone && !isTutorialFinished){
     alert("Congratulations, you have completed this tutorial!");
     isTutorialFinished = true;
+    localStorage['isTutorialFinished'] = true;
   }
 }
 
@@ -379,6 +390,7 @@ function checkCorrectness(addressString, correctAns){
         success: function(resource2) {
           var resourceString = JSON.stringify(resource2, null, 2);
           $data.append(resourceString);
+          localStorage[activeLesson.divID+'output']=resourceString;
           //if the response user got is the correct response, then the user is right!
           if(resourceString === correctResourceString){
             alert("Great work! You can move on to the next lesson.");
