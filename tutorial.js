@@ -42,12 +42,10 @@ Lesson.prototype.update = function() {
     //first time page loaded, updating the instruction blurb
     $.get(this.divID+".md", function(response){
       me.instructions = response;
-    } );    
+    });    
   } 
-
   //Shown the instruction blurb
   $("#instructions").html(markdown.toHTML(this.instructions));
-
   localStorage['currentLesson'] = activeLesson.divID;
 
   //if no submission required, the user automatically unlock the next page
