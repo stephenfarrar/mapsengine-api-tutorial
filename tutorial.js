@@ -357,8 +357,7 @@ function testGetTable() {
   //the Get Table is currently NOT AVAILABLE in v1, will someday be available and this 2 line codes needs to be removed
   address = address.replace("v1","search_tt");
   correctAns = correctAns.replace("v1","search_tt");
-  var me = this;
-  checkCorrectness(me, address, correctAns);
+  checkCorrectness(this, address, correctAns);
 }
 
 //*****************THE List Features FUNCTIONS**********************//
@@ -367,8 +366,7 @@ function executeListInput(){
   var string = this.inputDiv.val();
   var address = trimLeft(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
-  var me = this;
-  checkCorrectness(me, address, correctAns);
+  checkCorrectness(this, address, correctAns);
 }
 
 //*****************THE Query FUNCTIONS**********************//
@@ -378,8 +376,7 @@ function executeQueries(){
   var string = this.inputDiv.val();;
   var address = trimLeft(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&where=Population<2000000";
-  var me = this;
-  checkCorrectness(me, address, correctAns);
+  checkCorrectness(this, address, correctAns);
 }
 
 //*****************CHECKING CORRECT INPUT*******************//
