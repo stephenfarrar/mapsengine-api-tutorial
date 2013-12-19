@@ -78,12 +78,16 @@ Lesson.prototype.submit = function() {
   this.update();
 };
 
+Lesson.prototype.complete = function() {
+  this.done = true; 
+  localStorage[this.divID] = true;
+  this.next.unlock();
+  updateTick();
+}
+
 //Marked the current lesson as done, update the completion tick, and unlock the next lesson
 Lesson.prototype.unlock = function(){
-  this.done = true;
-  this.next.unlocked = true;
-  localStorage[this.divID] = true;
-  updateTick();
+  this.unlocked = true;
 };
 
 //Object to store chapter information
@@ -317,7 +321,7 @@ function getText() {
     success: function(resource) {
       alert("Nice work! You sent a successful request!");
       $data.append(resource);
-      me.unlock();
+      me.complete();
     },
     error: function(response) {
       alert("Sorry that was unsuccessful, try typing 'alice-in-wonderland.txt'.");
@@ -338,7 +342,7 @@ function testAPIKey() {
     success: function(resource) {
       alert("Congrats! Your API Key works. Now continue on to Get Table!");
       userAPIKey = userKey;
-      me.unlock();
+      me.complete();
     },
     error: function(response) {
       alert("Sorry your API Key did not work. Try again!");
@@ -402,7 +406,7 @@ function checkCorrectness(lesson, addressString, correctAns){
           //if the response user got is the correct response, then the user is right!
           if(resourceString === correctResourceString){
             alert("Great work! You can move on to the next lesson.");
-            lesson.unlock();
+            lesson.complete();
           } else {
             alert("Oops! You've entered wrong URL! Try again!");
           }
