@@ -307,16 +307,17 @@ function updateTick(){
 
 //*****************THE GME API FUNCTIONS**********************//
 function getText() {
-  var string = activeLesson.inputDiv.val();
+  var string = this.inputDiv.val();
   var address = trimLeft(string);
-  var $data = activeLesson.outputDiv;
+  var $data = this.outputDiv;
+  var me = this;
   jQuery.ajax({
   url: address,
     dataType: 'html',
     success: function(resource) {
       alert("Nice work! You sent a successful request!");
       $data.append(resource);
-      activeLesson.unlock();
+      me.unlock();
     },
     error: function(response) {
       alert("Sorry that was unsuccessful, try typing 'alice-in-wonderland.txt'.");
@@ -327,8 +328,9 @@ function getText() {
 //*****************THE API Key FUNCTIONS**********************//
 function testAPIKey() {
   //get user input
-  var userKey = activeLesson.inputDiv.val();
-  var $data = activeLesson.outputDiv;
+  var userKey = this.inputDiv.val();
+  var $data = this.outputDiv;
+  var me = this;
   //use user's API Key to do a HTTP request, if it works then it is a valid API Key
   jQuery.ajax({
   url: 'https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=' + userKey,
@@ -336,7 +338,7 @@ function testAPIKey() {
     success: function(resource) {
       alert("Congrats! Your API Key works. Now continue on to Get Table!");
       userAPIKey = userKey;
-      activeLesson.unlock();
+      me.unlock();
     },
     error: function(response) {
       alert("Sorry your API Key did not work. Try again!");
@@ -348,38 +350,38 @@ function testAPIKey() {
   
 function testGetTable() {
   //get user input and trim it
-  var string = activeLesson.inputDiv.val();;
-  var $data = activeLesson.outputDiv;
+  var string = this.inputDiv.val();;
+  var $data = this.outputDiv;
   var address = trimLeft(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
   //the Get Table is currently NOT AVAILABLE in v1, will someday be available and this 2 line codes needs to be removed
   address = address.replace("v1","search_tt");
   correctAns = correctAns.replace("v1","search_tt");
-  checkCorrectness(address, correctAns);
+  checkCorrectness(this, address, correctAns);
 }
 
 //*****************THE List Features FUNCTIONS**********************//
 function executeListInput(){
   //get user input and trim it
-  var string = activeLesson.inputDiv.val();
+  var string = this.inputDiv.val();
   var address = trimLeft(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
-  checkCorrectness(address, correctAns);
+  checkCorrectness(this, address, correctAns);
 }
 
 //*****************THE Query FUNCTIONS**********************//
 
 function executeQueries(){
   //get user input and trim it
-  var string = activeLesson.inputDiv.val();;
+  var string = this.inputDiv.val();;
   var address = trimLeft(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&where=Population<2000000";
-  checkCorrectness(address, correctAns);
+  checkCorrectness(this, address, correctAns);
 }
 
 //*****************CHECKING CORRECT INPUT*******************//
-function checkCorrectness(addressString, correctAns){
-  var $data = activeLesson.outputDiv;
+function checkCorrectness(lesson, addressString, correctAns){
+  var $data = lesson.outputDiv;
   //style the output div
   $data.css({ whiteSpace: 'pre' });
   $data.empty();
@@ -396,11 +398,11 @@ function checkCorrectness(addressString, correctAns){
         success: function(resource2) {
           var resourceString = JSON.stringify(resource2, null, 2);
           $data.append(resourceString);
-          localStorage[activeLesson.divID+'output']=resourceString;
+          localStorage[lesson.divID+'output']=resourceString;
           //if the response user got is the correct response, then the user is right!
           if(resourceString === correctResourceString){
             alert("Great work! You can move on to the next lesson.");
-            activeLesson.unlock();
+            lesson.unlock();
           } else {
             alert("Oops! You've entered wrong URL! Try again!");
           }
