@@ -36,7 +36,10 @@ Lesson.prototype.update = function() {
   //make text on button for active lesson red, and all others black
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
-      $("#"+lesson.divID+'button').removeClass('active').addClass('unlocked');
+      $("#"+lesson.divID+'button').removeClass('active');
+      if (lesson.unlocked) {
+        $("#"+lesson.divID+'button').addClass('unlocked');
+      }
     });
   });
   $("#"+this.divID+'button').removeClass('unlocked').addClass('active');
@@ -85,6 +88,7 @@ Lesson.prototype.tick = function() {
 Lesson.prototype.unlock = function(){
   this.unlocked = true;
   $("#"+this.divID+'button').removeClass('locked').addClass('unlocked');
+  $("#"+this.chapter.divID+'button').removeClass('locked').addClass('unlocked');
 };
 
 //Object to store chapter information
