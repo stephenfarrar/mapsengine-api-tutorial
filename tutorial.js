@@ -3,7 +3,6 @@
 
 var userAPIKey = "";
 var activeLesson;
-var isTutorialFinished = false;
 
 //object to store lesson information
 function Lesson(divID, options) {
@@ -12,10 +11,7 @@ function Lesson(divID, options) {
   if (options.submit) {
     this.submit = options.submit;
   }
-  //noSubmitRequired is TRUE if the user does not need to submit anything to complete the lesson
-  //noSubmitRequired is FALSE if the user needs to pass an exercise and submit them in order to complete it
-  this.noSubmitRequired = options.noSubmitRequired
-  //done is TRUE if: the user submit correctly OR the user has loaded the page that does not need submission
+  //done is TRUE if: the user has submitted correctly
   this.done = false;
   this.unlocked = false;
 }
@@ -40,21 +36,16 @@ Lesson.prototype.update = function() {
   //make text on button for active lesson red, and all others black
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
-      if (lesson.unlocked) {
-        $("#"+lesson.divID+'button').css('color', '#000000');
+      if ($("#"+lesson.divID+'button').hasClass('active')) {
+        $("#"+lesson.divID+'button').toggleClass('active unlocked');
       }
     });
   });
-  $("#"+this.divID+'button').css('color', '#DD4B39');
+  $("#"+this.divID+'button').toggleClass('unlocked active');
   //display the instruction blurb
   this.displayInstructions();
 
   localStorage['currentLesson'] = activeLesson.divID;
-
-  //if no submission required, the user automatically unlock the next page
-  if(this.noSubmitRequired){
-    this.complete();
-  }
 }
 
 // Displays the instructions, possibly loading them from the markdown file.
@@ -85,7 +76,7 @@ Lesson.prototype.complete = function() {
   localStorage[this.divID] = true;
   this.next.unlock();
   this.tick();
-  this.chapter.isComplete();
+  this.chapter.tickIfComplete();
 }
 
 Lesson.prototype.tick = function() {
@@ -95,7 +86,7 @@ Lesson.prototype.tick = function() {
 //marks a lesson as unlocked
 Lesson.prototype.unlock = function(){
   this.unlocked = true;
-  $("#"+this.divID+'button').css('color', '#000000');
+  $("#"+this.divID+'button').toggleClass('locked unlocked');
 };
 
 //Object to store chapter information
@@ -119,7 +110,7 @@ Chapter.prototype.tick = function() {
 }
 
 //checks if a chapter is complete and, as a result, if the tutorial is also complete
-Chapter.prototype.isComplete = function() {
+Chapter.prototype.tickIfComplete = function() {
   this.done = true;
   var me = this;
   this.lessons.forEach(function(lesson) {
@@ -150,16 +141,16 @@ Chapter.prototype.isTutorialComplete = function() {
 //ARRAY OF CHAPTERS
 var chapters = [
   new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
-    new Lesson('lesson0-intro', {title: 'Introduction', noSubmitRequired: true}),
-    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText, noSubmitRequired: false})
+    new Lesson('lesson0-intro', {title: 'Introduction'}),
+    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText})
   ]}),
   new Chapter('chapter1-registration', {title: 'Registration', lessons: [
-    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, noSubmitRequired: false})
+    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey})
   ]}),
   new Chapter('chapter2-read', {title: 'Reading Public Data', lessons: [
-    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, noSubmitRequired: false}),
-    new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput, noSubmitRequired: false}),
-    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, noSubmitRequired: false}),
+    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable}),
+    new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput}),
+    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries}),
   ]})
 ];
 
@@ -200,9 +191,10 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
 });
 
 function loadState() {
-  chapters[0].lessons[0].unlocked = true;
+  //enable the first lesson on first load
+  chapters[0].lessons[0].unlock();
+  localStorage[chapters[0].lessons[0].divID] = true;
   var activeLessonId = localStorage['currentLesson'] || 'lesson0-intro';
-  isTutorialFinished = localStorage['isTutorialFinished'] || false;
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
       //if lesson is completed, stored as 'true'
@@ -247,8 +239,7 @@ function makeButton(object, objectClass){
     .attr("type", "button")
     .attr("id", object.divID+"button")
     .attr("value", object.title)
-    .addClass("menu-button")
-    .addClass(objectClass)
+    .addClass("menu-button " + objectClass + " locked")
     .click(function(){
       object.update();
     });
