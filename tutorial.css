@@ -7,7 +7,6 @@
       display: block;
       position: relative;
       background-color: white;
-      color: #000000;
       text-align: left;
       background-repeat: no-repeat;
       background-image: none;
@@ -22,6 +21,7 @@
       font-size: 18px;
     }
     .lesson-button {
+      color: #CCCCCC;
       width: 95%;
       left: 5%;
       height: 3.5%;

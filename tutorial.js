@@ -40,7 +40,9 @@ Lesson.prototype.update = function() {
   //make text on button for active lesson red, and all others black
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
-    $("#"+lesson.divID+'button').css('color', '#000000');
+      if (lesson.unlocked) {
+        $("#"+lesson.divID+'button').css('color', '#000000');
+      }
     });
   });
   $("#"+this.divID+'button').css('color', '#DD4B39');
@@ -51,7 +53,7 @@ Lesson.prototype.update = function() {
 
   //if no submission required, the user automatically unlock the next page
   if(this.noSubmitRequired){
-    this.unlock();
+    this.complete();
   }
 }
 
@@ -82,12 +84,18 @@ Lesson.prototype.complete = function() {
   this.done = true; 
   localStorage[this.divID] = true;
   this.next.unlock();
-  updateTick();
+  this.tick();
+  this.chapter.isComplete();
 }
 
-//Marked the current lesson as done, update the completion tick, and unlock the next lesson
+Lesson.prototype.tick = function() {
+   $('#'+this.divID+'button').css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+}
+
+//marks a lesson as unlocked
 Lesson.prototype.unlock = function(){
   this.unlocked = true;
+  $("#"+this.divID+'button').css('color', '#000000');
 };
 
 //Object to store chapter information
@@ -100,11 +108,43 @@ function Chapter(divID, options) {
 
 //Chapter update, call update for the first lesson in the chapter
 Chapter.prototype.update = function() {
-  var lesson = this.lessons;
-  lesson.forEach(function(lesson) {
+  this.lessons.forEach(function(lesson) {
     $('#' + lesson.divID + 'button').toggle('medium');
   })
   this.lessons[0].update();
+}
+
+Chapter.prototype.tick = function() {
+   $('#'+this.divID+'button').css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+}
+
+//checks if a chapter is complete and, as a result, if the tutorial is also complete
+Chapter.prototype.isComplete = function() {
+  this.done = true;
+  var me = this;
+  this.lessons.forEach(function(lesson) {
+    if (!lesson.done) {
+      me.done = false;
+    }
+  });
+  if (this.done) {
+    me.tick();
+    me.isTutorialComplete();
+  }
+}
+
+Chapter.prototype.isTutorialComplete = function() {
+  var finished = true;
+  chapters.forEach(function(chapter) {
+    if (!chapter.done) {
+      finished = false;
+    }
+  });
+  //make sure user only sees completion message once
+  if (finished && !localStorage['finished']) {
+    alert("Congratulations, you have completed this tutorial!");
+    localStorage['finished'] = true;
+  }
 }
 
 //ARRAY OF CHAPTERS
@@ -167,8 +207,7 @@ function loadState() {
     chapter.lessons.forEach(function(lesson) {
       //if lesson is completed, stored as 'true'
       if (localStorage[lesson.divID]) {
-        lesson.done = true;
-        lesson.next.unlocked = true;
+        lesson.complete();
       }
       if (lesson.divID === activeLessonId) {
         lesson.update();
@@ -181,7 +220,6 @@ function loadState() {
       }
     });
   });
-  updateTick();
 }
 
 //Create the divs for each lesson
@@ -262,51 +300,6 @@ function clearInput() {
 //Trim the pre white spaces in the user input
 function trimLeft(string){
   return string.replace(/^\s+/, '');
-}
-
-//update the completion tick
-function updateTick(){
-  //set the tutorial to be in completed stage
-  var allChapterDone = true;
-  chapters.forEach(function(chapter){
-    //if there is a not done chapter, look through the lessons to check if the chapter is completed
-    if (!chapter.done){
-      //set the chapter to be in completed stage
-      var allLessonDone = true;
-      //Go through each lesson to see whether it is done or not
-      chapter.lessons.forEach(function(lesson){
-          if (lesson.done){
-            var lessonButton = $("#"+lesson.divID+"button");
-            //if the green tick is not set up yet
-            if (lessonButton.css('background-image') === "none"){
-              //create the green tick for the lesson
-              lessonButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
-            }
-          } else {
-            //the chapter is not completed since there is an incomplete lesson
-            allLessonDone = false;
-          }
-      });
-      //if the chapter is done
-      if(allLessonDone){
-        //create green tick for chapter
-        //set the chapter object "done" property to true
-        chapter.done = true;
-        var chapterButton  = $("#"+chapter.divID+"button");
-        chapterButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
-      }
-    }
-    //if there is still a not done chapter, the tutorial is not complete
-    if(!chapter.done){
-      allChapterDone = false;
-    }
-  });
-  //if the tutorial is complete and it is the first time user completed it, send a congratulatory message
-  if(allChapterDone && !isTutorialFinished){
-    alert("Congratulations, you have completed this tutorial!");
-    isTutorialFinished = true;
-    localStorage['isTutorialFinished'] = true;
-  }
 }
 
 //*****************THE GME API FUNCTIONS**********************//
