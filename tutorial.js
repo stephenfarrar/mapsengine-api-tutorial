@@ -36,12 +36,10 @@ Lesson.prototype.update = function() {
   //make text on button for active lesson red, and all others black
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
-      if ($("#"+lesson.divID+'button').hasClass('active')) {
-        $("#"+lesson.divID+'button').toggleClass('active unlocked');
-      }
+      $("#"+lesson.divID+'button').removeClass('active').addClass('unlocked');
     });
   });
-  $("#"+this.divID+'button').toggleClass('unlocked active');
+  $("#"+this.divID+'button').removeClass('unlocked').addClass('active');
   //display the instruction blurb
   this.displayInstructions();
 
@@ -86,7 +84,7 @@ Lesson.prototype.tick = function() {
 //marks a lesson as unlocked
 Lesson.prototype.unlock = function(){
   this.unlocked = true;
-  $("#"+this.divID+'button').toggleClass('locked unlocked');
+  $("#"+this.divID+'button').removeClass('locked').addClass('unlocked');
 };
 
 //Object to store chapter information
