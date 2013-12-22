@@ -310,6 +310,7 @@ function getText() {
   var string = activeLesson.inputDiv.val();
   var address = trimLeft(string);
   var $data = activeLesson.outputDiv;
+  $data.css({ whiteSpace: 'pre' });
   jQuery.ajax({
   url: address,
     dataType: 'html',
