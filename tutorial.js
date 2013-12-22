@@ -122,11 +122,11 @@ Chapter.prototype.tickIfComplete = function() {
   });
   if (this.done) {
     me.tick();
-    me.isTutorialComplete();
+    me.checkTutorialCompletion();
   }
 }
 
-Chapter.prototype.isTutorialComplete = function() {
+Chapter.prototype.checkTutorialCompletion = function() {
   var finished = true;
   chapters.forEach(function(chapter) {
     if (!chapter.done) {
