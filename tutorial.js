@@ -3,7 +3,6 @@
 
 var userAPIKey = "";
 var activeLesson;
-var isTutorialFinished = false;
 
 //object to store lesson information
 function Lesson(divID, options) {
@@ -12,10 +11,7 @@ function Lesson(divID, options) {
   if (options.submit) {
     this.submit = options.submit;
   }
-  //noSubmitRequired is TRUE if the user does not need to submit anything to complete the lesson
-  //noSubmitRequired is FALSE if the user needs to pass an exercise and submit them in order to complete it
-  this.noSubmitRequired = options.noSubmitRequired
-  //done is TRUE if: the user submit correctly OR the user has loaded the page that does not need submission
+  //done is TRUE if: the user has submitted correctly
   this.done = false;
   this.unlocked = false;
 }
@@ -40,19 +36,17 @@ Lesson.prototype.update = function() {
   //make text on button for active lesson red, and all others black
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
-    $("#"+lesson.divID+'button').css('color', '#000000');
+      $("#"+lesson.divID+'button').removeClass('active');
+      if (lesson.unlocked) {
+        $("#"+lesson.divID+'button').addClass('unlocked');
+      }
     });
   });
-  $("#"+this.divID+'button').css('color', '#DD4B39');
+  $("#"+this.divID+'button').removeClass('unlocked').addClass('active');
   //display the instruction blurb
   this.displayInstructions();
 
   localStorage['currentLesson'] = activeLesson.divID;
-
-  //if no submission required, the user automatically unlock the next page
-  if(this.noSubmitRequired){
-    this.unlock();
-  }
 }
 
 // Displays the instructions, possibly loading them from the markdown file.
@@ -78,12 +72,23 @@ Lesson.prototype.submit = function() {
   this.update();
 };
 
-//Marked the current lesson as done, update the completion tick, and unlock the next lesson
-Lesson.prototype.unlock = function(){
-  this.done = true;
-  this.next.unlocked = true;
+Lesson.prototype.complete = function() {
+  this.done = true; 
   localStorage[this.divID] = true;
-  updateTick();
+  this.next.unlock();
+  this.tick();
+  this.chapter.tickIfComplete();
+}
+
+Lesson.prototype.tick = function() {
+   $('#'+this.divID+'button').css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+}
+
+//marks a lesson as unlocked
+Lesson.prototype.unlock = function(){
+  this.unlocked = true;
+  $("#"+this.divID+'button').removeClass('locked').addClass('unlocked');
+  $("#"+this.chapter.divID+'button').removeClass('locked').addClass('unlocked');
 };
 
 //Object to store chapter information
@@ -96,26 +101,58 @@ function Chapter(divID, options) {
 
 //Chapter update, call update for the first lesson in the chapter
 Chapter.prototype.update = function() {
-  var lesson = this.lessons;
-  lesson.forEach(function(lesson) {
+  this.lessons.forEach(function(lesson) {
     $('#' + lesson.divID + 'button').toggle('medium');
   })
   this.lessons[0].update();
 }
 
+Chapter.prototype.tick = function() {
+   $('#'+this.divID+'button').css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+}
+
+//checks if a chapter is complete and, as a result, if the tutorial is also complete
+Chapter.prototype.tickIfComplete = function() {
+  this.done = true;
+  var me = this;
+  this.lessons.forEach(function(lesson) {
+    if (!lesson.done) {
+      me.done = false;
+    }
+  });
+  if (this.done) {
+    me.tick();
+    me.checkTutorialCompletion();
+  }
+}
+
+Chapter.prototype.checkTutorialCompletion = function() {
+  var finished = true;
+  chapters.forEach(function(chapter) {
+    if (!chapter.done) {
+      finished = false;
+    }
+  });
+  //make sure user only sees completion message once
+  if (finished && !localStorage['finished']) {
+    alert("Congratulations, you have completed this tutorial!");
+    localStorage['finished'] = true;
+  }
+}
+
 //ARRAY OF CHAPTERS
 var chapters = [
   new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
-    new Lesson('lesson0-intro', {title: 'Introduction', noSubmitRequired: true}),
-    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText, noSubmitRequired: false})
+    new Lesson('lesson0-intro', {title: 'Introduction'}),
+    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText})
   ]}),
   new Chapter('chapter1-registration', {title: 'Registration', lessons: [
-    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, noSubmitRequired: false})
+    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey})
   ]}),
   new Chapter('chapter2-read', {title: 'Reading Public Data', lessons: [
-    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, noSubmitRequired: false}),
-    new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput, noSubmitRequired: false}),
-    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, noSubmitRequired: false}),
+    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable}),
+    new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput}),
+    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries}),
   ]})
 ];
 
@@ -156,15 +193,15 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
 });
 
 function loadState() {
-  chapters[0].lessons[0].unlocked = true;
+  //enable the first lesson on first load
+  chapters[0].lessons[0].unlock();
+  localStorage[chapters[0].lessons[0].divID] = true;
   var activeLessonId = localStorage['currentLesson'] || 'lesson0-intro';
-  isTutorialFinished = localStorage['isTutorialFinished'] || false;
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
       //if lesson is completed, stored as 'true'
       if (localStorage[lesson.divID]) {
-        lesson.done = true;
-        lesson.next.unlocked = true;
+        lesson.complete();
       }
       if (lesson.divID === activeLessonId) {
         lesson.update();
@@ -177,7 +214,6 @@ function loadState() {
       }
     });
   });
-  updateTick();
 }
 
 //Create the divs for each lesson
@@ -205,8 +241,7 @@ function makeButton(object, objectClass){
     .attr("type", "button")
     .attr("id", object.divID+"button")
     .attr("value", object.title)
-    .addClass("menu-button")
-    .addClass(objectClass)
+    .addClass("menu-button " + objectClass + " locked")
     .click(function(){
       object.update();
     });
@@ -260,64 +295,20 @@ function trimLeft(string){
   return string.replace(/^\s+/, '');
 }
 
-//update the completion tick
-function updateTick(){
-  //set the tutorial to be in completed stage
-  var allChapterDone = true;
-  chapters.forEach(function(chapter){
-    //if there is a not done chapter, look through the lessons to check if the chapter is completed
-    if (!chapter.done){
-      //set the chapter to be in completed stage
-      var allLessonDone = true;
-      //Go through each lesson to see whether it is done or not
-      chapter.lessons.forEach(function(lesson){
-          if (lesson.done){
-            var lessonButton = $("#"+lesson.divID+"button");
-            //if the green tick is not set up yet
-            if (lessonButton.css('background-image') === "none"){
-              //create the green tick for the lesson
-              lessonButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
-            }
-          } else {
-            //the chapter is not completed since there is an incomplete lesson
-            allLessonDone = false;
-          }
-      });
-      //if the chapter is done
-      if(allLessonDone){
-        //create green tick for chapter
-        //set the chapter object "done" property to true
-        chapter.done = true;
-        var chapterButton  = $("#"+chapter.divID+"button");
-        chapterButton.css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
-      }
-    }
-    //if there is still a not done chapter, the tutorial is not complete
-    if(!chapter.done){
-      allChapterDone = false;
-    }
-  });
-  //if the tutorial is complete and it is the first time user completed it, send a congratulatory message
-  if(allChapterDone && !isTutorialFinished){
-    alert("Congratulations, you have completed this tutorial!");
-    isTutorialFinished = true;
-    localStorage['isTutorialFinished'] = true;
-  }
-}
-
 //*****************THE GME API FUNCTIONS**********************//
 function getText() {
-  var string = activeLesson.inputDiv.val();
+  var string = this.inputDiv.val();
   var address = trimLeft(string);
-  var $data = activeLesson.outputDiv;
+  var $data = this.outputDiv;
   $data.css({ whiteSpace: 'pre' });
+  var me = this;
   jQuery.ajax({
   url: address,
     dataType: 'html',
     success: function(resource) {
       alert("Nice work! You sent a successful request!");
       $data.append(resource);
-      activeLesson.unlock();
+      me.complete();
     },
     error: function(response) {
       alert("Sorry that was unsuccessful, try typing 'alice-in-wonderland.txt'.");
@@ -328,8 +319,9 @@ function getText() {
 //*****************THE API Key FUNCTIONS**********************//
 function testAPIKey() {
   //get user input
-  var userKey = activeLesson.inputDiv.val();
-  var $data = activeLesson.outputDiv;
+  var userKey = this.inputDiv.val();
+  var $data = this.outputDiv;
+  var me = this;
   //use user's API Key to do a HTTP request, if it works then it is a valid API Key
   jQuery.ajax({
   url: 'https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=' + userKey,
@@ -337,7 +329,7 @@ function testAPIKey() {
     success: function(resource) {
       alert("Congrats! Your API Key works. Now continue on to Get Table!");
       userAPIKey = userKey;
-      activeLesson.unlock();
+      me.complete();
     },
     error: function(response) {
       alert("Sorry your API Key did not work. Try again!");
@@ -349,38 +341,38 @@ function testAPIKey() {
   
 function testGetTable() {
   //get user input and trim it
-  var string = activeLesson.inputDiv.val();;
-  var $data = activeLesson.outputDiv;
+  var string = this.inputDiv.val();;
+  var $data = this.outputDiv;
   var address = trimLeft(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
   //the Get Table is currently NOT AVAILABLE in v1, will someday be available and this 2 line codes needs to be removed
   address = address.replace("v1","search_tt");
   correctAns = correctAns.replace("v1","search_tt");
-  checkCorrectness(address, correctAns);
+  checkCorrectness(this, address, correctAns);
 }
 
 //*****************THE List Features FUNCTIONS**********************//
 function executeListInput(){
   //get user input and trim it
-  var string = activeLesson.inputDiv.val();
+  var string = this.inputDiv.val();
   var address = trimLeft(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
-  checkCorrectness(address, correctAns);
+  checkCorrectness(this, address, correctAns);
 }
 
 //*****************THE Query FUNCTIONS**********************//
 
 function executeQueries(){
   //get user input and trim it
-  var string = activeLesson.inputDiv.val();;
+  var string = this.inputDiv.val();;
   var address = trimLeft(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&where=Population<2000000";
-  checkCorrectness(address, correctAns);
+  checkCorrectness(this, address, correctAns);
 }
 
 //*****************CHECKING CORRECT INPUT*******************//
-function checkCorrectness(addressString, correctAns){
-  var $data = activeLesson.outputDiv;
+function checkCorrectness(lesson, addressString, correctAns){
+  var $data = lesson.outputDiv;
   //style the output div
   $data.css({ whiteSpace: 'pre' });
   $data.empty();
@@ -397,11 +389,11 @@ function checkCorrectness(addressString, correctAns){
         success: function(resource2) {
           var resourceString = JSON.stringify(resource2, null, 2);
           $data.append(resourceString);
-          localStorage[activeLesson.divID+'output']=resourceString;
+          localStorage[lesson.divID+'output']=resourceString;
           //if the response user got is the correct response, then the user is right!
           if(resourceString === correctResourceString){
             alert("Great work! You can move on to the next lesson.");
-            activeLesson.unlock();
+            lesson.complete();
           } else {
             alert("Oops! You've entered wrong URL! Try again!");
           }

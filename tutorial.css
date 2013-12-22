@@ -7,7 +7,6 @@
       display: block;
       position: relative;
       background-color: white;
-      color: #000000;
       text-align: left;
       background-repeat: no-repeat;
       background-image: none;
@@ -26,6 +25,16 @@
       left: 5%;
       height: 3.5%;
       font-size: 14px;
+    }
+    /*define the colours for the left-menu text*/
+    .locked{
+      color: #CCCCCC;
+    }
+    .unlocked{
+      color: #000000;
+    }
+    .active{
+      color: #DD4B39;
     }
     /* .button is for prev, next, submit, clear i.e. not menu buttons */
     .button {
