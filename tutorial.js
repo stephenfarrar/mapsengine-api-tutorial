@@ -188,7 +188,7 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
 
   
   var $input = $(".url");
-  //create placeholder to the input
+  //create placeholder for the input
   var placeholder = "Enter your input here, press enter or click 'Get' to submit.";
   $input.text(placeholder);
   $input.focus(function(){
@@ -205,16 +205,20 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   });  
 
   //store the input everytime it changes, to the respective local storage
+  //onkeypress
   $input.keypress(function(event){
+    //enable submit by enter, not making the enter visible in the input
     if(event.which == 13){
       event.preventDefault();
       activeLesson.submit();
     }
     localStorage[activeLesson.divID+'input'] = $input.text();
   });
+  //onkeyup -> handle backspaces
   $input.keyup(function(){
     localStorage[activeLesson.divID+'input'] = $input.text();
   });
+  //on cut, and also pasting with mouse
   $input.on('paste cut',function(){
     setTimeout(function(){
       localStorage[activeLesson.divID+'input'] = $input.text();
