@@ -161,7 +161,6 @@ var prevLesson = chapters[0].lessons[0]; //first lesson
 chapters.forEach(function(chapter){
   chapter.lessons.forEach(function(lesson){
     lesson.chapter = chapter;
-    lesson.prev = prevLesson;
     prevLesson.next = lesson;
     prevLesson = lesson;
   });
