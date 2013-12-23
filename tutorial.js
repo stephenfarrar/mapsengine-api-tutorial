@@ -49,9 +49,9 @@ Lesson.prototype.update = function() {
   localStorage['currentLesson'] = activeLesson.divID;
 
   if (localStorage[this.divID+'input']){
-    $(".text-input").val(localStorage[this.divID+'input']);
+    $(".url").text(localStorage[this.divID+'input']);
   } else {
-    $(".text-input").val("");
+    $(".url").text("");
   }
 }
 
@@ -186,10 +186,39 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
     });
   });
 
+  
+  var $input = $(".url");
+  //create placeholder to the input
+  var placeholder = "Enter your input here, press enter or click 'Get' to submit.";
+  $input.text(placeholder);
+  $input.focus(function(){
+    if($input.text()===placeholder){
+      $input.text("");
+      $input.css("color","black");
+    }
+  })
+  .focusout(function(){
+    if(!$input.text().length){
+      $input.css("color","gray");
+      $input.text(placeholder);
+    }
+  });  
+
   //store the input everytime it changes, to the respective local storage
-  var $input = $(".text-input");
-  $input.change(function(){
-    localStorage[activeLesson.divID+'input'] = $input.val();
+  $input.keypress(function(event){
+    if(event.which == 13){
+      event.preventDefault();
+      activeLesson.submit();
+    }
+    localStorage[activeLesson.divID+'input'] = $input.text();
+  });
+  $input.keyup(function(){
+    localStorage[activeLesson.divID+'input'] = $input.text();
+  });
+  $input.on('paste cut',function(){
+    setTimeout(function(){
+      localStorage[activeLesson.divID+'input'] = $input.text();
+    },50);
   });
 
   //LOADING THE FONT SIZE ACCORDING TO WINDOW SIZES
@@ -287,7 +316,7 @@ function createInputOutput() {
 
 //Clear the input area 
 function clearInput() {
-  $(".text-input").val("");
+  $(".url").text("");
 }
 
 //Trim the pre white spaces in the user input
@@ -297,7 +326,7 @@ function trimLeft(string){
 
 //*****************THE GME API FUNCTIONS**********************//
 function getText() {
-  var string = $(".text-input").val();
+  var string = $(".url").text();
   var address = trimLeft(string);
   var $data = this.outputDiv;
   $data.css({ whiteSpace: 'pre' });
@@ -319,7 +348,7 @@ function getText() {
 //*****************THE API Key FUNCTIONS**********************//
 function testAPIKey() {
   //get user input
-  var userKey = $(".text-input").val();
+  var userKey = $(".url").text();
   var $data = this.outputDiv;
   var me = this;
   //use user's API Key to do a HTTP request, if it works then it is a valid API Key
@@ -341,7 +370,7 @@ function testAPIKey() {
   
 function testGetTable() {
   //get user input and trim it
-  var string = $(".text-input").val();
+  var string = $(".url").text();
   var $data = this.outputDiv;
   var address = trimLeft(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
@@ -354,7 +383,7 @@ function testGetTable() {
 //*****************THE List Features FUNCTIONS**********************//
 function executeListInput(){
   //get user input and trim it
-  var string = $(".text-input").val();
+  var string = $(".url").text();
   var address = trimLeft(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
   checkCorrectness(this, address, correctAns);
@@ -364,7 +393,7 @@ function executeListInput(){
 
 function executeQueries(){
   //get user input and trim it
-  var string = $(".text-input").val();
+  var string = $(".url").text();
   var address = trimLeft(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&where=Population<2000000";
   checkCorrectness(this, address, correctAns);
