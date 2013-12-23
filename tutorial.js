@@ -62,7 +62,7 @@ Lesson.prototype.displayInstructions = function() {
   }
 
   if (this.instructions) {
-    $("#instructions").html(markdown.toHTML(this.instructions));
+    $(".instructions").html(markdown.toHTML(this.instructions));
   }
 }
 
@@ -180,13 +180,6 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
       makeButton(lesson, "lesson-button");
     });
   });
-
-  //LOADING THE FONT SIZE ACCORDING TO WINDOW SIZES
-   //TITLE
-  $("#title").css({fontSize: 0.025*($("#title").height()+$("#title").width())});
-  //INSTRUCTIONS
-  $("#instructions").css('font-size', 0.018*($("#instructions").height()+$("#instructions").width()));
-
   //The first page shown is the first lesson
   hideLessons(0);
   loadState();
@@ -218,7 +211,7 @@ function loadState() {
 
 //Create the divs for each lesson
 function makeLessonDivs(){
-  var body = $("#body");
+  var body = $(".body");
   chapters.forEach(function(chapter){
      var newChapterDiv = $("<div>")
         .attr("id", chapter.divID)
@@ -236,7 +229,7 @@ function makeLessonDivs(){
 
 //Create the menu button for each lesson & chapter
 function makeButton(object, objectClass){
-  var button = $("#buttons");
+  var button = $(".buttons");
   var newButton = $("<input>")
     .attr("type", "button")
     .attr("id", object.divID+"button")
