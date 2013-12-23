@@ -7,133 +7,124 @@
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
   <script type="text/javascript" src="lessondesign.js"></script>
 </head>
-<body id = "body">
-  <div class = 'title-bar'><img src = "Images/GME-icon.png" class ="maps-icon"/>
+<body>
+  <div class = 'title-bar'>
+    <img src = "Images/GME-icon.png" class ="maps-icon"/>
     <div class = 'title'>Google Maps Engine API Tutorial</div>
   </div>
-    <div class = "menu"></div>
-    <div class = 'content'>
-      <div class = "instructions page-content">
-        <h2>List Features</h2>
-        Besides viewing a public table's attributes, you can also access the table's features using a GET request. A feature is a data entry in a table, represented by each row in the table. It can be a point, polygon, or polyline.<br><br> 
-        The basic URL to access a features list is:<br>                  
-        https://www.googleapis.com/mapsengine/v1/tables/{tableId}/features?version=published&key={APIkey} <br><br>
-        One example of the URL:<br>
-        `https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0`
-        <br><br>
-        <h3>EXERCISE</h3>  
-        Try to make the URL to list a table's features. Use the table ID = 15474835347274181123-14495543923251622067 and your valid API Key for the URL, then click submit. <br>
-      </div>
-      <div class = "inventory page-content">
-       <b> Helpful Information</b><br>
-          table ID = 2838237982309820938029839283982938<br>
-          your API Key = AIza37038_kw3308jdsfkjdls
-      </div>
-      <div class="input page-content" id="input" contenteditable = "true" tabindex="0"></div>
-      <input type="button" value="Go" class="go-button pointer" id="go-button"/>
-      <div id = "success-ribbon" class="page-content">Congratulations! You entered the right URL!</div>
-      <div id = "success-layer" class = "page-content">
-      <br>You can see the response you got in the box below. The response you get from the list features command is a collection of features in the GeoJSON format.The response specified the type of the data(featuresCollection), followed by the array of features. Each feature has a type "Feature", a geometry, and properties.<br><br>
-        The response shown has a geomery type of "Point". This means that the feature specifies a single point on the surface of the Earth, with the longitude and latitude displayed respectively in the 'coordinates' array. The other attributes in the table are specified in 'properties' and are specific to the data set. For example, in this table the schema contains 'Name', 'Population', and 'gx_id'.<br>
-      </div>
-      <div id = "error-layer" class = "page-content">
-         Looks like you entered the wrong URL<br>
-         Make sure that you read the question again and try once more! Don't give up :)<br>
-         Below you can see the error returned by the server:<br>
-      </div>
-     
-      <input type="button" value="Next Lesson" class="next-button page-content pointer" id="next-button">
-    
-    <div class= "output page-content" id="output-success">{
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          2.3508,
-          48.8567
-        ]
-      },
-      "properties": {
-        "Name": "Paris",
-        "Population": "2211000",
-        "gx_id": "1"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -6.2597,
-          53.3478
-        ]
-      },
-      "properties": {
-        "Name": "Dublin",
-        "Population": "527612",
-        "gx_id": "2"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          12.5,
-          41.9
-        ]
-      },
-      "properties": {
-        "Name": "Rome",
-        "Population": "2753000",
-        "gx_id": "3"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          13.3833,
-          52.5167
-        ]
-      },
-      "properties": {
-        "Name": "Berlin",
-        "Population": "3502000",
-        "gx_id": "4"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          2.1833,
-          41.3833
-        ]
-      },
-      "properties": {
-        "Name": "Barcelona",
-        "Population": "1621000",
-        "gx_id": "5"
-      }
-    }
-  ]
-}</div>
-<div class= "output page-content" id="output-error">Wrong URL
-HTTP Status: 400
-The data cannot be processed. See the details below for the information regarding the error:
+  <div class = "menu"></div>
+  <div class = 'lesson'>
+    <div class = "instructions">
+      <h2>List Features</h2>
+      Besides viewing a public table's attributes, you can also access the table's features using a GET request. A feature is a data entry in a table, represented by each row in the table. It can be a point, polygon, or polyline.<br><br> 
+      The basic URL to access a features list is:<br>                  
+      https://www.googleapis.com/mapsengine/v1/tables/{tableId}/features?version=published&key={APIkey} <br><br>
+      One example of the URL:<br>
+      `https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0`
+      <br>
+      <h3>EXERCISE</h3>  
+      Try to make the URL to list a table's features. Use the table ID = 15474835347274181123-14495543923251622067 and your valid API Key for the URL, then click submit. <br>
+    </div>
 
-{
-  "domain": "usageLimits",
-  "reason": "keyInvalid",
-  "message": "Bad Request",
-  "debugInfo": "QuotaState: KEY_INVALID\ncom.google.api.server.core.Fault: ImmutableErrorDefinition{base=INVALID_KEY, category=USER_ERROR, cause=com.google.api.server.core.Fault: ImmutableErrorDefinition{base=INVALID_KEY, category=USER_ERROR, cause=null, debugInfo=QuotaState: KEY_INVALID, domain=usageLimits, extendedHelp=null, httpHeaders={}, httpStatus=badRequest, internalReason=Reason{code=quotaState.keyInvalid, createdByBackend=false, errorProtoDomain=null, errorProtoCode=null, location=null, debugMessage=null, cause=null, unnamedArguments=[], message=null, arguments={}}, location=null, message=Bad Request, reason=keyInvalid, rpcCode=400} Bad Request: QuotaState: KEY_INVALID, debugInfo=QuotaState: KEY_INVALID, domain=usageLimits, extendedHelp=null, httpHeaders={}, httpStatus=badRequest, internalReason=Reason{code=quotaState.keyInvalid, createdByBackend=false, errorProtoDomain=null, errorProtoCode=null, location=null, debugMessage=null, cause=null, unnamedArguments=[], message=null, arguments={}}, location=null, message=Bad Request, reason=keyInvalid, rpcCode=400} Bad Request: QuotaState: KEY_INVALID\n\tat com.google.api.server.core.ErrorCollector.toFault(ErrorCollector.java:43)\n\tat com.google.api.server.core.intercept.ErrorConverterInterceptor.processErrorResponse(ErrorConverterInterceptor.java:69)\n\tat com.google.api.server.core.intercept.AroundInterceptorWrapper.processErrorResponse(AroundInterceptorWrapper.java:28)\n\tat com.google.api.server.stats.StatsBootstrap$InterceptorStatsRecorder.processErrorResponse(StatsBootstrap.java:301)\n\tat com.google.api.server.core.intercept.Interceptions$AroundInterception.handleErrorResponse(Interceptions.java:192)\n\tat com.google.api.server.core.intercept.Interceptions$AroundInterception.invoke(Interceptions.java:142)\n\tat com.google.api.server.core.protocol.http.rest.RestServlet.service(RestServlet.java:125)\n\tat javax.servlet.http.HttpServlet.service(HttpServlet.java:717)\n\tat com.google.api.server.core.protocol.http.ApiServlet.service(ApiServlet.java:51)\n\tat com.google.gse.FilteredServlet$ChainEnd.doFilter(FilteredServlet.java:212)\n\tat com.google.loadbalancer.gslb.backend.ubb.UBBFilter.doFilter(UBBFilter.java:61)\n\tat com.google.gse.FilteredServlet$Chain.doFilter(FilteredServlet.java:189)\n\tat com.google.servlet.testing.ResponseInjectionFilter.doFilter(ResponseInjectionFilter.java:135)\n\tat com.google.gse.FilteredServlet$Chain.doFilter(FilteredServlet.java:189)\n\tat com.google.gse.FilteredServlet.service(FilteredServlet.java:158)\n\tat com.google.gse.internal.HttpConnectionImpl.runServletFromWithinSpan(HttpConnectionImpl.java:934)\n\tat com.google.gse.internal.HttpConnectionImpl.access$000(HttpConnectionImpl.java:73)\n\tat com.google.gse.internal.HttpConnectionImpl$1.runServletFromWithinSpan(HttpConnectionImpl.java:807)\n\tat com.google.gse.GSETraceHelper$TraceableServletRunnable$2.run(GSETraceHelper.java:470)\n\tat com.google.tracing.LocalTraceSpanRunnable.run(LocalTraceSpanRunnable.java:56)\n\tat com.google.tracing.LocalTraceSpanBuilder.internalContinueSpan(LocalTraceSpanBuilder.java:615)\n\tat com.google.gse.GSETraceHelper$TraceableServletRunnable.continueGfeTrace(GSETraceHelper.java:421)\n\tat com.google.gse.GSETraceHelper$TraceableServletRunnable.runWithTracingEnabled(GSETraceHelper.java:376)\n\tat com.google.gse.GSETraceHelper$TraceableServletRunnable.run(GSETraceHelper.java:343)\n\tat com.google.gse.internal.HttpConnectionImpl.runServlet(HttpConnectionImpl.java:803)\n\tat com.google.gse.internal.HttpConnectionImpl.run(HttpConnectionImpl.java:763)\n\tat com.google.gse.internal.DispatchQueueImpl$WorkerThread.run(DispatchQueueImpl.java:387)\nCaused by: com.google.api.server.core.Fault: ImmutableErrorDefinition{base=INVALID_KEY, category=USER_ERROR, cause=null, debugInfo=QuotaState: KEY_INVALID, domain=usageLimits, extendedHelp=null, httpHeaders={}, httpStatus=badRequest, internalReason=Reason{code=quotaState.keyInvalid, createdByBackend=false, errorProtoDomain=null, errorProtoCode=null, location=null, debugMessage=null, cause=null, unnamedArguments=[], message=null, arguments={}}, location=null, message=Bad Request, reason=keyInvalid, rpcCode=400} Bad Request: QuotaState: KEY_INVALID\n\tat com.google.api.server.quota.QuotaUtil.createFault(QuotaUtil.java:59)\n\tat com.google.api.server.quota.ApplyQuota.throwFault(ApplyQuota.java:148)\n\tat com.google.api.server.quota.ApplyQuota.apply(ApplyQuota.java:62)\n\tat com.google.api.server.quota.QuotaBackendFilter.invoke(QuotaBackendFilter.java:35)\n\tat com.google.api.server.core.backend.BackendFilterChain.invoke(BackendFilterChain.java:53)\n\tat com.google.api.server.tracing.ReplayRecorder$RecordingBackendFilter.invoke(ReplayRecorder.java:108)\n\tat com.google.api.server.core.backend.BackendFilterChain.invoke(BackendFilterChain.java:53)\n\tat com.google.api.server.cache.CacheBackendFilter.invoke(CacheBackendFilter.java:43)\n\tat com.google.api.server.core.backend.BackendFilterChain.invoke(BackendFilterChain.java:53)\n\tat com.google.api.server.rest.adapter.rosy.RosyHandler$BackendOverrideFilter.invoke(RosyHandler.java:526)\n\tat com.google.api.server.core.backend.BackendFilterChain.invoke(BackendFilterChain.java:53)\n\tat com.google.api.server.push.PushBackendFilter.invoke(PushBackendFilter.java:54)\n\tat com.google.api.server.core.backend.BackendFilterChain.invoke(BackendFilterChain.java:53)\n\tat com.google.api.server.rest.adapter.rosy.RosyHandler.invoke(RosyHandler.java:369)\n\tat com.google.api.server.core.intercept.Interceptions$AroundInterception.invoke(Interceptions.java:127)\n\t... 21 more\n"
-}</div>
-</div>
+    <div class = "inventory">
+     <b> Helpful Information</b><br>
+        table ID = 2838237982309820938029839283982938<br>
+        your API Key = AIza37038_kw3308jdsfkjdls
+    </div>
+    
+    <div class="request">
+      <div class="url" contenteditable = "true" tabindex="0"></div>
+      <input type="button" value="Get" class="get-button pointer"/>
+    </div>
+    
+    <div class = "feedback">
+      <div class = "ribbon">Congratulations! You entered the right URL!</div>
+      <div class = "message"></div>
+    </div>
+   
+    <input type="button" value="Next Lesson" class="general-button next-button pointer">
+  
+    <div class= "response">{
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            2.3508,
+            48.8567
+          ]
+        },
+        "properties": {
+          "Name": "Paris",
+          "Population": "2211000",
+          "gx_id": "1"
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -6.2597,
+            53.3478
+          ]
+        },
+        "properties": {
+          "Name": "Dublin",
+          "Population": "527612",
+          "gx_id": "2"
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            12.5,
+            41.9
+          ]
+        },
+        "properties": {
+          "Name": "Rome",
+          "Population": "2753000",
+          "gx_id": "3"
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            13.3833,
+            52.5167
+          ]
+        },
+        "properties": {
+          "Name": "Berlin",
+          "Population": "3502000",
+          "gx_id": "4"
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            2.1833,
+            41.3833
+          ]
+        },
+        "properties": {
+          "Name": "Barcelona",
+          "Population": "1621000",
+          "gx_id": "5"
+        }
+      }
+    ]
+  }
+    </div>
+  </div>
 </body> 
 </html>

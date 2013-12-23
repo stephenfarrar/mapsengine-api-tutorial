@@ -23,21 +23,14 @@ html, body {
   vertical-align: middle;
   margin: 10px;
 }
-.menu{
+.lesson{
   display: block;
-  
-}
-.content{
-  display: block;
-  position:absolute;
+  margin: 10px;
+  margin-bottom: 20px;
   margin-left:300px;
   width: 650px;
-}
-.page-content{
-  margin: 10px;
   line-height: 1.5;
 }
-
 .instructions{
   display: block;
   height:auto;
@@ -46,8 +39,8 @@ html, body {
   font-size: 13px;
   margin-top: 20px;
 }
-
 .inventory{
+  margin-top:10px;
   display: block;
   background-color: #F9EDBE;
   color: black;
@@ -56,13 +49,12 @@ html, body {
   font-size: 12px;
   padding: 10px;
   font-family:arial;
-  margin-top:0px;
   box-shadow: 4px 4px 8px #CCC;
 }
 
-.input{
+.url{
   display: inline-block;
-  width: 532px;
+  width: 555px;
   min-height:24px;
   height: auto;
   word-wrap: break-word;
@@ -76,12 +68,13 @@ html, body {
   border: 1px solid black;
   color: gray;
   overflow-y:hidden;
+  margin-top:20px
 }
-.go-button{
+.get-button{
   float: right;
   display: inline;
-  margin-top: 10px;
-  margin-right: 10px;
+  margin-top: 20px;
+  margin-right: 0px;
   width: 80px;
   height: 27px;
   background-color: #4287FD;
@@ -92,8 +85,35 @@ html, body {
   border: 1px solid #4683EA;
   font-weight: bold;
 }
-
-#success-ribbon{
+.general-button{
+  margin-top:10px;
+  min-width: 80px;
+  height: 27px;
+  font-size: 11px;
+  font-family: arial;
+  color: white;
+  font-weight: bold;
+  background-color: #3d9400;
+  border-radius: 2px;
+  border: 1px solid #29691d;
+}
+.next-button{
+  margin-left:565px;
+  display:none;
+}
+.pointer:hover{
+  cursor: pointer;
+}
+.menu{
+  display: block;  
+}
+.success{
+  color:black;
+}
+.failure{
+  color:#DD4B39;
+}
+.ribbon{
   display:none;
   background-color: #3D9400;
   color: black;
@@ -104,31 +124,17 @@ html, body {
   font-weight:bold;
   color:white;
   border-radius:2px;
+  margin-top:10px;
 }
-#success-layer{
+.message{
   display:none;
-  z-index:1;
   width: 630px;
-  margin-bottom:0px;
   margin-top:10px;
   height:auto;
-  color:black;
   font-family:arial;
   font-size:13px;
 }
-
-#error-layer{
-  display:none;
-  z-index:1;
-  width: 630px;
-  margin-bottom:0px;
-  margin-top:0px;
-  height:auto;
-  color:#DD4B39;
-  font-family:arial;
-  font-size:13px;
-}
-.output{
+.response{
   display: none;
   padding:10px;
   background-color: white;
@@ -143,24 +149,5 @@ html, body {
   -webkit-box-shadow: 4px 4px 8px #CCC;
   box-shadow: 4px 4px 8px #CCC;
   border: 1px solid black;
-  margin-bottom: 20px;
-}
-
-.next-button{
-  display:none;
-  width: 80px;
-  height: 27px;
-  background-color: #3D9400;
-  color: white;
-  font-size: 11px;
-  font-family: arial;
-  border-radius: 2px;
-  border: 1px solid #29691d;
-  font-weight: bold;
-  margin-left:560px;
   margin-top:10px;
-}
-
-.pointer:hover{
-  cursor: pointer;
 }
