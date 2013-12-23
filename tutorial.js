@@ -183,7 +183,7 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
 
   //LOADING THE FONT SIZE ACCORDING TO WINDOW SIZES
    //TITLE
-  $("#title").css({fontSize: 0.031*($("#title").height()+$("#title").width())});
+  $("#title").css({fontSize: 0.025*($("#title").height()+$("#title").width())});
   //INSTRUCTIONS
   $("#instructions").css('font-size', 0.018*($("#instructions").height()+$("#instructions").width()));
 
@@ -277,7 +277,7 @@ function createInputOutput() {
       lessonDiv.append(newInput);
       lesson.inputDiv = newInput;
       //add the output area
-      var newOutput = $("<textarea>")
+      var newOutput = $("<div>")
         .addClass("text-output");
       lessonDiv.append(newOutput);
       lesson.outputDiv = newOutput;
@@ -300,6 +300,7 @@ function getText() {
   var string = this.inputDiv.val();
   var address = trimLeft(string);
   var $data = this.outputDiv;
+  $data.css({ whiteSpace: 'pre' });
   var me = this;
   jQuery.ajax({
   url: address,

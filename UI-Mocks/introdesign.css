@@ -1,0 +1,53 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+.title-bar {
+  display: block;
+  width: 100%;
+  background-color: #F1F1F1;
+  border-bottom: 2px solid #EAEAEA;
+}
+.title {
+  display: inline;
+  font-weight: bold;
+  color: #737373;
+  font-family: arial;
+  font-size: 28px;
+  vertical-align: middle;
+}
+.maps-icon{
+  display: inline;
+  height: 55px;
+  vertical-align: middle;
+  margin: 10px;
+}
+.content{
+  display: none;
+  text-align: center;
+  font-family: arial;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+.cat{
+  display:block;
+  width: 200px;
+  margin-top:20px;
+  margin-bottom:20px;
+  margin-left:auto;
+  margin-right:auto;
+}
+.ready-button{
+  margin-top:10px;
+  width: 72px;
+  height: 27px;
+  font-size: 11px;
+  font-family: arial;
+  color: white;
+  font-weight: bold;
+  background-color: #3d9400;
+  border-radius: 2px;
+  border: 1px solid #29691d;
+}
