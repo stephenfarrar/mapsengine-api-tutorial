@@ -156,7 +156,7 @@ var chapters = [
   ]})
 ];
 
-//Determining the prev, next, and chapter for each lesson
+//Determining the next, and chapter for each lesson
 var prevLesson = chapters[0].lessons[0]; //first lesson
 chapters.forEach(function(chapter){
   chapter.lessons.forEach(function(lesson){
