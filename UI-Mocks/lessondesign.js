@@ -1,37 +1,47 @@
 $(document).ready(function(){
 
-  $("#input").keypress(function(event){
+  $(".url").keypress(function(event){
   	if(event.which == 13){
   	  evaluateInput();
     }
   });
-  $("#go-button").click(function(){
+  $(".get-button").click(function(){
   	evaluateInput();
   });
   
   var placeholder = "Enter your input here, press enter or click 'Get' to submit.";
-  $("#input").text(placeholder);
-  $("#input").focus(function(){
-  	if($("#input").text()===placeholder){
-  		$("#input").text("");
-  		$("#input").css("color","black");
+  var $url = $(".url");
+  $url.text(placeholder);
+  $url.focus(function(){
+  	if($url.text()===placeholder){
+  		$url.text("");
+  		$url.css("color","black");
   	}
   })
   .focusout(function(){
-  	console.log($("#input").text().length);
-  	if(!$("#input").text().length){
-  		$("#input").css("color","gray");
-  		$("#input").text(placeholder);
+  	console.log($url.text().length);
+  	if(!$url.text().length){
+  		$url.css("color","gray");
+  		$url.text(placeholder);
   	}
   }); 	
 
 });
 
 function evaluateInput(){
-	var text = $("#input").text();
+	var text = $(".url").text();
 	text = trimLeft(text);
 	text = trimRight(text);
 	if(text === "cat"){
+    var content = "<br>You can see the response you got in the box below."+
+     "The response you get from the list features command is a collection of features in the GeoJSON format."+
+     "The response specified the type of the data(featuresCollection), followed by the array of features."+
+     "Each feature has a type "Feature", a geometry, and properties.<br><br>"+
+     "The response shown has a geomery type of \"Point\"."+
+     " This means that the feature specifies a single point on the surface of the Earth,"+ 
+     "with the longitude and latitude displayed respectively in the 'coordinates' array."+ 
+     "The other attributes in the table are specified in 'properties' and are specific to the data set."+
+     " For example, in this table the schema contains 'Name', 'Population', and 'gx_id'.<br>";
 		$("#success-ribbon").fadeIn();
 		$("#success-ribbon").css('display','block');
 		$("#success-layer").fadeIn();

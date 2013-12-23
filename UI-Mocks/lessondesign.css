@@ -86,7 +86,7 @@ html, body {
   font-weight: bold;
 }
 
-.next-button{
+.general-button{
   margin-top:10px;
   min-width: 80px;
   height: 27px;
@@ -136,7 +136,7 @@ html, body {
   border-radius:2px;
 }
 
-.output{
+.response{
   display: none;
   padding:10px;
   background-color: white;

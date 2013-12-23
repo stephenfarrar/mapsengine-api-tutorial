@@ -40,15 +40,14 @@
     <div class = "success-ribbon" class="page-content">Congratulations! You entered the right URL!</div>
     
     <div class = "feedback">
-    <br>You can see the response you got in the box below. The response you get from the list features command is a collection of features in the GeoJSON format.The response specified the type of the data(featuresCollection), followed by the array of features. Each feature has a type "Feature", a geometry, and properties.<br><br>
-      The response shown has a geomery type of "Point". This means that the feature specifies a single point on the surface of the Earth, with the longitude and latitude displayed respectively in the 'coordinates' array. The other attributes in the table are specified in 'properties' and are specific to the data set. For example, in this table the schema contains 'Name', 'Population', and 'gx_id'.<br>
-
+      <div class = "ribbon"></div>
+      <div class = "message"></div>
        Looks like you entered the wrong URL<br>
        Make sure that you read the question again and try once more! Don't give up :)<br>
        Below you can see the error returned by the server:<br>
     </div>
    
-    <input type="button" value="Next Lesson" class="next-button pointer">
+    <input type="button" value="Next Lesson" class="general-button pointer">
   
     <div class= "response">{
     "type": "FeatureCollection",
