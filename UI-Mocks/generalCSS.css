@@ -1,0 +1,165 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+.title-bar {
+  display: block;
+  width: 100%;
+  background-color: #F1F1F1;
+  border-bottom: 2px solid #EAEAEA;
+}
+.title {
+  display: inline;
+  font-weight: bold;
+  color: #737373;
+  font-family: arial;
+  font-size: 28px;
+  vertical-align: middle;
+}
+.maps-icon{
+  display: inline;
+  height: 55px;
+  vertical-align: middle;
+  margin: 10px;
+}
+.lesson{
+  display: block;
+  margin: 10px;
+  margin-bottom: 20px;
+  margin-left:300px;
+  width: 650px;
+  line-height: 1.5;
+}
+.instructions{
+  display: block;
+  height:auto;
+  word-wrap: break-word;
+  font-family: arial;
+  font-size: 13px;
+  margin-top: 20px;
+}
+.inventory{
+  margin-top:10px;
+  display: block;
+  background-color: #F9EDBE;
+  color: black;
+  word-wrap: break-word;
+  border: 1px solid #FBCB43;
+  font-size: 12px;
+  padding: 10px;
+  font-family:arial;
+  box-shadow: 4px 4px 8px #CCC;
+}
+
+.url{
+  display: inline-block;
+  width: 555px;
+  min-height:24px;
+  height: auto;
+  word-wrap: break-word;
+  font-size: 13px;
+  font-family: monospace;
+  resize: none;
+  -moz-box-shadow: 4px 4px 8px #CCC;
+  -webkit-box-shadow: 4px 4px 8px #CCC;
+  box-shadow: 4px 4px 8px #CCC;
+  background-color:white;
+  border: 1px solid black;
+  color: gray;
+  overflow-y:hidden;
+  margin-top:20px
+}
+.get-button{
+  float: right;
+  display: inline;
+  margin-top: 20px;
+  margin-right: 0px;
+  width: 80px;
+  height: 27px;
+  background-color: #4287FD;
+  color: white;
+  font-size: 11px;
+  font-family: arial;
+  border-radius: 2px;
+  border: 1px solid #4683EA;
+  font-weight: bold;
+}
+.general-button{
+  margin-top:10px;
+  min-width: 80px;
+  height: 27px;
+  font-size: 11px;
+  font-family: arial;
+  color: white;
+  font-weight: bold;
+  background-color: #3d9400;
+  border-radius: 2px;
+  border: 1px solid #29691d;
+}
+.next-button{
+  margin-left:565px;
+  display:none;
+}
+.pointer:hover{
+  cursor: pointer;
+}
+.menu{
+  display: block;  
+}
+.success{
+  color:black;
+}
+.failure{
+  color:#DD4B39;
+}
+.ribbon{
+  display:none;
+  background-color: #3D9400;
+  color: black;
+  word-wrap: break-word;
+  font-size: 13px;
+  font-family:arial; 
+  padding: 10px;
+  font-weight:bold;
+  color:white;
+  border-radius:2px;
+  margin-top:10px;
+}
+.message{
+  display:none;
+  width: 630px;
+  margin-top:10px;
+  height:auto;
+  font-family:arial;
+  font-size:13px;
+}
+.response{
+  display: none;
+  padding:10px;
+  background-color: white;
+  color: black;
+  word-wrap: break-word;
+  font-size: 13px;
+  font-family: monospace;
+  white-space: pre;
+  height: 300px;
+  overflow-y:auto;
+  -moz-box-shadow: 4px 4px 8px #CCC;
+  -webkit-box-shadow: 4px 4px 8px #CCC;
+  box-shadow: 4px 4px 8px #CCC;
+  border: 1px solid black;
+  margin-top:10px;
+}
+.cat{
+  display:block;
+  width: 200px;
+  margin-top:20px;
+  margin-bottom:20px;
+}
+.highfive-cat{
+  display:block;
+  width: 200px;
+  margin-top:20px;
+  margin-bottom:20px;
+}
