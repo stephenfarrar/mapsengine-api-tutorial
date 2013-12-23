@@ -47,6 +47,12 @@ Lesson.prototype.update = function() {
   this.displayInstructions();
 
   localStorage['currentLesson'] = activeLesson.divID;
+
+  if (localStorage[this.divID+'input']){
+    $(".text-input").val(localStorage[this.divID+'input']);
+  } else {
+    $(".text-input").val("");
+  }
 }
 
 // Displays the instructions, possibly loading them from the markdown file.
@@ -156,12 +162,11 @@ var chapters = [
   ]})
 ];
 
-//Determining the prev, next, and chapter for each lesson
+//Determining the next, and chapter for each lesson
 var prevLesson = chapters[0].lessons[0]; //first lesson
 chapters.forEach(function(chapter){
   chapter.lessons.forEach(function(lesson){
     lesson.chapter = chapter;
-    lesson.prev = prevLesson;
     prevLesson.next = lesson;
     prevLesson = lesson;
   });
@@ -179,6 +184,12 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
     chapter.lessons.forEach(function(lesson){
       makeButton(lesson, "lesson-button");
     });
+  });
+
+  //store the input everytime it changes, to the respective local storage
+  var $input = $(".text-input");
+  $input.change(function(){
+    localStorage[activeLesson.divID+'input'] = $input.val();
   });
 
   //LOADING THE FONT SIZE ACCORDING TO WINDOW SIZES
@@ -205,9 +216,6 @@ function loadState() {
       }
       if (lesson.divID === activeLessonId) {
         lesson.update();
-      }
-      if (localStorage[lesson.divID+'input']){
-        lesson.inputDiv.val(localStorage[lesson.divID+'input']);
       }
       if (localStorage[lesson.divID+'output']){
         lesson.outputDiv.html(localStorage[lesson.divID+'output']);
@@ -263,19 +271,11 @@ function hideLessons(speed) {
   })
 }
 
-//Create the input and output area for each lesson
+//Create the output area for each lesson
 function createInputOutput() {
   chapters.forEach(function(chapter, i){
     chapter.lessons.forEach(function(lesson, j){
       var lessonDiv = $("#"+lesson.divID);
-      //add the text area
-      var newInput = $("<textarea>")
-        .addClass("text-input")
-        .change(function(){
-          localStorage[lesson.divID+'input'] = newInput.val();
-        });
-      lessonDiv.append(newInput);
-      lesson.inputDiv = newInput;
       //add the output area
       var newOutput = $("<div>")
         .addClass("text-output");
@@ -287,7 +287,7 @@ function createInputOutput() {
 
 //Clear the input area 
 function clearInput() {
-  activeLesson.inputDiv.val("");
+  $(".text-input").val("");
 }
 
 //Trim the pre white spaces in the user input
@@ -297,7 +297,7 @@ function trimLeft(string){
 
 //*****************THE GME API FUNCTIONS**********************//
 function getText() {
-  var string = this.inputDiv.val();
+  var string = $(".text-input").val();
   var address = trimLeft(string);
   var $data = this.outputDiv;
   $data.css({ whiteSpace: 'pre' });
@@ -319,7 +319,7 @@ function getText() {
 //*****************THE API Key FUNCTIONS**********************//
 function testAPIKey() {
   //get user input
-  var userKey = this.inputDiv.val();
+  var userKey = $(".text-input").val();
   var $data = this.outputDiv;
   var me = this;
   //use user's API Key to do a HTTP request, if it works then it is a valid API Key
@@ -341,7 +341,7 @@ function testAPIKey() {
   
 function testGetTable() {
   //get user input and trim it
-  var string = this.inputDiv.val();;
+  var string = $(".text-input").val();
   var $data = this.outputDiv;
   var address = trimLeft(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
@@ -354,7 +354,7 @@ function testGetTable() {
 //*****************THE List Features FUNCTIONS**********************//
 function executeListInput(){
   //get user input and trim it
-  var string = this.inputDiv.val();
+  var string = $(".text-input").val();
   var address = trimLeft(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
   checkCorrectness(this, address, correctAns);
@@ -364,7 +364,7 @@ function executeListInput(){
 
 function executeQueries(){
   //get user input and trim it
-  var string = this.inputDiv.val();;
+  var string = $(".text-input").val();
   var address = trimLeft(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&where=Population<2000000";
   checkCorrectness(this, address, correctAns);
