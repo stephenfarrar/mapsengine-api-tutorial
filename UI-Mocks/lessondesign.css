@@ -26,6 +26,7 @@ html, body {
 .lesson{
   display: block;
   margin: 10px;
+  margin-bottom: 20px;
   margin-left:300px;
   width: 650px;
   line-height: 1.5;
@@ -39,6 +40,7 @@ html, body {
   margin-top: 20px;
 }
 .inventory{
+  margin-top:10px;
   display: block;
   background-color: #F9EDBE;
   color: black;
@@ -47,15 +49,12 @@ html, body {
   font-size: 12px;
   padding: 10px;
   font-family:arial;
-  margin-top:0px;
   box-shadow: 4px 4px 8px #CCC;
 }
-.request{
-  
-}
+
 .url{
   display: inline-block;
-  width: 532px;
+  width: 555px;
   min-height:24px;
   height: auto;
   word-wrap: break-word;
@@ -69,12 +68,13 @@ html, body {
   border: 1px solid black;
   color: gray;
   overflow-y:hidden;
+  margin-top:20px
 }
 .get-button{
   float: right;
   display: inline;
-  margin-top: 10px;
-  margin-right: 10px;
+  margin-top: 20px;
+  margin-right: 0px;
   width: 80px;
   height: 27px;
   background-color: #4287FD;
@@ -85,7 +85,6 @@ html, body {
   border: 1px solid #4683EA;
   font-weight: bold;
 }
-
 .general-button{
   margin-top:10px;
   min-width: 80px;
@@ -98,32 +97,23 @@ html, body {
   border-radius: 2px;
   border: 1px solid #29691d;
 }
-
+.next-button{
+  margin-left:565px;
+  display:none;
+}
 .pointer:hover{
   cursor: pointer;
 }
 .menu{
-  display: block;
-  
-}
-.feedback{
-  display:none;
-  width: 630px;
-  margin-bottom:0px;
-  margin-top:10px;
-  height:auto;
-  font-family:arial;
-  font-size:13px;
+  display: block;  
 }
 .success{
   color:black;
 }
-
 .failure{
   color:#DD4B39;
 }
-
-.success-ribbon{
+.ribbon{
   display:none;
   background-color: #3D9400;
   color: black;
@@ -134,8 +124,16 @@ html, body {
   font-weight:bold;
   color:white;
   border-radius:2px;
+  margin-top:10px;
 }
-
+.message{
+  display:none;
+  width: 630px;
+  margin-top:10px;
+  height:auto;
+  font-family:arial;
+  font-size:13px;
+}
 .response{
   display: none;
   padding:10px;
@@ -151,5 +149,5 @@ html, body {
   -webkit-box-shadow: 4px 4px 8px #CCC;
   box-shadow: 4px 4px 8px #CCC;
   border: 1px solid black;
-  margin-bottom: 20px;
+  margin-top:10px;
 }
