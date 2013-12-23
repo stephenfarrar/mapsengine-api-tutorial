@@ -23,25 +23,30 @@ html, body {
   vertical-align: middle;
   margin: 10px;
 }
-.content{
-  display: none;
-  text-align: center;
+.lesson{
+  display: block;
+  margin: 10px;
+  margin-left:300px;
+  width: 650px;
+  line-height: 1.5;
+}
+.instructions{
+  display: block;
+  height:auto;
+  word-wrap: break-word;
   font-family: arial;
   font-size: 13px;
-  line-height: 1.5;
-  margin-bottom: 20px;
+  margin-top: 20px;
 }
 .cat{
   display:block;
   width: 200px;
   margin-top:20px;
   margin-bottom:20px;
-  margin-left:auto;
-  margin-right:auto;
 }
-.ready-button{
+.next-button{
   margin-top:10px;
-  width: 72px;
+  min-width: 80px;
   height: 27px;
   font-size: 11px;
   font-family: arial;
@@ -50,4 +55,7 @@ html, body {
   background-color: #3d9400;
   border-radius: 2px;
   border: 1px solid #29691d;
+}
+.pointer:hover{
+  cursor: pointer;
 }

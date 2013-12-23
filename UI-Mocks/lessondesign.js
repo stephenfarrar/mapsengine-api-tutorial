@@ -9,7 +9,7 @@ $(document).ready(function(){
   	evaluateInput();
   });
   
-  var placeholder = "Enter your input here, press enter or click 'Go' to submit.";
+  var placeholder = "Enter your input here, press enter or click 'Get' to submit.";
   $("#input").text(placeholder);
   $("#input").focus(function(){
   	if($("#input").text()===placeholder){
