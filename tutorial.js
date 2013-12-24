@@ -1,7 +1,6 @@
 //Javascript file for tutorial
 //THE GLOBAL VARIABLES
 
-var userAPIKey = "";
 var activeLesson;
 var placeholder = "Enter your input here, press enter or click 'Get' to submit.";
 
@@ -15,6 +14,7 @@ function Lesson(divID, options) {
   //done is TRUE if: the user has submitted correctly
   this.done = false;
   this.unlocked = false;
+  this.needInventory = options.needInventory;
 }
 
 Lesson.prototype.update = function() {
@@ -26,10 +26,14 @@ Lesson.prototype.update = function() {
   $('.response').empty();
   activeLesson = this;
   document.title = this.title;
-  $("#"+this.divID).css({display : "block"});
-  $('.feedback').css('display','none');
-  $('.response').css('display','none');
-  $('.general-button').css('display','none');
+  //hide some elements
+  hideDivs();
+  //show inventory if needed
+  if(this.needInventory){
+    $(".inventory").css('display','block');
+  } else {
+     $(".inventory").css('display','none');
+  }
   //update buttons
   if ($("#"+this.divID+'button').is(":hidden")) {
     hideLessons('medium');
@@ -225,13 +229,13 @@ Chapter.prototype.checkTutorialCompletion = function() {
 //ARRAY OF CHAPTERS
 var chapters = [
   new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
-    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText}),
-    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey})
+    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText, needInventory:false}),
+    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, needInventory:false})
   ]}),
   new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
-    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable}),
-    new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput}),
-    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries}),
+    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, needInventory:true}),
+    new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput, needInventory:true}),
+    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, needInventory:true}),
   ]})
 ];
 
@@ -304,6 +308,8 @@ function loadState() {
   chapters[0].lessons[0].unlock();
   localStorage[chapters[0].lessons[0].divID] = true;
   var activeLessonId = localStorage['currentLesson'] || 'lesson1-gmeapi';
+  //update the inventory box
+  updateInventory();
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
       //if lesson is completed, stored as 'true'
@@ -340,12 +346,26 @@ function hideLessons(speed) {
     })
   })
 }
-
+//hide the feedback, output, and next button
+function hideDivs(){
+  $('.feedback').css('display','none');
+  $('.response').css('display','none');
+  $('.general-button').css('display','none');
+}
 //Trim the pre white spaces in the user input
 function trim(string){
   return string.replace(/^\s+$/, '');
 }
 
+//updating the inventory box
+function updateInventory(){
+  var $inventory = $(".inventory");
+  $inventory.empty();
+  $inventory.append("<b>Helpful information</b><br>");
+  $inventory.append("table ID: 15474835347274181123-14495543923251622067<br>");
+  $inventory.append("your API Key: ");
+  $inventory.append(localStorage['APIKey']);
+}
 //*****************THE GME API FUNCTIONS**********************//
 function getText() {
   var string = $(".url").text();
@@ -381,7 +401,8 @@ function testAPIKey() {
   url: 'https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=' + userKey,
     dataType: 'json',
     success: function(resource) {
-      userAPIKey = userKey;
+      localStorage['APIKey'] = userKey;
+      updateInventory();
       me.successResponse();
       me.complete();
     },
