@@ -1,181 +1,183 @@
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-    }
-    .menu-button{
-      display: block;
-      position: relative;
-      background-color: white;
-      text-align: left;
-      background-repeat: no-repeat;
-      background-image: none;
-      background-position: 95% 20%;
-      background-size: 6% 80%;
-      border: none;
-      border-bottom: 1px solid #e5e5e5;
-    }
-    .chapter-button {
-      width: 100%;
-      height: 4.5%;
-      font-size: 18px;
-    }
-    .lesson-button {
-      width: 95%;
-      left: 5%;
-      height: 3.5%;
-      font-size: 14px;
-    }
-    /*define the colours for the left-menu text*/
-    .locked{
-      color: #CCCCCC;
-    }
-    .unlocked{
-      color: #000000;
-    }
-    .active{
-      color: #DD4B39;
-    }
-    /* .button is for prev, next, submit, clear i.e. not menu buttons */
-    .button {
-      display: block;
-      position: absolute;
-      background-color: #4D90FE;
-      color: white;
-      font-family: Arial regular;
-      font-weight: bold;
-      z-index: 2;
-      border: 1px solid #1155CC;
-      font-size: 16px;
-    }
-    .next-button {
-      width: 8%;
-      height: 3%;
-      left: 54.5%;
-      top: 11.25%;
-    }
-    .submit-button {
-      width: 4%;
-      height: 3.2%;
-      left: 23.5%;
-      top: 96.5%;
-    }
-    .url {
-      display: block;
-      position: absolute;
-      width: 39.75%;
-      height: 39.5%;
-      left: 23%;
-      top: 56%;
-      word-wrap: break-word;
-      font-size: 13px;
-      font-family: monospace;
-      resize: none;
-      -moz-box-shadow: 4px 4px 8px #CCC;
-      -webkit-box-shadow: 4px 4px 8px #CCC;
-      box-shadow: 4px 4px 8px #CCC;
-      background-color:white;
-      border: 1px solid black;
-      color: gray;
-      overflow-y:hidden;
-    }
-    .response {
-      display: block;
-      position: absolute;
-      background-color: #2D2D2D;
-      color: white;
-      padding: 1%;
-      width: 35%;
-      height: 85.9%;
-      left: 63%;
-      top: 10.75%;
-      resize: none;
-      overflow-y: scroll;
-      font-family: monospace;
-      z-index: 3;
-      word-wrap: break-word;
-      font-size: 16px;
-    }
-    .title-bar {
-      display: block;
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      height: 10.5%;
-      width: 100%;
-      background-color: #F1F1F1;
-      border-bottom: 5px solid #EAEAEA;
-    }
-    .title {
-      display: block;
-      position: absolute;
-      top: 25%;
-      left: 5%;
-      font-weight: bold;
-      height: 80%;
-      width: 90%;
-      color: #737373;
-      font-family: arial;
-    }
-    .maps-icon{
-      display: block;
-      position: absolute;
-      left: 0.5%;
-      top: 10%;
-      height: 80%;
-      width: 4%;
-    }
-    .instructions {
-      display: block;
-      position: absolute;
-      top: 14.75%;
-      left: 23%;
-      padding: 1%;
-      overflow-y: scroll;
-      resize: none;
-      height:37.5%;
-      width: 38.05%;
-      color: black;
-      font-family: Arial;
-      background-color: #FFFFFF;
-      word-wrap: break-word;
-      font-size: 16px;
-    }
-    .prev-next-bar{
-      display: block;
-      position: absolute;
-      top: 10.75%;
-      left: 23%;
-      resize: none;
-      height:3.7%;
-      width: 40%;
-      border: 2px solid #e5e5e5;
-      font-family: Verdana;
-      background-color: #F1F1F1;
-      z-index: 1;
-    }
-    .buttons {
-      z-index: 2;
-      display: block;
-      position: absolute;
-      height: 100%;
-      padding: 0px;
-      top: 10.75%;
-      width: 23%;
-      float: left;
-      background-color: #FFFFFF;
-      border-right: 2px solid #e5e5e5;
-    }
-    .button-bar {
-      display: block;
-      position: absolute;
-      top: 96%;
-      height: 4%;
-      width: 40.3%;
-      left: 23%;
-      background-color: #F1F1F1;
-      z-index:1;
-    }
-    img[alt=cat-image] {
-      height: 300px;
-    }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+.buttons {
+  z-index: 2;
+  display: block;
+  position: absolute;
+  height: 100%;
+  padding: 0px;
+  top: 10.75%;
+  width: 280px;
+  float: left;
+  background-color: #FFFFFF;
+}
+.menu-button{
+  display: block;
+  position: relative;
+  background-color: white;
+  text-align: left;
+  background-repeat: no-repeat;
+  background-image: none;
+  background-position: 95% 20%;
+  background-size: 6% 80%;
+  border: none;
+  border-bottom: 1px solid #e5e5e5;
+}
+.chapter-button {
+  width: 100%;
+  height: 4.5%;
+  font-size: 18px;
+}
+.lesson-button {
+  width: 95%;
+  left: 5%;
+  height: 3.5%;
+  font-size: 14px;
+}
+/*define the colours for the left-menu text*/
+.locked{
+  color: #CCCCCC;
+}
+.unlocked{
+  color: #000000;
+}
+.active{
+  color: #DD4B39;
+}
+/* .button is for prev, next, submit, clear i.e. not menu buttons */
+.button {
+  display: block;
+  position: absolute;
+  background-color: #4D90FE;
+  color: white;
+  font-family: Arial regular;
+  font-weight: bold;
+  z-index: 2;
+  border: 1px solid #1155CC;
+  font-size: 16px;
+}
+.next-button {
+  width: 8%;
+  height: 3%;
+  left: 54.5%;
+  top: 11.25%;
+}
+.title-bar {
+  display: block;
+  width: 100%;
+  background-color: #F1F1F1;
+  border-bottom: 2px solid #EAEAEA;
+}
+.title {
+  display: inline;
+  font-weight: bold;
+  color: #737373;
+  font-family: arial;
+  font-size: 28px;
+  vertical-align: middle;
+}
+.maps-icon{
+  display: inline;
+  height: 55px;
+  vertical-align: middle;
+  margin: 10px;
+}
+.lesson{
+  display: block;
+  margin: 10px;
+  margin-bottom: 20px;
+  margin-left:300px;
+  width: 650px;
+  line-height: 1.5;
+}
+.instructions {
+  display: block;
+  height:auto;
+  word-wrap: break-word;
+  font-family: arial;
+  font-size: 13px;
+  margin-top: 20px;
+}
+.url{
+  display: inline-block;
+  width: 555px;
+  min-height:24px;
+  height: auto;
+  word-wrap: break-word;
+  font-size: 13px;
+  font-family: monospace;
+  resize: none;
+  -moz-box-shadow: 4px 4px 8px #CCC;
+  -webkit-box-shadow: 4px 4px 8px #CCC;
+  box-shadow: 4px 4px 8px #CCC;
+  background-color:white;
+  border: 1px solid black;
+  color: gray;
+  overflow-y:hidden;
+  margin-top:20px
+}
+.get-button{
+  float: right;
+  display: inline;
+  margin-top: 20px;
+  margin-right: 0px;
+  width: 80px;
+  height: 27px;
+  background-color: #4287FD;
+  color: white;
+  font-size: 11px;
+  font-family: arial;
+  border-radius: 2px;
+  border: 1px solid #4683EA;
+  font-weight: bold;
+}
+.success{
+  color:black;
+}
+.failure{
+  color:#DD4B39;
+}
+.ribbon{
+  display:none;
+  background-color: #3D9400;
+  color: black;
+  word-wrap: break-word;
+  font-size: 13px;
+  font-family:arial; 
+  padding: 10px;
+  font-weight:bold;
+  color:white;
+  border-radius:2px;
+  margin-top:10px;
+}
+.message{
+  display:none;
+  width: 630px;
+  margin-top:10px;
+  height:auto;
+  font-family:arial;
+  font-size:13px;
+}
+.response{
+  display: block;
+  padding:10px;
+  background-color: white;
+  color: black;
+  word-wrap: break-word;
+  font-size: 13px;
+  font-family: monospace;
+  white-space: pre;
+  height: 300px;
+  overflow-y:auto;
+  -moz-box-shadow: 4px 4px 8px #CCC;
+  -webkit-box-shadow: 4px 4px 8px #CCC;
+  box-shadow: 4px 4px 8px #CCC;
+  border: 1px solid black;
+  margin-top:10px;
+}
+img[alt=cat-image] {
+  height: 300px;
+}
