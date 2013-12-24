@@ -76,8 +76,11 @@
       box-shadow: 4px 4px 8px #CCC;
       background-color:white;
       border: 1px solid black;
-      color: gray;
       overflow-y:hidden;
+      color:black;
+    }
+    .url.placeholder {
+      color: gray;
     }
     .response {
       display: block;
@@ -116,6 +119,7 @@
       width: 90%;
       color: #737373;
       font-family: arial;
+      font-size:28px;
     }
     .maps-icon{
       display: block;
