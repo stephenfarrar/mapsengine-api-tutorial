@@ -82,8 +82,13 @@
       box-shadow: 4px 4px 8px #CCC;
       background-color:white;
       border: 1px solid black;
-      color: gray;
       overflow-y:hidden;
+    }
+    .placeholder {
+      color: gray;
+    }
+    .url-content {
+      color: black;
     }
     .response {
       display: block;

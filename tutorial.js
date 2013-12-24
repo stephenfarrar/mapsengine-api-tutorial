@@ -3,6 +3,7 @@
 
 var userAPIKey = "";
 var activeLesson;
+var placeholder = "Enter your input here, press enter or click 'Get' to submit.";
 
 //object to store lesson information
 function Lesson(divID, options) {
@@ -48,8 +49,16 @@ Lesson.prototype.update = function() {
   this.displayInstructions();
 
   localStorage['currentLesson'] = activeLesson.divID;
-
-  $(".url").text(localStorage[this.divID + 'input'] || "");
+  $(".url").focusout();
+  if (localStorage[this.divID + 'input']){
+    $(".url").addClass("url-content")
+          .removeClass("placeholder"); 
+    $(".url").text(localStorage[this.divID + 'input']);
+  } else{
+    $(".url").addClass("placeholder")
+          .removeClass("url-content");
+    $(".url").text(placeholder);
+  }
 }
 
 // Displays the instructions, possibly loading them from the markdown file.
@@ -185,17 +194,17 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   
   var $input = $(".url");
   //create placeholder for the input
-  var placeholder = "Enter your input here, press enter or click 'Get' to submit.";
-  $input.text(placeholder);
   $input.focus(function(){
     if($input.text()===placeholder){
+      $input.addClass("url-content")
+            .removeClass("placeholder");
       $input.text("");
-      $input.css("color","black");
     }
   })
   .focusout(function(){
     if(!$input.text().length){
-      $input.css("color","gray");
+      $input.addClass("placeholder")
+            .removeClass("url-content");
       $input.text(placeholder);
     }
   });  
@@ -218,7 +227,8 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   $input.on('paste cut',function(){
     setTimeout(function(){
       localStorage[activeLesson.divID+'input'] = $input.text();
-    },50);
+      $input.text($input.text());
+    },0);
   });
 
   //LOADING THE FONT SIZE ACCORDING TO WINDOW SIZES
