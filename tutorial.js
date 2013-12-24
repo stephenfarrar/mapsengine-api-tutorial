@@ -145,13 +145,10 @@ Chapter.prototype.checkTutorialCompletion = function() {
 //ARRAY OF CHAPTERS
 var chapters = [
   new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
-    new Lesson('lesson0-intro', {title: 'Introduction'}),
-    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText})
-  ]}),
-  new Chapter('chapter1-registration', {title: 'Registration', lessons: [
+    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText}),
     new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey})
   ]}),
-  new Chapter('chapter2-read', {title: 'Reading Public Data', lessons: [
+  new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
     new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable}),
     new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput}),
     new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries}),
