@@ -21,6 +21,7 @@ Lesson.prototype.update = function() {
   if (!this.unlocked) return;
   //else, the lesson can be accessed
   hideAll();
+  $('.response').empty();
   activeLesson = this;
   document.title = this.title;
   $("#"+this.divID).css({display : "block"});
@@ -178,7 +179,6 @@ prevLesson.next = prevLesson;
 google.maps.event.addDomListener(window, 'load', function initialize(){
   //create the HTML elements
   makeLessonDivs();
-  createInputOutput();
   chapters.forEach(function(chapter){
     makeButton(chapter, "chapter-button");
     chapter.lessons.forEach(function(lesson){
@@ -250,9 +250,6 @@ function loadState() {
       if (lesson.divID === activeLessonId) {
         lesson.update();
       }
-      if (localStorage[lesson.divID+'output']){
-        lesson.outputDiv.html(localStorage[lesson.divID+'output']);
-      }
     });
   });
 }
@@ -304,20 +301,6 @@ function hideLessons(speed) {
   })
 }
 
-//Create the output area for each lesson
-function createInputOutput() {
-  chapters.forEach(function(chapter, i){
-    chapter.lessons.forEach(function(lesson, j){
-      var lessonDiv = $("#"+lesson.divID);
-      //add the output area
-      var newOutput = $("<div>")
-        .addClass("text-output");
-      lessonDiv.append(newOutput);
-      lesson.outputDiv = newOutput;
-    });
-  });
-}
-
 //Clear the input area 
 function clearInput() {
   $(".url").text("");
@@ -332,7 +315,7 @@ function trimLeft(string){
 function getText() {
   var string = $(".url").text();
   var address = trimLeft(string);
-  var $data = this.outputDiv;
+  var $data = $('.response');
   $data.css({ whiteSpace: 'pre' });
   var me = this;
   jQuery.ajax({
@@ -353,7 +336,7 @@ function getText() {
 function testAPIKey() {
   //get user input
   var userKey = $(".url").text();
-  var $data = this.outputDiv;
+  var $data = $('.response');
   var me = this;
   //use user's API Key to do a HTTP request, if it works then it is a valid API Key
   jQuery.ajax({
@@ -375,7 +358,8 @@ function testAPIKey() {
 function testGetTable() {
   //get user input and trim it
   var string = $(".url").text();
-  var $data = this.outputDiv;
+  var $data = $('.response');
+
   var address = trimLeft(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
   //the Get Table is currently NOT AVAILABLE in v1, will someday be available and this 2 line codes needs to be removed
@@ -405,7 +389,7 @@ function executeQueries(){
 
 //*****************CHECKING CORRECT INPUT*******************//
 function checkCorrectness(lesson, addressString, correctAns){
-  var $data = lesson.outputDiv;
+  var $data = $('.response');
   //style the output div
   $data.css({ whiteSpace: 'pre' });
   $data.empty();
@@ -422,7 +406,6 @@ function checkCorrectness(lesson, addressString, correctAns){
         success: function(resource2) {
           var resourceString = JSON.stringify(resource2, null, 2);
           $data.append(resourceString);
-          localStorage[lesson.divID+'output']=resourceString;
           //if the response user got is the correct response, then the user is right!
           if(resourceString === correctResourceString){
             alert("Great work! You can move on to the next lesson.");
