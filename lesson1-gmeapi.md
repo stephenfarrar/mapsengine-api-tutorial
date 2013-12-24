@@ -1,3 +1,4 @@
-Great! Now, some more things you need to know. The Google Maps Engine API is a RESTful API that allows users to manage data using simple HTTP requests. Reading data requires a GET request which returns a standard HTTP response as well as other information about the map data.   
+##GME API##  
+The Google Maps Engine API is a RESTful API that allows users to manage data using simple HTTP requests. Reading data requires a GET request which returns a standard HTTP response as well as other information about the map data.   
 
 This is achieved using structured URLs just the same as you would enter into your browser, but works like any other request. Why don't you try this here? Enter: 'alice-in-wonderland.txt' into the box below and click "Submit" and see the response!

@@ -1,3 +1,4 @@
+##Queries##  
 If you want to query a table for specific data, you can add additional parameters to a List Features request including:  
 
 * intersects: get features which intersect with a geometry (point, polygon, circle, linestring)

@@ -1,3 +1,4 @@
+##List Features##  
 Besides viewing a public table's attributes, you can also access the table's features using a GET request. A feature is a data entry in a table, represented by each row in the table. It can be a point, polygon, or polyline. 
 
 The basic URL to access a features list is:                  
