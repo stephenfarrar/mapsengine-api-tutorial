@@ -9,17 +9,18 @@
   <script src="markdown.js"></script>
   <script type="text/javascript" src="tutorial.js"></script>
 </head>
-<body class = "body">
+<body>
   <div class = 'title-bar'>
     <img src = "http://img.talkandroid.com/uploads/2013/10/google_maps_engine_app_icon.png" class ="maps-icon"/>
     <div class = 'title'>Google Maps Engine API Tutorial</div>
   </div>
-  <div class = 'instructions'></div>
-  <div class = 'response'></div>
+  <div class = 'lesson'>
+    <div class = 'instructions'></div>
+    <div class = 'url' contenteditable = "true" tabindex="0"></div>
+    <div class = 'response'></div>
+  </div>
   <div class = 'prev-next-bar'></div>
-  <input type = 'button' value = '< Prev Lesson' class = 'button prev-button' onclick = 'activeLesson.prev.update()'>
   <input type = 'button' value = 'Next Lesson >' class = 'button next-button' onclick = 'activeLesson.next.update()'>
-  <div class = 'url' contenteditable = "true" tabindex="0"></div>
   <input type = 'button' value = 'Submit' class = 'button submit-button' onclick = 'activeLesson.submit()'>
   <div class = "buttons"></div>
   <div class = 'button-bar'></div>
