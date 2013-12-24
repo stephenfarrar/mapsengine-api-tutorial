@@ -20,7 +20,6 @@ Lesson.prototype.update = function() {
   //if the lesson is still unlocked, it can't be accessed
   if (!this.unlocked) return;
   //else, the lesson can be accessed
-  hideAll();
   $('.response').empty();
   activeLesson = this;
   document.title = this.title;
@@ -146,13 +145,10 @@ Chapter.prototype.checkTutorialCompletion = function() {
 //ARRAY OF CHAPTERS
 var chapters = [
   new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
-    new Lesson('lesson0-intro', {title: 'Introduction'}),
-    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText})
-  ]}),
-  new Chapter('chapter1-registration', {title: 'Registration', lessons: [
+    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText}),
     new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey})
   ]}),
-  new Chapter('chapter2-read', {title: 'Reading Public Data', lessons: [
+  new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
     new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable}),
     new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput}),
     new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries}),
@@ -174,7 +170,6 @@ prevLesson.next = prevLesson;
 //*****************THE GLOBAL FUNCTIONS**********************//
 google.maps.event.addDomListener(window, 'load', function initialize(){
   //create the HTML elements
-  makeLessonDivs();
   chapters.forEach(function(chapter){
     makeButton(chapter, "chapter-button");
     chapter.lessons.forEach(function(lesson){
@@ -219,7 +214,7 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
       localStorage[activeLesson.divID+'input'] = $input.text();
     },50);
   });
-  
+
   //The first page shown is the first lesson
   hideLessons(0);
   loadState();
@@ -243,24 +238,6 @@ function loadState() {
   });
 }
 
-//Create the divs for each lesson
-function makeLessonDivs(){
-  var body = $(".body");
-  chapters.forEach(function(chapter){
-     var newChapterDiv = $("<div>")
-        .attr("id", chapter.divID)
-        .addClass("chapter");
-    body.append(newChapterDiv);
-    var chapterDiv = $("#"+chapter.divID);
-    chapter.lessons.forEach(function(lesson){
-      var newLessonDiv = $("<div>")
-        .attr("id", lesson.divID)
-        .addClass("lesson");
-      chapterDiv.append(newLessonDiv);
-    });
-  });
-}
-
 //Create the menu button for each lesson & chapter
 function makeButton(object, objectClass){
   var button = $(".buttons");
@@ -275,11 +252,6 @@ function makeButton(object, objectClass){
   button.append(newButton);
 }
 
-//BLOCKING ALL DIVS AUTOMATICALLY
-function hideAll() {
-  $(".lesson").hide();
-}
-
 //Hides the lesson buttons within the chapter
 function hideLessons(speed) {
   chapters.forEach(function(chapters) {
@@ -288,11 +260,6 @@ function hideLessons(speed) {
       $('#' + lessons.divID + 'button').hide(speed);
     })
   })
-}
-
-//Clear the input area 
-function clearInput() {
-  $(".url").text("");
 }
 
 //Trim the pre white spaces in the user input
