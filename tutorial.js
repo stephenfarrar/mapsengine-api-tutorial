@@ -49,11 +49,7 @@ Lesson.prototype.update = function() {
 
   localStorage['currentLesson'] = activeLesson.divID;
 
-  if (localStorage[this.divID+'input']){
-    $(".url").text(localStorage[this.divID+'input']);
-  } else {
-    $(".url").text("");
-  }
+  $(".url").text(localStorage[this.divID + 'input'] || "");
 }
 
 // Displays the instructions, possibly loading them from the markdown file.
