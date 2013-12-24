@@ -97,9 +97,12 @@ html, body {
   box-shadow: 4px 4px 8px #CCC;
   background-color:white;
   border: 1px solid black;
-  color: gray;
+  color: black;
   overflow-y:hidden;
   margin-top:20px
+}
+.url.placeholder {
+  color: gray;
 }
 .get-button{
   float: right;
