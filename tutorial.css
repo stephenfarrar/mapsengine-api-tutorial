@@ -66,19 +66,24 @@
       left: 28%;
       top: 96.5%;
     }
-    .text-input {
+    .url {
       display: block;
       position: absolute;
-      background-color: #FFFFFF;
-      color: black;
       width: 39.75%;
       height: 39.5%;
       left: 23%;
       top: 56%;
-      resize: none;
-      overflow-y: scroll;
+      word-wrap: break-word;
+      font-size: 13px;
       font-family: monospace;
-      font-size: 16px;
+      resize: none;
+      -moz-box-shadow: 4px 4px 8px #CCC;
+      -webkit-box-shadow: 4px 4px 8px #CCC;
+      box-shadow: 4px 4px 8px #CCC;
+      background-color:white;
+      border: 1px solid black;
+      color: gray;
+      overflow-y:hidden;
     }
     .response {
       display: block;
