@@ -127,7 +127,6 @@ html, body {
   cursor: pointer;
 }
 .general-button{
-  display: none;
   margin-top:10px;
   min-width: 80px;
   height: 27px;
