@@ -24,17 +24,19 @@ html, body {
   background-position: 95% 20%;
   background-size: 6% 80%;
   border: none;
-  border-bottom: 1px solid #e5e5e5;
+  font-family: Arial;
+  margin-bottom: 12px;
 }
 .chapter-button {
   width: 100%;
-  height: 4.5%;
-  font-size: 18px;
+  height: 24px;
+  font-size: 14px;
+  font-weight: bold;
 }
 .lesson-button {
   width: 95%;
   left: 5%;
-  height: 3.5%;
+  height: 24px;
   font-size: 14px;
 }
 /*define the colours for the left-menu text*/
@@ -199,4 +201,7 @@ html, body {
 }
 img[alt=yes-cat-image] {
   height: 300px;
+}
+*:focus {
+    outline: 0;
 }
