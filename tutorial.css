@@ -47,24 +47,6 @@ html, body {
 .active{
   color: #DD4B39;
 }
-/* .button is for prev, next, submit, clear i.e. not menu buttons */
-.button {
-  display: block;
-  position: absolute;
-  background-color: #4D90FE;
-  color: white;
-  font-family: Arial regular;
-  font-weight: bold;
-  z-index: 2;
-  border: 1px solid #1155CC;
-  font-size: 16px;
-}
-.next-button {
-  width: 8%;
-  height: 3%;
-  left: 54.5%;
-  top: 11.25%;
-}
 .title-bar {
   display: block;
   width: 100%;
@@ -133,6 +115,35 @@ html, body {
   border-radius: 2px;
   border: 1px solid #4683EA;
   font-weight: bold;
+}
+.next-button{
+  margin-left:565px;
+  display:none;
+}
+.pointer:hover{
+  cursor: pointer;
+}
+.general-button{
+  display: none;
+  margin-top:10px;
+  min-width: 80px;
+  height: 27px;
+  font-size: 11px;
+  font-family: arial;
+  color: white;
+  font-weight: bold;
+  background-color: #3d9400;
+  border-radius: 2px;
+  border: 1px solid #29691d;
+}
+.menu{
+  display: block;  
+}
+.success{
+  color:black;
+}
+.failure{
+  color:#DD4B39;
 }
 .success{
   color:black;
