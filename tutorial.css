@@ -77,12 +77,10 @@
       background-color:white;
       border: 1px solid black;
       overflow-y:hidden;
+      color:black;
     }
-    .placeholder {
+    .url.placeholder {
       color: gray;
-    }
-    .url-content {
-      color: black;
     }
     .response {
       display: block;

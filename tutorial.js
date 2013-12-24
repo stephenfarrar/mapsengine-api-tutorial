@@ -48,16 +48,11 @@ Lesson.prototype.update = function() {
   this.displayInstructions();
 
   localStorage['currentLesson'] = activeLesson.divID;
-  $(".url").focusout();
-  if (localStorage[this.divID + 'input']){
-    $(".url").addClass("url-content")
-          .removeClass("placeholder"); 
-    $(".url").text(localStorage[this.divID + 'input']);
-  } else{
-    $(".url").addClass("placeholder")
-          .removeClass("url-content");
-    $(".url").text(placeholder);
-  }
+  
+  var storedUrl = localStorage[this.divID + 'input'];
+  $(".url").toggleClass("placeholder", !storedUrl)
+    .text(storedUrl || placeholder);
+  
 }
 
 // Displays the instructions, possibly loading them from the markdown file.
@@ -190,15 +185,13 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   //create placeholder for the input
   $input.focus(function(){
     if($input.text()===placeholder){
-      $input.addClass("url-content")
-            .removeClass("placeholder");
+      $input.removeClass("placeholder");
       $input.text("");
     }
   })
   .focusout(function(){
     if(!$input.text().length){
       $input.addClass("placeholder")
-            .removeClass("url-content");
       $input.text(placeholder);
     }
   });  
