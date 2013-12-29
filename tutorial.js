@@ -18,18 +18,18 @@ function Lesson(divID, options) {
 }
 
 Lesson.prototype.update = function() {
-  //scroll to top of the page
-  $("html, body").animate({scrollTop:0},500);
   //if the lesson is still unlocked, it can't be accessed
   if (!this.unlocked) return;
   //else, the lesson can be accessed
+  //scroll to top of the page
+  $("html, body").animate({scrollTop:0},500);
   $('.response').empty();
   activeLesson = this;
   document.title = this.title;
-  $("#"+this.divID).css({display : "block"});
-  $('.feedback').css('display','none');
-  $('.response').css('display','none');
-  $('.general-button').css('display','none');
+  $("#"+this.divID).show();
+  $('.feedback').hide();
+  $('.response').hide();
+  $('.general-button').hide();
   //update buttons
   if ($("#"+this.divID+'button').is(":hidden")) {
     hideLessons('medium');
@@ -77,7 +77,7 @@ Lesson.prototype.displayInstructions = function() {
 }
 
 //If the input is right, do the success responses
-Lesson.prototype.successResponse = function() {
+Lesson.prototype.displaySuccessMessage = function() {
   var me = this;
  
   // If the success message aren't loaded, load them.
@@ -93,11 +93,11 @@ Lesson.prototype.successResponse = function() {
   }
 
   //Display the success ribbon and message
-  $(".feedback").css('display','none');
-  $(".ribbon").css('display','block');
-  $(".message").css('display','block');
+  $(".feedback").hide();
+  $(".ribbon").show();
+  $(".message").show();
   $(".feedback").fadeIn();
-  $(".feedback").css('display','block');
+  $(".feedback").show();
   $(".feedback").removeClass("failure");
   $(".feedback").addClass("success");
   //automatically scroll to the success message
@@ -107,30 +107,30 @@ Lesson.prototype.successResponse = function() {
   $(".url").css('border-color', '#000000');
   //Display the response
   if (!($(".response").text())){
-    $(".response").css('display','none');
+    $(".response").hide();
   } else{
-    $(".response").css('display','none');
+    $(".response").hide();
     $(".response").fadeIn();
-    $(".response").css('display','block');
+    $(".response").show();
   }
   //Display the next button
-  $(".general-button").css('display','none');
+  $(".general-button").hide();
   $(".general-button").addClass('next-button');
   $(".general-button").attr("value","Next Lesson");
   $(".general-button").fadeIn();
-  $(".general-button").css('display','block');  
+  $(".general-button").show();  
 }
 
 //If the input is wrong, do the error responses
-Lesson.prototype.errorResponse = function() {
+Lesson.prototype.displayErrorMessage = function() {
   $(".message").html("You entered the wrong input. Please try again.");
   
   //Display the message, hide the success ribbon
-  $(".feedback").css('display','none');
-  $(".ribbon").css('display','none');
-  $(".message").css('display','block');
+  $(".feedback").hide();
+  $(".ribbon").hide();
+  $(".message").show();
   $(".feedback").fadeIn();
-  $(".feedback").css('display','block');
+  $(".feedback").show();
   $(".feedback").removeClass("success");
   $(".feedback").addClass("failure");
     
@@ -142,16 +142,16 @@ Lesson.prototype.errorResponse = function() {
   
   //Display the response
   if ((!$(".response").text())){
-    $(".response").css('display','none');
+    $(".response").hide();
   } else{
-    $(".response").css('display','none');
+    $(".response").hide();
     $(".response").fadeIn();
-    $(".response").css('display','block');
+    $(".response").show();
   }
   
   //Hide the next button
   $(".general-button").fadeOut();
-  $(".general-button").css('display','none');
+  $(".general-button").hide();
 }
 
 Lesson.prototype.complete = function() {
@@ -343,7 +343,7 @@ function hideLessons(speed) {
 
 //Trim the pre white spaces in the user input
 function trim(string){
-  return string.replace(/^\s+$/, '');
+  return string.replace(/^\s+|\s+$/g, '');
 }
 
 //*****************THE GME API FUNCTIONS**********************//
