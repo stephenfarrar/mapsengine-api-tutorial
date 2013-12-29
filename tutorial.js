@@ -13,7 +13,7 @@ function Lesson(divID, options) {
   //done is TRUE if: the user has submitted correctly
   this.done = false;
   this.unlocked = false;
-  this.needInventory = options.needInventory;
+  this.showInventory = options.showInventory;
 }
 
 Lesson.prototype.update = function() {
@@ -25,12 +25,12 @@ Lesson.prototype.update = function() {
   document.title = this.title;
   
   //hide some elements
-  hideDivs();
+  hideResultDivs();
   //show inventory if needed
-  if(this.needInventory){
-    $(".inventory").css('display','block');
+  if(this.showInventory){
+    $(".inventory").show();
   } else {
-     $(".inventory").css('display','none');
+     $(".inventory").hide();
   }
 
   //update buttons
@@ -156,13 +156,13 @@ Chapter.prototype.checkTutorialCompletion = function() {
 //ARRAY OF CHAPTERS
 var chapters = [
   new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
-    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText, needInventory:false}),
-    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, needInventory:false})
+    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText, showInventory:false}),
+    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, showInventory:false})
   ]}),
   new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
-    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, needInventory:true}),
-    new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput, needInventory:true}),
-    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, needInventory:true}),
+    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, showInventory:true}),
+    new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput, showInventory:true}),
+    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, showInventory:true}),
   ]})
 ];
 
@@ -236,7 +236,7 @@ function loadState() {
   localStorage[chapters[0].lessons[0].divID] = true;
   var activeLessonId = localStorage['currentLesson'] || 'lesson0-intro';
   //update the inventory box
-  updateInventory();
+  populateInventory();
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
       //if lesson is completed, stored as 'true'
@@ -280,14 +280,14 @@ function trimLeft(string){
 }
 
 //hide the feedback, output, and next button
-function hideDivs(){
-  $('.feedback').css('display','none');
-  $('.response').css('display','none');
-  $('.general-button').css('display','none');
+function hideResultDivs(){
+  $('.feedback').hide();
+  $('.response').hide();
+  $('.general-button').hide();
 }
 
 //updating the inventory box
-function updateInventory(){
+function populateInventory(){
   var $inventory = $(".inventory");
   $inventory.empty();
   $inventory.append("<b>Helpful information</b><br>");
@@ -329,7 +329,7 @@ function testAPIKey() {
     success: function(resource) {
       alert("Congrats! Your API Key works. Now continue on to Get Table!");
       localStorage['APIKey'] = userKey;
-      updateInventory();
+      populateInventory();
       me.complete();
     },
     error: function(response) {
