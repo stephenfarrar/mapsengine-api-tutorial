@@ -87,7 +87,7 @@ Lesson.prototype.complete = function() {
 }
 
 Lesson.prototype.tick = function() {
-   $('#'+this.divID+'button').css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+   $('#'+this.divID+'button').css('background-image', 'url("UI-Mocks/Images/green-tick.jpg")');
 }
 
 //marks a lesson as unlocked
