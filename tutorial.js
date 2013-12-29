@@ -84,7 +84,7 @@ Lesson.prototype.displaySuccessMessage = function() {
   if (!this.successMessage){
     $.get(this.divID+"-success.md", function(response){
       me.successMessage = response;
-      me.successResponse();
+      me.displaySuccessMessage();
     });
   }
 
@@ -359,11 +359,11 @@ function getText() {
     dataType: 'html',
     success: function(resource) {
       $data.append(resource);
-      me.successResponse();
+      me.displaySuccessMessage();
       me.complete();
     },
     error: function(response) {
-      me.errorResponse();
+      me.displayErrorMessage();
     }
   });
 }
@@ -382,11 +382,11 @@ function testAPIKey() {
     dataType: 'json',
     success: function(resource) {
       userAPIKey = userKey;
-      me.successResponse();
+      me.displaySuccessMessage();
       me.complete();
     },
     error: function(response) {
-      me.errorResponse();
+      me.displayErrorMessage();
     }
   });
 }
@@ -446,10 +446,10 @@ function checkCorrectness(lesson, addressString, correctAns){
           $data.append(resourceString);
           //if the response user got is the correct response, then the user is right!
           if(resourceString === correctResourceString){
-            lesson.successResponse();
+            lesson.displaySuccessMessage();
             lesson.complete();
           } else {
-            lesson.errorResponse();
+            lesson.displayErrorMessage();
           }
         },
         error: function(response) {
@@ -469,7 +469,7 @@ function checkCorrectness(lesson, addressString, correctAns){
           }
           var responseString = JSON.stringify(errorMess, null, 2);
           $data.append(responseString);
-          lesson.errorResponse();
+          lesson.displayErrorMessage();
         }
       });
     }
