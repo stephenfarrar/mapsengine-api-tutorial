@@ -114,7 +114,7 @@ Chapter.prototype.update = function() {
 }
 
 Chapter.prototype.tick = function() {
-   $('#'+this.divID+'button').css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+   $('#'+this.divID+'button').css('background-image', 'url("UI-Mocks/Images/green-tick.jpg")');
 }
 
 //checks if a chapter is complete and, as a result, if the tutorial is also complete
