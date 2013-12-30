@@ -1,7 +1,5 @@
 //Javascript file for tutorial
 //THE GLOBAL VARIABLES
-
-var userAPIKey = "";
 var activeLesson;
 var placeholder = "Enter your input here, press enter or click 'Get' to submit.";
 
@@ -15,6 +13,7 @@ function Lesson(divID, options) {
   //done is TRUE if: the user has submitted correctly
   this.done = false;
   this.unlocked = false;
+  this.showInventory = options.showInventory;
 }
 
 Lesson.prototype.update = function() {
@@ -24,7 +23,15 @@ Lesson.prototype.update = function() {
   $('.response').empty();
   activeLesson = this;
   document.title = this.title;
-  $("#"+this.divID).css({display : "block"});
+  
+  //hide some elements
+  hideResultDivs();
+  //show inventory if needed
+  if(this.showInventory){
+    $(".inventory").show();
+  } else {
+     $(".inventory").hide();
+  }
 
   //update buttons
   if ($("#"+this.divID+'button').is(":hidden")) {
@@ -149,13 +156,13 @@ Chapter.prototype.checkTutorialCompletion = function() {
 //ARRAY OF CHAPTERS
 var chapters = [
   new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
-    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText}),
-    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey})
+    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText, showInventory:false}),
+    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, showInventory:false})
   ]}),
   new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
-    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable}),
-    new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput}),
-    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries}),
+    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, showInventory:true}),
+    new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput, showInventory:true}),
+    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, showInventory:true}),
   ]})
 ];
 
@@ -228,6 +235,8 @@ function loadState() {
   chapters[0].lessons[0].unlock();
   localStorage[chapters[0].lessons[0].divID] = true;
   var activeLessonId = localStorage['currentLesson'] || 'lesson0-intro';
+  //update the inventory box
+  populateInventory();
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
       //if lesson is completed, stored as 'true'
@@ -270,6 +279,22 @@ function trimLeft(string){
   return string.replace(/^\s+/, '');
 }
 
+//hide the feedback, output, and next button
+function hideResultDivs(){
+  $('.feedback').hide();
+  $('.response').hide();
+  $('.general-button').hide();
+}
+
+//updating the inventory box
+function populateInventory(){
+  var $inventory = $(".inventory");
+  $inventory.empty();
+  $inventory.append("<b>Helpful information</b><br>");
+  $inventory.append("table ID: 15474835347274181123-14495543923251622067<br>");
+  $inventory.append("your API Key: ");
+  $inventory.append(localStorage['APIKey']);
+}
 //*****************THE GME API FUNCTIONS**********************//
 function getText() {
   var string = $(".url").text();
@@ -303,7 +328,8 @@ function testAPIKey() {
     dataType: 'json',
     success: function(resource) {
       alert("Congrats! Your API Key works. Now continue on to Get Table!");
-      userAPIKey = userKey;
+      localStorage['APIKey'] = userKey;
+      populateInventory();
       me.complete();
     },
     error: function(response) {
