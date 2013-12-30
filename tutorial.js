@@ -459,6 +459,8 @@ function checkCorrectness(lesson, addressString, correctAns){
           $data.append("Wrong URL\n");
           //Output the HTTP status
           $data.append("HTTP Status: "+response.status);
+          //call the display error message here to handle the response that is not JSON objects
+          lesson.displayErrorMessage();
           response = JSON.parse(response.responseText);
           var errorMess = response.error.errors[0];
           //Giving messages for different error reasons
@@ -471,8 +473,7 @@ function checkCorrectness(lesson, addressString, correctAns){
             $data.append("\nThe data cannot be processed. See the details below for the information regarding the error:\n\n");
           }
           var responseString = JSON.stringify(errorMess, null, 2);
-          $data.append(responseString);
-          lesson.displayErrorMessage();
+          $data.append(responseString); 
         }
       });
     }
