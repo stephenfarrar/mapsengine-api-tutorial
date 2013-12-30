@@ -26,8 +26,11 @@ Lesson.prototype.update = function() {
   $('.response').empty();
   activeLesson = this;
   document.title = this.title;
-  //hide some elements
-  hideResultDivs();
+  //hide the lesson elements
+  hideAll();
+  //show the necessary element for lesson
+  $(".instructions").show();
+  $(".request").show();
   //show inventory if needed
   if(this.showInventory){
     $(".inventory").show();
@@ -95,7 +98,6 @@ Lesson.prototype.displaySuccessMessage = function() {
   //Display the success ribbon and message
   $(".feedback").hide().fadeIn(fadeInTime).removeClass("failure").addClass("success");
   $(".ribbon").show();
-  $(".message").show();
 
   //automatically scroll to the success message
   var successTop = $(".feedback").position().top;
@@ -119,7 +121,6 @@ Lesson.prototype.displayErrorMessage = function() {
   //Display the message, hide the success ribbon
   $(".feedback").hide().fadeIn(fadeInTime).removeClass("success").addClass("failure");
   $(".ribbon").hide();
-  $(".message").show();
     
   //automatically scroll to the error message
   var errorTop = $(".feedback").position().top;
@@ -334,11 +335,14 @@ function trim(string){
   return string.replace(/^\s+|\s+$/g, '');
 }
 
-//hide the feedback, output, and next button
-function hideResultDivs(){
+//hide all lesson divs
+function hideAll(){
+  $('.instructions').hide();
+  $('.inventory').hide();
+  $('.request').hide();
   $('.feedback').hide();
-  $('.response').hide();
   $('.general-button').hide();
+  $('.response').hide();
 }
 
 //updating the inventory box

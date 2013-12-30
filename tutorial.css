@@ -74,7 +74,6 @@ html, body {
   line-height: 1.5;
 }
 .instructions{
-  display: block;
   height:auto;
   word-wrap: break-word;
   font-family: arial;
@@ -83,7 +82,6 @@ html, body {
 }
 .inventory{
   margin-top:10px;
-  display: block;
   background-color: #F9EDBE;
   color: black;
   word-wrap: break-word;
@@ -134,7 +132,6 @@ html, body {
 }
 .next-button{
   margin-left:568px;
-  display:none;
 }
 .pointer:hover{
   cursor: pointer;
@@ -151,9 +148,6 @@ html, body {
   border-radius: 2px;
   border: 1px solid #29691d;
 }
-.menu{
-  display: block;  
-}
 .success{
   color:black;
 }
@@ -161,7 +155,6 @@ html, body {
   color:#DD4B39;
 }
 .ribbon{
-  display:none;
   background-color: #3D9400;
   color: black;
   word-wrap: break-word;
@@ -174,14 +167,13 @@ html, body {
   margin-top:10px;
 }
 .message{
-  display:none;
+  display:block;
   margin-top:10px;
   height:auto;
   font-family:arial;
   font-size:13px;
 }
 .response{
-  display: block;
   padding:10px;
   background-color: white;
   color: black;
