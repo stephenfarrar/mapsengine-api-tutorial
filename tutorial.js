@@ -472,11 +472,11 @@ function checkCorrectness(lesson, addressString, correctAns){
             lesson.displayErrorMessage("Your API Key is invalid. Make sure that you entered the right API Key and table ID.");
           } else if (errorMess.reason === "invalid") {
             var field = errorMess.location;
-            lesson.displayErrorMessage("Invalid value in the \""+field+"\" field. Check whether you've given the right tableId.");
+            lesson.displayErrorMessage("Invalid value in the \""+field+"\" field. Check whether you've given the right tableId and right values for the parameters.");
           } else if (errorMess.reason === "required"){
             lesson.displayErrorMessage("A required parameter has been left out of the request. Make sure that you entered all parameters needed.");
           } else if (errorMess.reason === "notFound"){
-            lesson.displayErrorMessage("No results were found for your request. The asset might not exist, not a public asset, or itt has been deleted from the Google Maps Engine.")
+            lesson.displayErrorMessage("No results were found for your request. The asset might not exist, not a public asset, or it has been deleted from the Google Maps Engine.")
           } else if (errorMess.reason === "insufficientPermissions"){
             lesson.displayErrorMessage("You don't have the permission to do this request. Make sure that the scope of your access is correct.");
           } else if (errorMess.reason === "limitExceeded"){
