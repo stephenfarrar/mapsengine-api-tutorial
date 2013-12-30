@@ -74,6 +74,7 @@ html, body {
   line-height: 1.5;
 }
 .instructions{
+  display: block;
   height:auto;
   word-wrap: break-word;
   font-family: arial;
