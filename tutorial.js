@@ -2,6 +2,7 @@
 //THE GLOBAL VARIABLES
 var activeLesson;
 var placeholder = "Enter your input here, press enter or click 'Get' to submit.";
+var fadeInTime = 1000;
 
 //object to store lesson information
 function Lesson(divID, options) {
@@ -20,10 +21,11 @@ Lesson.prototype.update = function() {
   //if the lesson is still unlocked, it can't be accessed
   if (!this.unlocked) return;
   //else, the lesson can be accessed
+  //scroll to top of the page
+  $("html, body").animate({scrollTop:0},500);
   $('.response').empty();
   activeLesson = this;
   document.title = this.title;
-  
   //hide some elements
   hideResultDivs();
   //show inventory if needed
@@ -32,7 +34,8 @@ Lesson.prototype.update = function() {
   } else {
      $(".inventory").hide();
   }
-
+  //make the border black again
+  $(".url").removeClass('redborder');
   //update buttons
   if ($("#"+this.divID+'button').is(":hidden")) {
     hideLessons('medium');
@@ -65,25 +68,80 @@ Lesson.prototype.update = function() {
 // Displays the instructions, possibly loading them from the markdown file.
 Lesson.prototype.displayInstructions = function() {
   var me = this;
-
-  // If the instructions aren't loaded, load them.
-  if (!this.instructions){
+  if (!this.instructions) {
+    // If the instructions aren't loaded, load them.
     $.get(this.divID+".md", function(response){
       me.instructions = response;
       me.displayInstructions();
     });
+    return;
   }
-
-  if (this.instructions) {
-    $(".instructions").html(markdown.toHTML(this.instructions));
-  }
+  $(".instructions").html(markdown.toHTML(this.instructions));
 }
 
-//Give the submit prototype for the lessons that does not have submission function
-//the submit button will call the update function for those lessons
-Lesson.prototype.submit = function() {
-  this.update();
-};
+
+//If the input is right, do the success responses
+Lesson.prototype.displaySuccessMessage = function() {
+  var me = this;
+  if (!this.successMessage) {
+    // If the success message aren't loaded, load them.
+    $.get(this.divID+"-success.md", function(response){
+      me.successMessage = response;
+      me.displaySuccessMessage();
+    });
+    return;
+  }
+  $(".message").html(markdown.toHTML(this.successMessage));
+  //Display the success ribbon and message
+  $(".feedback").hide().fadeIn(fadeInTime).removeClass("failure").addClass("success");
+  $(".ribbon").show();
+  $(".message").show();
+
+  //automatically scroll to the success message
+  var successTop = $(".feedback").position().top;
+  $("html, body").animate({scrollTop:successTop-25},500);
+  //change border colour to black
+  $(".url").removeClass('redborder');
+  
+  showResponse();
+
+  //Display the next button
+  $(".general-button").addClass('next-button');
+  $(".next-button").hide();
+  $(".next-button").attr("value","Next Lesson");
+  $(".next-button").fadeIn(fadeInTime);
+}
+
+//If the input is wrong, do the error responses
+Lesson.prototype.displayErrorMessage = function(errorMessage) {
+  $(".message").html("You entered the wrong input. ");
+  $(".message").append(errorMessage);
+  $(".message").append(" Please try again.");
+  
+  //Display the message, hide the success ribbon
+  $(".feedback").hide().fadeIn(fadeInTime).removeClass("success").addClass("failure");
+  $(".ribbon").hide();
+  $(".message").show();
+    
+  //automatically scroll to the error message
+  var errorTop = $(".feedback").position().top;
+  $("html, body").animate({scrollTop:errorTop-225},500);
+  //change border colour to red
+  $(".url").addClass("redborder");
+
+  showResponse();
+}
+
+function showResponse(){
+   //Display the response 
+  if (!$(".response").text()){
+    //if there is no response (for API Key lessons, etc., do not display output)
+    $(".response").hide();
+  } else{
+    $(".response").hide();
+    $(".response").fadeIn(fadeInTime);
+  }
+}
 
 Lesson.prototype.complete = function() {
   this.done = true; 
@@ -94,7 +152,7 @@ Lesson.prototype.complete = function() {
 }
 
 Lesson.prototype.tick = function() {
-   $('#'+this.divID+'button').css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+   $('#'+this.divID+'button').css('background-image', 'url("UI-Mocks/Images/green-tick.jpg")');
 }
 
 //marks a lesson as unlocked
@@ -121,7 +179,7 @@ Chapter.prototype.update = function() {
 }
 
 Chapter.prototype.tick = function() {
-   $('#'+this.divID+'button').css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+   $('#'+this.divID+'button').css('background-image', 'url("UI-Mocks/Images/green-tick.jpg")');
 }
 
 //checks if a chapter is complete and, as a result, if the tutorial is also complete
@@ -233,7 +291,6 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
 function loadState() {
   //enable the first lesson on first load
   chapters[0].lessons[0].unlock();
-  localStorage[chapters[0].lessons[0].divID] = true;
   var activeLessonId = localStorage['currentLesson'] || 'lesson1-gmeapi';
   //update the inventory box
   populateInventory();
@@ -274,9 +331,9 @@ function hideLessons(speed) {
   })
 }
 
-//Trim the pre white spaces in the user input
-function trimLeft(string){
-  return string.replace(/^\s+/, '');
+//Trim the white spaces in the user input
+function trim(string){
+  return string.replace(/^\s+|\s+$/g, '');
 }
 
 //hide the feedback, output, and next button
@@ -298,20 +355,21 @@ function populateInventory(){
 //*****************THE GME API FUNCTIONS**********************//
 function getText() {
   var string = $(".url").text();
-  var address = trimLeft(string);
+  var address = trim(string);
   var $data = $('.response');
+  $data.empty();
   $data.css({ whiteSpace: 'pre' });
   var me = this;
   jQuery.ajax({
   url: address,
     dataType: 'html',
     success: function(resource) {
-      alert("Nice work! You sent a successful request!");
       $data.append(resource);
+      me.displaySuccessMessage();
       me.complete();
     },
     error: function(response) {
-      alert("Sorry that was unsuccessful, try typing 'alice-in-wonderland.txt'.");
+      me.displayErrorMessage("Make sure that the spelling is correct, and there are no spaces between the text.");
     }
   });
 }
@@ -320,20 +378,21 @@ function getText() {
 function testAPIKey() {
   //get user input
   var userKey = $(".url").text();
-  var $data = $('.response');
   var me = this;
+  var $data = $('.response');
+  $data.empty();
   //use user's API Key to do a HTTP request, if it works then it is a valid API Key
   jQuery.ajax({
   url: 'https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=' + userKey,
     dataType: 'json',
     success: function(resource) {
-      alert("Congrats! Your API Key works. Now continue on to Get Table!");
       localStorage['APIKey'] = userKey;
       populateInventory();
+      me.displaySuccessMessage();
       me.complete();
     },
     error: function(response) {
-      alert("Sorry your API Key did not work. Try again!");
+      me.displayErrorMessage("Make sure that you entered the right API Key from Google Developer's Console.");
     }
   });
 }
@@ -343,9 +402,8 @@ function testAPIKey() {
 function testGetTable() {
   //get user input and trim it
   var string = $(".url").text();
-  var $data = $('.response');
 
-  var address = trimLeft(string);
+  var address = trim(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
   //the Get Table is currently NOT AVAILABLE in v1, will someday be available and this 2 line codes needs to be removed
   address = address.replace("v1","search_tt");
@@ -357,7 +415,7 @@ function testGetTable() {
 function executeListInput(){
   //get user input and trim it
   var string = $(".url").text();
-  var address = trimLeft(string);
+  var address = trim(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
   checkCorrectness(this, address, correctAns);
 }
@@ -367,7 +425,7 @@ function executeListInput(){
 function executeQueries(){
   //get user input and trim it
   var string = $(".url").text();
-  var address = trimLeft(string);
+  var address = trim(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&where=Population<2000000";
   checkCorrectness(this, address, correctAns);
 }
@@ -393,30 +451,51 @@ function checkCorrectness(lesson, addressString, correctAns){
           $data.append(resourceString);
           //if the response user got is the correct response, then the user is right!
           if(resourceString === correctResourceString){
-            alert("Great work! You can move on to the next lesson.");
+            lesson.displaySuccessMessage();
             lesson.complete();
           } else {
-            alert("Oops! You've entered wrong URL! Try again!");
-          }
+            lesson.displayErrorMessage("You did not do what the exercise is telling you to do. Make sure that you read the question carefully.");
+          } 
         },
         error: function(response) {
-          alert ("Oops! You've entered wrong URL! Try again!");
           $data.append("Wrong URL\n");
           //Output the HTTP status
           $data.append("HTTP Status: "+response.status);
+          //call the display error message here to handle the response that is not JSON objects
+          lesson.displayErrorMessage("You did not enter a valid URL.");
           response = JSON.parse(response.responseText);
           var errorMess = response.error.errors[0];
           //Giving messages for different error reasons
           if (errorMess.reason === "authError") {
-            $data.append("\nYour authorization token is invalid. \nPlease check that the table can be viewed by general public\n\n");
+            lesson.displayErrorMessage("Your authorization token is invalid. Please check that the table can be viewed by general public.");
+          } else if (errorMess.reason === "dailyLimitExceededUnreg"){
+            lesson.displayErrorMessage("Your API Key is invalid. Make sure that you entered the right API Key and table ID.");
           } else if (errorMess.reason === "invalid") {
             var field = errorMess.location;
-            $data.append("\nInvalid value in the \""+field+"\" field.\nCheck whether you've given the right tableId\n\n");
+            lesson.displayErrorMessage("Invalid value in the \""+field+"\" field. Check whether you've given the right tableId and right values for the parameters.");
+          } else if (errorMess.reason === "required"){
+            lesson.displayErrorMessage("A required parameter has been left out of the request. Make sure that you entered all parameters needed.");
+          } else if (errorMess.reason === "notFound"){
+            lesson.displayErrorMessage("No results were found for your request. The asset might not exist, not a public asset, or it has been deleted from the Google Maps Engine.")
+          } else if (errorMess.reason === "insufficientPermissions"){
+            lesson.displayErrorMessage("You don't have the permission to do this request. Make sure that the scope of your access is correct.");
+          } else if (errorMess.reason === "limitExceeded"){
+            lesson.displayErrorMessage("The resource is too large to be accessed through the API.");
+          } else if (errorMess.reason === "duplicate"){
+            lesson.displayErrorMessage("The new feature you are trying to insert has an ID that already exists in the table.");
+          } else if (errorMess.reason === "rateLimitExceeded"|| errorMess.reason === "quotaExceeded"){
+            lesson.displayErrorMessage("You have exhausted the application's daily quota or its per-second rate limit. Please contact the Enterprise Support for higher limits.");
+          } else if (errorMess.reason === "unauthorized"){
+            lesson.displayErrorMessage("You didn't pass an authorization header with your request.");
+          } else if (errorMess.reason === "requestToolarge"){
+            lesson.displayErrorMessage("Your request contained too many features and/or vertices.");
+          } else if (errorMess.reason === "accessNotConfigured"){
+            lesson.displayErrorMessage("There is a per-IP or per-Referer restriction configured on the API Key and the request does not match these restrictions, or the Maps Engine API is not activated on the project ID.");
           } else {
-            $data.append("\nThe data cannot be processed. See the details below for the information regarding the error:\n\n");
+            lesson.displayErrorMessage("The data cannot be processed. Please check your request again to ensure that it is correct.");
           }
           var responseString = JSON.stringify(errorMess, null, 2);
-          $data.append(responseString);
+          $data.append(responseString); 
         }
       });
     }
