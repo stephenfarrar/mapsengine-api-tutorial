@@ -68,35 +68,30 @@ Lesson.prototype.update = function() {
 // Displays the instructions, possibly loading them from the markdown file.
 Lesson.prototype.displayInstructions = function() {
   var me = this;
-
-  //if the instruction already loaded, display them
-  if (this.instructions) {
-    $(".instructions").html(markdown.toHTML(this.instructions));
-  } else {
+  if (!this.instructions) {
     // If the instructions aren't loaded, load them.
     $.get(this.divID+".md", function(response){
       me.instructions = response;
-      $(".instructions").html(markdown.toHTML(me.instructions));
+      me.displayInstructions();
     });
+    return;
   }
+  $(".instructions").html(markdown.toHTML(this.instructions));
 }
 
 
 //If the input is right, do the success responses
 Lesson.prototype.displaySuccessMessage = function() {
   var me = this;
- 
-  //if success message already loaded, just display them
-  if (this.successMessage) {
-    $(".message").html(markdown.toHTML(this.successMessage));
-  } else {
+  if (!this.successMessage) {
     // If the success message aren't loaded, load them.
     $.get(this.divID+"-success.md", function(response){
       me.successMessage = response;
-      $(".message").html(markdown.toHTML(me.successMessage));
+      me.displaySuccessMessage();
     });
+    return;
   }
-
+  $(".message").html(markdown.toHTML(this.successMessage));
   //Display the success ribbon and message
   $(".feedback").hide().fadeIn(fadeInTime).removeClass("failure").addClass("success");
   $(".ribbon").show();
