@@ -10,11 +10,20 @@ function Lesson(divID, options) {
   this.title = options.title;
   if (options.submit) {
     this.submit = options.submit;
+    //if it has a submission, then it must be a lesson
+    this.isLesson = true;
+  } else {
+    //it is an intro/final page
+    //has a different button value
+    this.isLesson = false;
+    this.buttonValue = options.buttonValue;
   }
   //done is TRUE if: the user has submitted correctly
   this.done = false;
   this.unlocked = false;
-  this.showInventory = options.showInventory;
+  if (options.showInventory){
+    this.showInventory = options.showInventory;
+  }
 }
 
 Lesson.prototype.update = function() {
@@ -23,48 +32,65 @@ Lesson.prototype.update = function() {
   //else, the lesson can be accessed
   //scroll to top of the page
   $("html, body").animate({scrollTop:0},500);
-  $('.response').empty();
   activeLesson = this;
   document.title = this.title;
   //hide the lesson elements
   hideAll();
-  //show the necessary element for lesson
-  $(".instructions").show();
-  $(".request").show();
-  //show inventory if needed
-  if(this.showInventory){
-    $(".inventory").show();
-  } else {
-     $(".inventory").hide();
-  }
-  //make the border black again
-  $(".url").removeClass('redborder');
-  //update buttons
-  if ($("#"+this.divID+'button').is(":hidden")) {
-    hideLessons('medium');
-    var lesson = this.chapter.lessons;
-    lesson.forEach(function(lesson) {
-      $('#' + lesson.divID + 'button').show('medium');
-    })
-  }
-  //make text on button for active lesson red, and all others black
-  chapters.forEach(function(chapter) {
-    chapter.lessons.forEach(function(lesson) {
-      $("#"+lesson.divID+'button').removeClass('active');
-      if (lesson.unlocked) {
-        $("#"+lesson.divID+'button').addClass('unlocked');
-      }
-    });
-  });
-  $("#"+this.divID+'button').removeClass('unlocked').addClass('active');
   //display the instruction blurb
   this.displayInstructions();
 
-  localStorage['currentLesson'] = activeLesson.divID;
+  //if it is a lesson
+  if (this.isLesson){
+    $('.response').empty();
+    //show the necessary element for lesson
+    $('.buttons').show();
+    $(".request").show();
+    //show inventory if needed
+    if(this.showInventory){
+      $(".inventory").show();
+    } else {
+       $(".inventory").hide();
+    }
+    //make the border black again
+    $(".url").removeClass('redborder');
+    //update buttons
+    if ($("#"+this.divID+'button').is(":hidden")) {
+      hideLessons('medium');
+      var lesson = this.chapter.lessons;
+      lesson.forEach(function(lesson) {
+        $('#' + lesson.divID + 'button').show('medium');
+      })
+    }
+    //make text on button for active lesson red, and all others black
+    chapters.forEach(function(chapter) {
+      chapter.lessons.forEach(function(lesson) {
+        $("#"+lesson.divID+'button').removeClass('active');
+        if (lesson.unlocked) {
+          $("#"+lesson.divID+'button').addClass('unlocked');
+        }
+      });
+    });
+    $("#"+this.divID+'button').removeClass('unlocked').addClass('active');
+    
+    localStorage['currentLesson'] = activeLesson.divID;
+    
+    var storedUrl = localStorage[this.divID + 'input'];
+    $(".url").toggleClass("placeholder", !storedUrl)
+      .text(storedUrl || placeholder);
+
+    //update the button to be a next button
+    $(".general-button").addClass('next-button');
+    $(".next-button").attr("value","Next Lesson");
+  } else {
+    //it is an intro/final page
+    //show the necessary element
+    console.log(this.next);
+    $(".general-button").show();
+    $(".general-button").attr("value",this.buttonValue);
+    //remove the next button class
+    $(".general-button").removeClass("next-button");
+  }
   
-  var storedUrl = localStorage[this.divID + 'input'];
-  $(".url").toggleClass("placeholder", !storedUrl)
-    .text(storedUrl || placeholder);
   
 }
 
@@ -108,9 +134,7 @@ Lesson.prototype.displaySuccessMessage = function() {
   showResponse();
 
   //Display the next button
-  $(".general-button").addClass('next-button');
   $(".next-button").hide();
-  $(".next-button").attr("value","Next Lesson");
   $(".next-button").fadeIn(fadeInTime);
 }
 
@@ -157,8 +181,10 @@ Lesson.prototype.tick = function() {
 //marks a lesson as unlocked
 Lesson.prototype.unlock = function(){
   this.unlocked = true;
-  $("#"+this.divID+'button').removeClass('locked').addClass('unlocked');
-  $("#"+this.chapter.divID+'button').removeClass('locked').addClass('unlocked');
+  if (this.isLesson){
+    $("#"+this.divID+'button').removeClass('locked').addClass('unlocked');
+    $("#"+this.chapter.divID+'button').removeClass('locked').addClass('unlocked');
+  }
 };
 
 //Object to store chapter information
@@ -205,7 +231,6 @@ Chapter.prototype.checkTutorialCompletion = function() {
   });
   //make sure user only sees completion message once
   if (finished && !localStorage['finished']) {
-    alert("Congratulations, you have completed this tutorial!");
     localStorage['finished'] = true;
   }
 }
@@ -223,8 +248,13 @@ var chapters = [
   ]})
 ];
 
+//introduction and final page
+var introduction = new Lesson('introduction', {title: "Welcome!", buttonValue: "Yes, I am!"});
+var finish = new Lesson('finish', {title:'Congratulations!', buttonValue: "Go back to tutorial"});
+
 //Determining the next, and chapter for each lesson
 var prevLesson = chapters[0].lessons[0]; //first lesson
+introduction.next = prevLesson;
 chapters.forEach(function(chapter){
   chapter.lessons.forEach(function(lesson){
     lesson.chapter = chapter;
@@ -233,7 +263,9 @@ chapters.forEach(function(chapter){
   });
 });
 //last lesson
-prevLesson.next = prevLesson;
+prevLesson.next = finish;
+//the final page have link to go back to tutorial.
+finish.next = prevLesson;
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 google.maps.event.addDomListener(window, 'load', function initialize(){
@@ -288,9 +320,10 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
 });
 
 function loadState() {
-  //enable the first lesson on first load
+  //enable the introduction page and first lesson on first load
+  introduction.unlock();
   chapters[0].lessons[0].unlock();
-  var activeLessonId = localStorage['currentLesson'] || 'lesson1-gmeapi';
+  var activeLessonId = localStorage['currentLesson'] || 'introduction';
   //update the inventory box
   populateInventory();
   chapters.forEach(function(chapter) {
@@ -304,6 +337,9 @@ function loadState() {
       }
     });
   });
+  if (activeLessonId === "introduction"){
+    introduction.update();
+  }
 }
 
 //Create the menu button for each lesson & chapter
@@ -337,7 +373,7 @@ function trim(string){
 
 //hide all lesson divs
 function hideAll(){
-  $('.instructions').hide();
+  $('.buttons').hide();
   $('.inventory').hide();
   $('.request').hide();
   $('.feedback').hide();
