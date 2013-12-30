@@ -114,11 +114,11 @@ Lesson.prototype.displaySuccessMessage = function() {
     $(".response").show();
   }
   //Display the next button
-  $(".general-button").hide();
   $(".general-button").addClass('next-button');
-  $(".general-button").attr("value","Next Lesson");
-  $(".general-button").fadeIn();
-  $(".general-button").show();  
+  $(".next-button").hide();
+  $(".next-button").attr("value","Next Lesson");
+  $(".next-button").fadeIn();
+  $(".next-button").show();  
 }
 
 //If the input is wrong, do the error responses
@@ -148,10 +148,11 @@ Lesson.prototype.displayErrorMessage = function() {
     $(".response").fadeIn();
     $(".response").show();
   }
-  
+  /*
   //Hide the next button
-  $(".general-button").fadeOut();
-  $(".general-button").hide();
+  $(".next-button").fadeOut();
+  $(".next-button").hide();
+  */
 }
 
 Lesson.prototype.complete = function() {
