@@ -114,6 +114,9 @@ html, body {
 .url.placeholder {
   color: gray;
 }
+.url.redborder {
+  border-color: #DD4B39;
+}
 .get-button{
   float: right;
   display: inline;
@@ -130,7 +133,7 @@ html, body {
   font-weight: bold;
 }
 .next-button{
-  margin-left:565px;
+  margin-left:568px;
   display:none;
 }
 .pointer:hover{
@@ -172,7 +175,6 @@ html, body {
 }
 .message{
   display:none;
-  width: 630px;
   margin-top:10px;
   height:auto;
   font-family:arial;
