@@ -180,6 +180,28 @@ html, body {
   font-family:arial;
   font-size:13px;
 }
+.show-button{
+  background-color:#F8F8F8);
+  border: 1px solid #C6C6C6;
+  margin-top:10px;
+  height: 19px;
+  color: black;
+  font-family: arial;
+  font-weight: bold;
+  font-size: 11px;
+  border-radius: 2px;
+}
+.answer{
+  margin-top:10px;
+  display: block;
+  background-color: #F9EDBE;
+  color: black;
+  word-wrap: break-word;
+  border: 1px solid #FBCB43;
+  font-size: 12px;
+  padding: 5px;
+  font-family:arial;
+}
 .response{
   display: block;
   padding:10px;

@@ -337,6 +337,8 @@ function trim(string){
 //hide the feedback, output, and next button
 function hideResultDivs(){
   $('.feedback').hide();
+  $('.show-button').hide();
+  $('.answer').hide();
   $('.response').hide();
   $('.general-button').hide();
 }
