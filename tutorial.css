@@ -4,14 +4,10 @@ html, body {
   height: 100%;
 }
 .buttons {
-  z-index: 2;
   display: block;
-  position: absolute;
-  height: 100%;
-  padding: 0px;
-  top: 10.75%;
-  width: 280px;
   float: left;
+  padding: 0px;
+  width: 280px;
   background-color: #FFFFFF;
 }
 .menu-button{
@@ -21,21 +17,21 @@ html, body {
   text-align: left;
   background-repeat: no-repeat;
   background-image: none;
-  background-position: 95% 20%;
-  background-size: 6% 80%;
+  background-position: right;
+  background-size: 20px;
   border: none;
   font-family: Arial;
   margin-bottom: 12px;
 }
 .chapter-button {
-  width: 100%;
+  width: 280px;
   height: 24px;
   font-size: 14px;
   font-weight: bold;
 }
 .lesson-button {
-  width: 95%;
-  left: 5%;
+  width: 270px;
+  margin-left: 10px;
   height: 24px;
   font-size: 14px;
 }
@@ -77,13 +73,25 @@ html, body {
   width: 650px;
   line-height: 1.5;
 }
-.instructions {
+.instructions{
   display: block;
   height:auto;
   word-wrap: break-word;
   font-family: arial;
   font-size: 13px;
   margin-top: 20px;
+}
+.inventory{
+  margin-top:10px;
+  display: block;
+  background-color: #F9EDBE;
+  color: black;
+  word-wrap: break-word;
+  border: 1px solid #FBCB43;
+  font-size: 12px;
+  padding: 10px;
+  font-family:arial;
+  box-shadow: 4px 4px 8px #CCC;
 }
 .url{
   display: inline-block;
@@ -106,6 +114,9 @@ html, body {
 .url.placeholder {
   color: gray;
 }
+.url.redborder {
+  border-color: #DD4B39;
+}
 .get-button{
   float: right;
   display: inline;
@@ -122,7 +133,7 @@ html, body {
   font-weight: bold;
 }
 .next-button{
-  margin-left:565px;
+  margin-left:568px;
   display:none;
 }
 .pointer:hover{
@@ -149,12 +160,6 @@ html, body {
 .failure{
   color:#DD4B39;
 }
-.success{
-  color:black;
-}
-.failure{
-  color:#DD4B39;
-}
 .ribbon{
   display:none;
   background-color: #3D9400;
@@ -170,7 +175,6 @@ html, body {
 }
 .message{
   display:none;
-  width: 630px;
   margin-top:10px;
   height:auto;
   font-family:arial;
@@ -193,7 +197,7 @@ html, body {
   border: 1px solid black;
   margin-top:10px;
 }
-img[alt=cat-image] {
+img[alt=yes-cat-image] {
   height: 300px;
 }
 *:focus {

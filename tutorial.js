@@ -1,9 +1,8 @@
 //Javascript file for tutorial
 //THE GLOBAL VARIABLES
-
-var userAPIKey = "";
 var activeLesson;
 var placeholder = "Enter your input here, press enter or click 'Get' to submit.";
+var fadeInTime = 1000;
 
 //object to store lesson information
 function Lesson(divID, options) {
@@ -15,6 +14,7 @@ function Lesson(divID, options) {
   //done is TRUE if: the user has submitted correctly
   this.done = false;
   this.unlocked = false;
+  this.showInventory = options.showInventory;
 }
 
 Lesson.prototype.update = function() {
@@ -26,10 +26,16 @@ Lesson.prototype.update = function() {
   $('.response').empty();
   activeLesson = this;
   document.title = this.title;
-  $("#"+this.divID).show();
-  $('.feedback').hide();
-  $('.response').hide();
-  $('.general-button').hide();
+  //hide some elements
+  hideResultDivs();
+  //show inventory if needed
+  if(this.showInventory){
+    $(".inventory").show();
+  } else {
+     $(".inventory").hide();
+  }
+  //make the border black again
+  $(".url").removeClass('redborder');
   //update buttons
   if ($("#"+this.divID+'button').is(":hidden")) {
     hideLessons('medium');
@@ -63,62 +69,52 @@ Lesson.prototype.update = function() {
 Lesson.prototype.displayInstructions = function() {
   var me = this;
 
-  // If the instructions aren't loaded, load them.
-  if (!this.instructions){
-    $.get(this.divID+".md", function(response){
-      me.instructions = response;
-      me.displayInstructions();
-    });
-  }
-
+  //if the instruction already loaded, display them
   if (this.instructions) {
     $(".instructions").html(markdown.toHTML(this.instructions));
+  } else {
+    // If the instructions aren't loaded, load them.
+    $.get(this.divID+".md", function(response){
+      me.instructions = response;
+      $(".instructions").html(markdown.toHTML(me.instructions));
+    });
   }
 }
+
 
 //If the input is right, do the success responses
 Lesson.prototype.displaySuccessMessage = function() {
   var me = this;
  
-  // If the success message aren't loaded, load them.
-  if (!this.successMessage){
+  //if success message already loaded, just display them
+  if (this.successMessage) {
+    $(".message").html(markdown.toHTML(this.successMessage));
+  } else {
+    // If the success message aren't loaded, load them.
     $.get(this.divID+"-success.md", function(response){
       me.successMessage = response;
-      me.displaySuccessMessage();
+      $(".message").html(markdown.toHTML(me.successMessage));
     });
   }
 
-  if (this.successMessage) {
-    $(".message").html(markdown.toHTML(this.successMessage));
-  }
-
   //Display the success ribbon and message
-  $(".feedback").hide();
+  $(".feedback").hide().fadeIn(fadeInTime).removeClass("failure").addClass("success");
   $(".ribbon").show();
   $(".message").show();
-  $(".feedback").fadeIn();
-  $(".feedback").show();
-  $(".feedback").removeClass("failure");
-  $(".feedback").addClass("success");
+
   //automatically scroll to the success message
   var successTop = $(".feedback").position().top;
   $("html, body").animate({scrollTop:successTop-25},500);
   //change border colour to black
-  $(".url").css('border-color', '#000000');
-  //Display the response
-  if (!($(".response").text())){
-    $(".response").hide();
-  } else{
-    $(".response").hide();
-    $(".response").fadeIn();
-    $(".response").show();
-  }
+  $(".url").removeClass('redborder');
+  
+  showResponse();
+
   //Display the next button
   $(".general-button").addClass('next-button');
   $(".next-button").hide();
   $(".next-button").attr("value","Next Lesson");
-  $(".next-button").fadeIn();
-  $(".next-button").show();  
+  $(".next-button").fadeIn(fadeInTime);
 }
 
 //If the input is wrong, do the error responses
@@ -126,33 +122,28 @@ Lesson.prototype.displayErrorMessage = function() {
   $(".message").html("You entered the wrong input. Please try again.");
   
   //Display the message, hide the success ribbon
-  $(".feedback").hide();
+  $(".feedback").hide().fadeIn(fadeInTime).removeClass("success").addClass("failure");
   $(".ribbon").hide();
   $(".message").show();
-  $(".feedback").fadeIn();
-  $(".feedback").show();
-  $(".feedback").removeClass("success");
-  $(".feedback").addClass("failure");
     
   //automatically scroll to the error message
   var errorTop = $(".feedback").position().top;
   $("html, body").animate({scrollTop:errorTop-225},500);
   //change border colour to red
-  $(".url").css('border-color', '#DD4B39'); 
-  
-  //Display the response
-  if ((!$(".response").text())){
+  $(".url").addClass("redborder");
+
+  showResponse();
+}
+
+function showResponse(){
+   //Display the response 
+  if (!$(".response").text()){
+    //if there is no response (for API Key lessons, etc., do not display output)
     $(".response").hide();
   } else{
     $(".response").hide();
-    $(".response").fadeIn();
-    $(".response").show();
+    $(".response").fadeIn(fadeInTime);
   }
-  /*
-  //Hide the next button
-  $(".next-button").fadeOut();
-  $(".next-button").hide();
-  */
 }
 
 Lesson.prototype.complete = function() {
@@ -164,7 +155,7 @@ Lesson.prototype.complete = function() {
 }
 
 Lesson.prototype.tick = function() {
-   $('#'+this.divID+'button').css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+   $('#'+this.divID+'button').css('background-image', 'url("UI-Mocks/Images/green-tick.jpg")');
 }
 
 //marks a lesson as unlocked
@@ -191,7 +182,7 @@ Chapter.prototype.update = function() {
 }
 
 Chapter.prototype.tick = function() {
-   $('#'+this.divID+'button').css('background-image', 'url(http://www.sxc.hu/assets/183254/1832538623/green-tick-in-circle-1335495-m.jpg)');
+   $('#'+this.divID+'button').css('background-image', 'url("UI-Mocks/Images/green-tick.jpg")');
 }
 
 //checks if a chapter is complete and, as a result, if the tutorial is also complete
@@ -226,13 +217,13 @@ Chapter.prototype.checkTutorialCompletion = function() {
 //ARRAY OF CHAPTERS
 var chapters = [
   new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
-    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText}),
-    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey})
+    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText, showInventory:false}),
+    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, showInventory:false})
   ]}),
   new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
-    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable}),
-    new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput}),
-    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries}),
+    new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, showInventory:true}),
+    new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput, showInventory:true}),
+    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, showInventory:true}),
   ]})
 ];
 
@@ -303,8 +294,9 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
 function loadState() {
   //enable the first lesson on first load
   chapters[0].lessons[0].unlock();
-  localStorage[chapters[0].lessons[0].divID] = true;
   var activeLessonId = localStorage['currentLesson'] || 'lesson1-gmeapi';
+  //update the inventory box
+  populateInventory();
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
       //if lesson is completed, stored as 'true'
@@ -342,11 +334,27 @@ function hideLessons(speed) {
   })
 }
 
-//Trim the pre white spaces in the user input
+//Trim the white spaces in the user input
 function trim(string){
   return string.replace(/^\s+|\s+$/g, '');
 }
 
+//hide the feedback, output, and next button
+function hideResultDivs(){
+  $('.feedback').hide();
+  $('.response').hide();
+  $('.general-button').hide();
+}
+
+//updating the inventory box
+function populateInventory(){
+  var $inventory = $(".inventory");
+  $inventory.empty();
+  $inventory.append("<b>Helpful information</b><br>");
+  $inventory.append("table ID: 15474835347274181123-14495543923251622067<br>");
+  $inventory.append("your API Key: ");
+  $inventory.append(localStorage['APIKey']);
+}
 //*****************THE GME API FUNCTIONS**********************//
 function getText() {
   var string = $(".url").text();
@@ -373,16 +381,16 @@ function getText() {
 function testAPIKey() {
   //get user input
   var userKey = $(".url").text();
-  userKey = trim(userKey);
+  var me = this;
   var $data = $('.response');
   $data.empty();
-  var me = this;
   //use user's API Key to do a HTTP request, if it works then it is a valid API Key
   jQuery.ajax({
   url: 'https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=' + userKey,
     dataType: 'json',
     success: function(resource) {
-      userAPIKey = userKey;
+      localStorage['APIKey'] = userKey;
+      populateInventory();
       me.displaySuccessMessage();
       me.complete();
     },
@@ -397,7 +405,6 @@ function testAPIKey() {
 function testGetTable() {
   //get user input and trim it
   var string = $(".url").text();
-  var $data = $('.response');
 
   var address = trim(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
@@ -451,7 +458,7 @@ function checkCorrectness(lesson, addressString, correctAns){
             lesson.complete();
           } else {
             lesson.displayErrorMessage();
-          }
+          } 
         },
         error: function(response) {
           $data.append("Wrong URL\n");
