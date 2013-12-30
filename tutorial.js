@@ -234,7 +234,7 @@ function loadState() {
   //enable the first lesson on first load
   chapters[0].lessons[0].unlock();
   localStorage[chapters[0].lessons[0].divID] = true;
-  var activeLessonId = localStorage['currentLesson'] || 'lesson0-intro';
+  var activeLessonId = localStorage['currentLesson'] || 'lesson1-gmeapi';
   //update the inventory box
   populateInventory();
   chapters.forEach(function(chapter) {
