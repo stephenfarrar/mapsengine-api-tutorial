@@ -258,7 +258,7 @@ chapters.forEach(function(chapter){
 //last lesson
 prevLesson.next = finish;
 //the final page have link to go back to tutorial.
-finish.next = prevLesson;
+finish.next = chapters[0].lessons[0];
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 google.maps.event.addDomListener(window, 'load', function initialize(){
