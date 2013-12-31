@@ -34,7 +34,7 @@ Lesson.prototype.update = function() {
   activeLesson = this;
   document.title = this.title;
   //hide the lesson elements
-  hideAll();
+  $('.hidden-by-default').hide();
   //display the instruction blurb
   this.displayInstructions();
   //update and show the button
@@ -389,18 +389,6 @@ function trim(string){
   return string.replace(/^\s+|\s+$/g, '');
 }
 
-//hide all lesson divs
-function hideAll(){
-  $('.buttons').hide();
-  $('.inventory').hide();
-  $('.request').hide();
-  $('.feedback').hide();
-  //hide show button and answer
-  $('.sometimes-hidden').hide();
-  $('.green-button').hide();
-  $('.response').hide();
-}
-
 //updating the inventory box
 function populateInventory(){
   var $inventory = $(".inventory");
@@ -517,14 +505,23 @@ function checkCorrectness(lesson, addressString, correctAns){
           $data.append("Wrong URL\n");
           //Output the HTTP status
           $data.append("HTTP Status: "+response.status);
-          //call the display error message here to handle the response that is not JSON objects
-          lesson.displayErrorMessage("You did not enter a valid URL.");
-          response = JSON.parse(response.responseText);
-          //if the data returned is a JSON, decrease the attempt since displayErrorMessage will be called again.
-          lesson.attempt--;
-          var errorMess = response.error.errors[0];
+          
+          //Try parsing the response
+          var errorMess;
+          try {
+            response = JSON.parse(response.responseText);
+            errorMess = response.error.errors[0];
+            //append the response to the output area
+            var responseString = JSON.stringify(errorMess, null, 2);
+            $data.append(responseString); 
+          } catch (e) {
+            errorMess = "notJSONObject";
+          }
+         
           //Giving messages for different error reasons
-          if (errorMess.reason === "authError") {
+          if (errorMess === "notJSONObject"){
+            lesson.displayErrorMessage("You did not enter a valid URL.");
+          } else if (errorMess.reason === "authError") {
             lesson.displayErrorMessage("Your authorization token is invalid. Please check that the table can be viewed by general public.");
           } else if (errorMess.reason === "keyInvalid"){
             lesson.displayErrorMessage("Your API Key is invalid. Make sure that you entered the right API Key and table ID.");
@@ -554,8 +551,6 @@ function checkCorrectness(lesson, addressString, correctAns){
           } else {
             lesson.displayErrorMessage("The data cannot be processed. Please check your request again to ensure that it is correct.");
           }
-          var responseString = JSON.stringify(errorMess, null, 2);
-          $data.append(responseString); 
         }
       });
     }
