@@ -1,7 +1,6 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;
 }
 .buttons {
   display: block;
@@ -65,10 +64,12 @@ html, body {
   vertical-align: middle;
   margin: 10px;
 }
+.content{
+  margin-bottom: 20px;
+}
 .lesson{
   display: block;
   margin: 10px;
-  margin-bottom: 20px;
   margin-left:300px;
   width: 650px;
   line-height: 1.5;
@@ -83,7 +84,6 @@ html, body {
 }
 .inventory{
   margin-top:10px;
-  display: block;
   background-color: #F9EDBE;
   color: black;
   word-wrap: break-word;
@@ -109,50 +109,52 @@ html, body {
   border: 1px solid black;
   color: black;
   overflow-y:hidden;
-  margin-top:20px
-}
-.url.placeholder {
-  color: gray;
+  margin-top:20px;
+  line-height: 1.5;
 }
 .url.redborder {
   border-color: #DD4B39;
+}
+.hidden-url-div{
+  display:none;
+  width: 555px;
+  min-height:24px;
+  height: auto;
+  word-wrap: break-word;
+  font-size: 13px;
+  font-family: monospace;
+  resize: none;
+  overflow-y:hidden;
+  line-height: 1.5;
+}
+.pointer:hover{
+  cursor: pointer;
+}
+.kennedy-button{
+  margin-top:10px;
+  min-width: 80px;
+  height: 27px;
+  font-size: 11px;
+  font-family: arial;
+  font-weight: bold;
+  border-radius: 2px;
 }
 .get-button{
   float: right;
   display: inline;
   margin-top: 20px;
   margin-right: 0px;
-  width: 80px;
-  height: 27px;
-  background-color: #4287FD;
+  background-color:#4d90fe;
   color: white;
-  font-size: 11px;
-  font-family: arial;
-  border-radius: 2px;
-  border: 1px solid #4683EA;
-  font-weight: bold;
+  border: 1px solid #3079ed;
 }
-.next-button{
-  margin-left:568px;
-  display:none;
-}
-.pointer:hover{
-  cursor: pointer;
-}
-.general-button{
-  margin-top:10px;
-  min-width: 80px;
-  height: 27px;
-  font-size: 11px;
-  font-family: arial;
-  color: white;
-  font-weight: bold;
+.green-button{
   background-color: #3d9400;
-  border-radius: 2px;
   border: 1px solid #29691d;
+  color: white;
 }
-.menu{
-  display: block;  
+.right-aligned{
+  margin-left:568px;
 }
 .success{
   color:black;
@@ -161,7 +163,6 @@ html, body {
   color:#DD4B39;
 }
 .ribbon{
-  display:none;
   background-color: #3D9400;
   color: black;
   word-wrap: break-word;
@@ -174,14 +175,32 @@ html, body {
   margin-top:10px;
 }
 .message{
-  display:none;
+  display:block;
   margin-top:10px;
   height:auto;
   font-family:arial;
   font-size:13px;
 }
-.response{
+.show-button{
+  background-color:#F8F8F8);
+  border: 1px solid #C6C6C6;
+  color: black;
+}
+.answer{
+  margin-top:10px;
   display: block;
+  background-color: #F9EDBE;
+  color: black;
+  word-wrap: break-word;
+  border: 1px solid #FBCB43;
+  font-size: 12px;
+  padding: 10px;
+  font-family:arial;
+}
+.answer p{
+  margin: 0px;
+}
+.response{
   padding:10px;
   background-color: white;
   color: black;

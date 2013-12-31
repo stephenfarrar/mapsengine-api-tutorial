@@ -1,20 +1,28 @@
 //Javascript file for tutorial
 //THE GLOBAL VARIABLES
 var activeLesson;
-var placeholder = "Enter your input here, press enter or click 'Get' to submit.";
-var fadeInTime = 1000;
+
+var fadeInTime = 500;
 
 //object to store lesson information
 function Lesson(divID, options) {
   this.divID = divID;
   this.title = options.title;
+  this.buttonValue = options.buttonValue||"Next Lesson";
   if (options.submit) {
     this.submit = options.submit;
+    //if it has a submission, then it must be a lesson
+    this.hasSubmit = true;
+  } else {
+    //it is an intro/final page
+    this.hasSubmit = false;
   }
   //done is TRUE if: the user has submitted correctly
   this.done = false;
   this.unlocked = false;
-  this.showInventory = options.showInventory;
+  if (options.showInventory){
+    this.showInventory = options.showInventory;
+  }
 }
 
 Lesson.prototype.update = function() {
@@ -23,46 +31,62 @@ Lesson.prototype.update = function() {
   //else, the lesson can be accessed
   //scroll to top of the page
   $("html, body").animate({scrollTop:0},500);
-  $('.response').empty();
   activeLesson = this;
   document.title = this.title;
-  //hide some elements
-  hideResultDivs();
-  //show inventory if needed
-  if(this.showInventory){
-    $(".inventory").show();
-  } else {
-     $(".inventory").hide();
-  }
-  //make the border black again
-  $(".url").removeClass('redborder');
-  //update buttons
-  if ($("#"+this.divID+'button').is(":hidden")) {
-    hideLessons('medium');
-    var lesson = this.chapter.lessons;
-    lesson.forEach(function(lesson) {
-      $('#' + lesson.divID + 'button').show('medium');
-    })
-  }
-  //make text on button for active lesson red, and all others black
-  chapters.forEach(function(chapter) {
-    chapter.lessons.forEach(function(lesson) {
-      $("#"+lesson.divID+'button').removeClass('active');
-      if (lesson.unlocked) {
-        $("#"+lesson.divID+'button').addClass('unlocked');
-      }
-    });
-  });
-  $("#"+this.divID+'button').removeClass('unlocked').addClass('active');
+  //hide the lesson elements
+  $('.hidden-by-default').hide();
   //display the instruction blurb
   this.displayInstructions();
+  //update and show the button
+  $('.green-button').attr('value', this.buttonValue);
 
-  localStorage['currentLesson'] = activeLesson.divID;
-  
-  var storedUrl = localStorage[this.divID + 'input'];
-  $(".url").toggleClass("placeholder", !storedUrl)
-    .text(storedUrl || placeholder);
-  
+  //if it is an intro/final page
+  if (!this.hasSubmit){
+    //show the green button and removed the right aligned class
+    $(".green-button").show().removeClass("right-aligned");
+  } else {
+    //it is not an intro/final page (lessons page)
+    $('.response').empty();
+    //show the necessary element for lesson
+    $('.buttons').show();
+    $(".request").show();
+    //show inventory if needed
+    if(this.showInventory){
+      $(".inventory").show();
+    } else {
+       $(".inventory").hide();
+    }
+    //make the border black again
+    $(".url").removeClass('redborder');
+    //right aligned the green button
+    $(".green-button").addClass('right-aligned');
+
+    //update buttons menu
+    if ($("#"+this.divID+'button').is(":hidden")) {
+      hideLessons('medium');
+      var lesson = this.chapter.lessons;
+      lesson.forEach(function(lesson) {
+        $('#' + lesson.divID + 'button').show('medium');
+      })
+    }
+
+    //make text on button for active lesson red, and all others black
+    chapters.forEach(function(chapter) {
+      chapter.lessons.forEach(function(lesson) {
+        $("#"+lesson.divID+'button').removeClass('active');
+        if (lesson.unlocked) {
+          $("#"+lesson.divID+'button').addClass('unlocked');
+        }
+      });
+    });
+    $("#"+this.divID+'button').removeClass('unlocked').addClass('active');
+    //store the current lesson
+    localStorage['currentLesson'] = activeLesson.divID;
+    //update the input (placeholder/saved URL)
+    var storedUrl = localStorage[this.divID + 'input'];
+    $(".url").val(storedUrl || "");
+    setTextAreaHeight();
+  }
 }
 
 // Displays the instructions, possibly loading them from the markdown file.
@@ -79,6 +103,20 @@ Lesson.prototype.displayInstructions = function() {
   $(".instructions").html(markdown.toHTML(this.instructions));
 }
 
+Lesson.prototype.showAnswer = function(){
+  var me = this;
+  if (!this.answer) {
+    // If the answers aren't loaded, load them.
+    $.get(this.divID+"-answer.md", function(response){
+      me.answer = response;
+      me.showAnswer();
+    });
+    return;
+  }
+  $(".answer").html(markdown.toHTML(this.answer));
+  //show the answer
+  $(".answer").show();
+}
 
 //If the input is right, do the success responses
 Lesson.prototype.displaySuccessMessage = function() {
@@ -95,7 +133,8 @@ Lesson.prototype.displaySuccessMessage = function() {
   //Display the success ribbon and message
   $(".feedback").hide().fadeIn(fadeInTime).removeClass("failure").addClass("success");
   $(".ribbon").show();
-  $(".message").show();
+  //hide show button and answer
+  $('.sometimes-hidden').hide();
 
   //automatically scroll to the success message
   var successTop = $(".feedback").position().top;
@@ -106,23 +145,28 @@ Lesson.prototype.displaySuccessMessage = function() {
   showResponse();
 
   //Display the next button
-  $(".general-button").addClass('next-button');
-  $(".next-button").hide();
-  $(".next-button").attr("value","Next Lesson");
-  $(".next-button").fadeIn(fadeInTime);
+  $(".green-button").hide().fadeIn(fadeInTime);
 }
 
 //If the input is wrong, do the error responses
 Lesson.prototype.displayErrorMessage = function(errorMessage) {
-  $(".message").html("You entered the wrong input. ");
-  $(".message").append(errorMessage);
-  $(".message").append(" Please try again.");
+  $(".message").html("You entered the wrong input. ").append(errorMessage).append(" Please try again.");
   
   //Display the message, hide the success ribbon
   $(".feedback").hide().fadeIn(fadeInTime).removeClass("success").addClass("failure");
   $(".ribbon").hide();
-  $(".message").show();
-    
+  
+  //Append the attempt made on the lesson
+  if(!this.attempt){
+    this.attempt = 0;
+  }
+  this.attempt++;
+
+  //if there has been 3 attempt or more, show the answer button
+  if (this.attempt>=3){
+    $(".show-button").show();
+  }
+
   //automatically scroll to the error message
   var errorTop = $(".feedback").position().top;
   $("html, body").animate({scrollTop:errorTop-225},500);
@@ -138,8 +182,7 @@ function showResponse(){
     //if there is no response (for API Key lessons, etc., do not display output)
     $(".response").hide();
   } else{
-    $(".response").hide();
-    $(".response").fadeIn(fadeInTime);
+    $(".response").hide().fadeIn(fadeInTime);
   }
 }
 
@@ -158,8 +201,10 @@ Lesson.prototype.tick = function() {
 //marks a lesson as unlocked
 Lesson.prototype.unlock = function(){
   this.unlocked = true;
-  $("#"+this.divID+'button').removeClass('locked').addClass('unlocked');
-  $("#"+this.chapter.divID+'button').removeClass('locked').addClass('unlocked');
+  if (this.hasSubmit){
+    $("#"+this.divID+'button').removeClass('locked').addClass('unlocked');
+    $("#"+this.chapter.divID+'button').removeClass('locked').addClass('unlocked');
+  }
 };
 
 //Object to store chapter information
@@ -206,7 +251,6 @@ Chapter.prototype.checkTutorialCompletion = function() {
   });
   //make sure user only sees completion message once
   if (finished && !localStorage['finished']) {
-    alert("Congratulations, you have completed this tutorial!");
     localStorage['finished'] = true;
   }
 }
@@ -224,8 +268,13 @@ var chapters = [
   ]})
 ];
 
+//introduction and final page
+var introduction = new Lesson('introduction', {title: "Welcome!", buttonValue: "Yes, I am!"});
+var finish = new Lesson('finish', {title:'Congratulations!', buttonValue: "Go back to tutorial"});
+
 //Determining the next, and chapter for each lesson
 var prevLesson = chapters[0].lessons[0]; //first lesson
+introduction.next = prevLesson;
 chapters.forEach(function(chapter){
   chapter.lessons.forEach(function(lesson){
     lesson.chapter = chapter;
@@ -234,7 +283,9 @@ chapters.forEach(function(chapter){
   });
 });
 //last lesson
-prevLesson.next = prevLesson;
+prevLesson.next = finish;
+//the final page have link to go back to tutorial.
+finish.next = chapters[0].lessons[0];
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 google.maps.event.addDomListener(window, 'load', function initialize(){
@@ -247,19 +298,6 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   });
 
   var $input = $(".url");
-  //create placeholder for the input
-  $input.focus(function(){
-    if($input.text()===placeholder){
-      $input.removeClass("placeholder");
-      $input.text("");
-    }
-  })
-  .focusout(function(){
-    if(!$input.text().length){
-      $input.addClass("placeholder")
-      $input.text(placeholder);
-    }
-  });  
 
   //store the input everytime it changes, to the respective local storage
   //onkeypress
@@ -269,17 +307,19 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
       event.preventDefault();
       activeLesson.submit();
     }
-    localStorage[activeLesson.divID+'input'] = $input.text();
+    localStorage[activeLesson.divID+'input'] = $input.val();
+    setTextAreaHeight();
   });
   //onkeyup -> handle backspaces
   $input.keyup(function(){
-    localStorage[activeLesson.divID+'input'] = $input.text();
+    localStorage[activeLesson.divID+'input'] = $input.val();
+    setTextAreaHeight();
   });
   //on cut, and also pasting with mouse
   $input.on('paste cut',function(){
     setTimeout(function(){
-      localStorage[activeLesson.divID+'input'] = $input.text();
-      $input.text($input.text());
+      localStorage[activeLesson.divID+'input'] = $input.val();
+      setTextAreaHeight();
     },0);
   });
 
@@ -288,10 +328,18 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   loadState();
 });
 
+function setTextAreaHeight(){
+  var $input = $(".url");
+  //store it in the div, get the height and set the textarea height
+  $(".hidden-url-div").text($input.val());
+  $input.height($(".hidden-url-div").height());
+}
 function loadState() {
-  //enable the first lesson on first load
+  //enable the introduction page and first lesson on first load
+  introduction.unlock();
   chapters[0].lessons[0].unlock();
-  var activeLessonId = localStorage['currentLesson'] || 'lesson1-gmeapi';
+
+  var activeLessonId = localStorage['currentLesson'] || 'introduction';
   //update the inventory box
   populateInventory();
   chapters.forEach(function(chapter) {
@@ -305,6 +353,9 @@ function loadState() {
       }
     });
   });
+  if (activeLessonId === "introduction"){
+    introduction.update();
+  }
 }
 
 //Create the menu button for each lesson & chapter
@@ -336,29 +387,21 @@ function trim(string){
   return string.replace(/^\s+|\s+$/g, '');
 }
 
-//hide the feedback, output, and next button
-function hideResultDivs(){
-  $('.feedback').hide();
-  $('.response').hide();
-  $('.general-button').hide();
-}
-
 //updating the inventory box
 function populateInventory(){
   var $inventory = $(".inventory");
-  $inventory.empty();
-  $inventory.append("<b>Helpful information</b><br>");
-  $inventory.append("table ID: 15474835347274181123-14495543923251622067<br>");
-  $inventory.append("your API Key: ");
-  $inventory.append(localStorage['APIKey']);
+  $inventory.empty()
+            .append("<b>Helpful information</b><br>")
+            .append("table ID: 15474835347274181123-14495543923251622067<br>")
+            .append("your API Key: ")
+            .append(localStorage['APIKey']);
 }
 //*****************THE GME API FUNCTIONS**********************//
 function getText() {
-  var string = $(".url").text();
+  var string = $(".url").val();
   var address = trim(string);
   var $data = $('.response');
-  $data.empty();
-  $data.css({ whiteSpace: 'pre' });
+  $data.empty().css({ whiteSpace: 'pre' });
   var me = this;
   jQuery.ajax({
   url: address,
@@ -377,7 +420,7 @@ function getText() {
 //*****************THE API Key FUNCTIONS**********************//
 function testAPIKey() {
   //get user input
-  var userKey = $(".url").text();
+  var userKey = $(".url").val();
   var me = this;
   var $data = $('.response');
   $data.empty();
@@ -401,7 +444,7 @@ function testAPIKey() {
   
 function testGetTable() {
   //get user input and trim it
-  var string = $(".url").text();
+  var string = $(".url").val();
 
   var address = trim(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
@@ -414,7 +457,7 @@ function testGetTable() {
 //*****************THE List Features FUNCTIONS**********************//
 function executeListInput(){
   //get user input and trim it
-  var string = $(".url").text();
+  var string = $(".url").val();
   var address = trim(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
   checkCorrectness(this, address, correctAns);
@@ -424,7 +467,7 @@ function executeListInput(){
 
 function executeQueries(){
   //get user input and trim it
-  var string = $(".url").text();
+  var string = $(".url").val();
   var address = trim(string);
   var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&where=Population<2000000";
   checkCorrectness(this, address, correctAns);
@@ -434,8 +477,7 @@ function executeQueries(){
 function checkCorrectness(lesson, addressString, correctAns){
   var $data = $('.response');
   //style the output div
-  $data.css({ whiteSpace: 'pre' });
-  $data.empty();
+  $data.empty().css({ whiteSpace: 'pre' });
   //Get the response with the correct URL
   jQuery.ajax({
     url: correctAns,
@@ -461,15 +503,28 @@ function checkCorrectness(lesson, addressString, correctAns){
           $data.append("Wrong URL\n");
           //Output the HTTP status
           $data.append("HTTP Status: "+response.status);
-          //call the display error message here to handle the response that is not JSON objects
-          lesson.displayErrorMessage("You did not enter a valid URL.");
-          response = JSON.parse(response.responseText);
-          var errorMess = response.error.errors[0];
+          
+          //Try parsing the response
+          var errorMess;
+          try {
+            response = JSON.parse(response.responseText);
+            errorMess = response.error.errors[0];
+            //append the response to the output area
+            var responseString = JSON.stringify(errorMess, null, 2);
+            $data.append(responseString); 
+          } catch (e) {
+            errorMess = "notJSONObject";
+          }
+         
           //Giving messages for different error reasons
-          if (errorMess.reason === "authError") {
+          if (errorMess === "notJSONObject"){
+            lesson.displayErrorMessage("You did not enter a valid URL.");
+          } else if (errorMess.reason === "authError") {
             lesson.displayErrorMessage("Your authorization token is invalid. Please check that the table can be viewed by general public.");
-          } else if (errorMess.reason === "dailyLimitExceededUnreg"){
+          } else if (errorMess.reason === "keyInvalid"){
             lesson.displayErrorMessage("Your API Key is invalid. Make sure that you entered the right API Key and table ID.");
+          } else if (errorMess.reason === "dailyLimitExceededUnreg"){
+            lesson.displayErrorMessage("There might be something wrong with your 'key' parameter. Make sure that you entered it correctly.");
           } else if (errorMess.reason === "invalid") {
             var field = errorMess.location;
             lesson.displayErrorMessage("Invalid value in the \""+field+"\" field. Check whether you've given the right tableId and right values for the parameters.");
@@ -494,8 +549,6 @@ function checkCorrectness(lesson, addressString, correctAns){
           } else {
             lesson.displayErrorMessage("The data cannot be processed. Please check your request again to ensure that it is correct.");
           }
-          var responseString = JSON.stringify(errorMess, null, 2);
-          $data.append(responseString); 
         }
       });
     }
