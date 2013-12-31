@@ -331,9 +331,10 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
 function setTextAreaHeight(){
   var $input = $(".url");
   //store it in the div, get the height and set the textarea height
-  $(".hidden-url-div").text($input.val());
+  $(".hidden-url-div").text($input.val()+'a');
   $input.height($(".hidden-url-div").height());
 }
+
 function loadState() {
   //enable the introduction page and first lesson on first load
   introduction.unlock();
