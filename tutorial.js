@@ -133,9 +133,8 @@ Lesson.prototype.displaySuccessMessage = function() {
   //Display the success ribbon and message
   $(".feedback").hide().fadeIn(fadeInTime).removeClass("failure").addClass("success");
   $(".ribbon").show();
-  //hide the answer and the show answer button
-  $(".show-button").hide();
-  $(".answer").hide();
+  //hide show button and answer
+  $('.sometimes-hidden').hide();
 
   //automatically scroll to the success message
   var successTop = $(".feedback").position().top;
@@ -158,13 +157,13 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   $(".ribbon").hide();
   
   //Append the attempt made on the lesson
-  if(!localStorage[this.divID+'attempt']){
-    localStorage[this.divID+'attempt'] = 0;
+  if(!this.attempt){
+    this.attempt = 0;
   }
-  localStorage[this.divID+'attempt']++;
+  this.attempt++;
 
   //if there has been 3 attempt or more, show the answer button
-  if (localStorage[this.divID+'attempt']>=3){
+  if (this.attempt>=3){
     $(".show-button").show();
   }
 
@@ -396,8 +395,8 @@ function hideAll(){
   $('.inventory').hide();
   $('.request').hide();
   $('.feedback').hide();
-  $('.show-button').hide();
-  $('.answer').hide();
+  //hide show button and answer
+  $('.sometimes-hidden').hide();
   $('.green-button').hide();
   $('.response').hide();
 }
@@ -521,6 +520,8 @@ function checkCorrectness(lesson, addressString, correctAns){
           //call the display error message here to handle the response that is not JSON objects
           lesson.displayErrorMessage("You did not enter a valid URL.");
           response = JSON.parse(response.responseText);
+          //if the data returned is a JSON, decrease the attempt since displayErrorMessage will be called again.
+          lesson.attempt--;
           var errorMess = response.error.errors[0];
           //Giving messages for different error reasons
           if (errorMess.reason === "authError") {
