@@ -109,13 +109,23 @@ html, body {
   border: 1px solid black;
   color: black;
   overflow-y:hidden;
-  margin-top:20px
-}
-.url.placeholder {
-  color: gray;
+  margin-top:20px;
+  line-height: 1.5;
 }
 .url.redborder {
   border-color: #DD4B39;
+}
+.hidden-url-div{
+  display:none;
+  width: 555px;
+  min-height:24px;
+  height: auto;
+  word-wrap: break-word;
+  font-size: 13px;
+  font-family: monospace;
+  resize: none;
+  overflow-y:hidden;
+  line-height: 1.5;
 }
 .pointer:hover{
   cursor: pointer;
