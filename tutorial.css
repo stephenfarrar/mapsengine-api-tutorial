@@ -117,38 +117,34 @@ html, body {
 .url.redborder {
   border-color: #DD4B39;
 }
-.get-button{
-  float: right;
-  display: inline;
-  margin-top: 20px;
-  margin-right: 0px;
-  width: 80px;
-  height: 27px;
-  background-color: #4287FD;
-  color: white;
-  font-size: 11px;
-  font-family: arial;
-  border-radius: 2px;
-  border: 1px solid #4683EA;
-  font-weight: bold;
-}
-.next-button{
-  margin-left:568px;
-}
 .pointer:hover{
   cursor: pointer;
 }
-.general-button{
+.kennedy-button{
   margin-top:10px;
   min-width: 80px;
   height: 27px;
   font-size: 11px;
   font-family: arial;
-  color: white;
   font-weight: bold;
-  background-color: #3d9400;
   border-radius: 2px;
+}
+.get-button{
+  float: right;
+  display: inline;
+  margin-top: 20px;
+  margin-right: 0px;
+  background-color: #4287FD;
+  color: white;
+  border: 1px solid #4683EA;
+}
+.green-button{
+  background-color: #3d9400;
   border: 1px solid #29691d;
+  color: white;
+}
+.right-aligned{
+  margin-left:568px;
 }
 .success{
   color:black;

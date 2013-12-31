@@ -2,21 +2,20 @@
 //THE GLOBAL VARIABLES
 var activeLesson;
 var placeholder = "Enter your input here, press enter or click 'Get' to submit.";
-var fadeInTime = 1000;
+var fadeInTime = 500;
 
 //object to store lesson information
 function Lesson(divID, options) {
   this.divID = divID;
   this.title = options.title;
+  this.buttonValue = options.buttonValue||"Next Lesson";
   if (options.submit) {
     this.submit = options.submit;
     //if it has a submission, then it must be a lesson
-    this.isLesson = true;
+    this.hasSubmit = true;
   } else {
     //it is an intro/final page
-    //has a different button value
-    this.isLesson = false;
-    this.buttonValue = options.buttonValue;
+    this.hasSubmit = false;
   }
   //done is TRUE if: the user has submitted correctly
   this.done = false;
@@ -38,9 +37,15 @@ Lesson.prototype.update = function() {
   hideAll();
   //display the instruction blurb
   this.displayInstructions();
+  //update and show the button
+  $('.green-button').attr('value', this.buttonValue);
 
-  //if it is a lesson
-  if (this.isLesson){
+  //if it is an intro/final page
+  if (!this.hasSubmit){
+    //show the green button and removed the right aligned class
+    $(".green-button").show().removeClass("right-aligned");
+  } else {
+    //it is not an intro/final page (lessons page)
     $('.response').empty();
     //show the necessary element for lesson
     $('.buttons').show();
@@ -53,7 +58,10 @@ Lesson.prototype.update = function() {
     }
     //make the border black again
     $(".url").removeClass('redborder');
-    //update buttons
+    //right aligned the green button
+    $(".green-button").addClass('right-aligned');
+
+    //update buttons menu
     if ($("#"+this.divID+'button').is(":hidden")) {
       hideLessons('medium');
       var lesson = this.chapter.lessons;
@@ -61,6 +69,7 @@ Lesson.prototype.update = function() {
         $('#' + lesson.divID + 'button').show('medium');
       })
     }
+
     //make text on button for active lesson red, and all others black
     chapters.forEach(function(chapter) {
       chapter.lessons.forEach(function(lesson) {
@@ -71,27 +80,13 @@ Lesson.prototype.update = function() {
       });
     });
     $("#"+this.divID+'button').removeClass('unlocked').addClass('active');
-    
+    //store the current lesson
     localStorage['currentLesson'] = activeLesson.divID;
-    
+    //update the input (placeholder/saved URL)
     var storedUrl = localStorage[this.divID + 'input'];
     $(".url").toggleClass("placeholder", !storedUrl)
       .text(storedUrl || placeholder);
-
-    //update the button to be a next button
-    $(".general-button").addClass('next-button');
-    $(".next-button").attr("value","Next Lesson");
-  } else {
-    //it is an intro/final page
-    //show the necessary element
-    console.log(this.next);
-    $(".general-button").show();
-    $(".general-button").attr("value",this.buttonValue);
-    //remove the next button class
-    $(".general-button").removeClass("next-button");
   }
-  
-  
 }
 
 // Displays the instructions, possibly loading them from the markdown file.
@@ -134,15 +129,12 @@ Lesson.prototype.displaySuccessMessage = function() {
   showResponse();
 
   //Display the next button
-  $(".next-button").hide();
-  $(".next-button").fadeIn(fadeInTime);
+  $(".green-button").hide().fadeIn(fadeInTime);
 }
 
 //If the input is wrong, do the error responses
 Lesson.prototype.displayErrorMessage = function(errorMessage) {
-  $(".message").html("You entered the wrong input. ");
-  $(".message").append(errorMessage);
-  $(".message").append(" Please try again.");
+  $(".message").html("You entered the wrong input. ").append(errorMessage).append(" Please try again.");
   
   //Display the message, hide the success ribbon
   $(".feedback").hide().fadeIn(fadeInTime).removeClass("success").addClass("failure");
@@ -163,8 +155,7 @@ function showResponse(){
     //if there is no response (for API Key lessons, etc., do not display output)
     $(".response").hide();
   } else{
-    $(".response").hide();
-    $(".response").fadeIn(fadeInTime);
+    $(".response").hide().fadeIn(fadeInTime);
   }
 }
 
@@ -183,7 +174,7 @@ Lesson.prototype.tick = function() {
 //marks a lesson as unlocked
 Lesson.prototype.unlock = function(){
   this.unlocked = true;
-  if (this.isLesson){
+  if (this.hasSubmit){
     $("#"+this.divID+'button').removeClass('locked').addClass('unlocked');
     $("#"+this.chapter.divID+'button').removeClass('locked').addClass('unlocked');
   }
@@ -283,14 +274,12 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   //create placeholder for the input
   $input.focus(function(){
     if($input.text()===placeholder){
-      $input.removeClass("placeholder");
-      $input.text("");
+      $input.removeClass("placeholder").text("");
     }
   })
   .focusout(function(){
     if(!$input.text().length){
-      $input.addClass("placeholder")
-      $input.text(placeholder);
+      $input.addClass("placeholder").text(placeholder);
     }
   });  
 
@@ -379,26 +368,25 @@ function hideAll(){
   $('.inventory').hide();
   $('.request').hide();
   $('.feedback').hide();
-  $('.general-button').hide();
+  $('.green-button').hide();
   $('.response').hide();
 }
 
 //updating the inventory box
 function populateInventory(){
   var $inventory = $(".inventory");
-  $inventory.empty();
-  $inventory.append("<b>Helpful information</b><br>");
-  $inventory.append("table ID: 15474835347274181123-14495543923251622067<br>");
-  $inventory.append("your API Key: ");
-  $inventory.append(localStorage['APIKey']);
+  $inventory.empty()
+            .append("<b>Helpful information</b><br>")
+            .append("table ID: 15474835347274181123-14495543923251622067<br>")
+            .append("your API Key: ")
+            .append(localStorage['APIKey']);
 }
 //*****************THE GME API FUNCTIONS**********************//
 function getText() {
   var string = $(".url").text();
   var address = trim(string);
   var $data = $('.response');
-  $data.empty();
-  $data.css({ whiteSpace: 'pre' });
+  $data.empty().css({ whiteSpace: 'pre' });
   var me = this;
   jQuery.ajax({
   url: address,
@@ -474,8 +462,7 @@ function executeQueries(){
 function checkCorrectness(lesson, addressString, correctAns){
   var $data = $('.response');
   //style the output div
-  $data.css({ whiteSpace: 'pre' });
-  $data.empty();
+  $data.empty().css({ whiteSpace: 'pre' });
   //Get the response with the correct URL
   jQuery.ajax({
     url: correctAns,
@@ -508,8 +495,10 @@ function checkCorrectness(lesson, addressString, correctAns){
           //Giving messages for different error reasons
           if (errorMess.reason === "authError") {
             lesson.displayErrorMessage("Your authorization token is invalid. Please check that the table can be viewed by general public.");
-          } else if (errorMess.reason === "dailyLimitExceededUnreg"){
+          } else if (errorMess.reason === "keyInvalid"){
             lesson.displayErrorMessage("Your API Key is invalid. Make sure that you entered the right API Key and table ID.");
+          } else if (errorMess.reason === "dailyLimitExceededUnreg"){
+            lesson.displayErrorMessage("There might be something wrong with your 'key' parameter. Make sure that you entered it correctly.");
           } else if (errorMess.reason === "invalid") {
             var field = errorMess.location;
             lesson.displayErrorMessage("Invalid value in the \""+field+"\" field. Check whether you've given the right tableId and right values for the parameters.");
