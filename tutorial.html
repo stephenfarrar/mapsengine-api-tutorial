@@ -15,24 +15,22 @@
     <div class = 'title'>Google Maps Engine API Tutorial</div>
   </div>
   <div class = 'content'>
-    <div class = "buttons"></div>
+    <div class = "buttons hidden-by-default"></div>
     <div class = 'lesson'>
       <div class = 'instructions'></div>
-      <div class = "inventory"></div>
-      <div class = 'request'>
+      <div class = "inventory hidden-by-default"></div>
+      <div class = 'request hidden-by-default'>
         <div class = 'url' contenteditable = "true" tabindex="0"></div>
         <input type="button" value="Get" class="kennedy-button get-button pointer" onclick = 'activeLesson.submit()'/>
       </div>
-      <!-- TODO: js this feedback handling-->
-      <!-- need to add "success" and "failure" class to the feedback div to handle success/failure-->
-      <div class = "feedback">
+      <div class = "feedback hidden-by-default">
         <div class = "ribbon">Great work!</div>
         <div class = "message"></div>
+        <input type = "button" class = 'kennedy-button show-button pointer hidden-by-default' value = 'Show Answer' onclick = 'activeLesson.showAnswer()'>
+        <div class = "answer hidden-by-default"></div>
       </div>
-      <!-- for the "next lesson" button in the lesson, we need to add the next-button class -->
-      <!-- this class which will contain a value and onclick = 'activeLesson.next.update()'-->
-      <input type = 'button' class = 'kennedy-button green-button pointer' onclick = 'activeLesson.next.update()'>
-      <div class = 'response'></div>
+      <input type = 'button' class = 'kennedy-button green-button pointer hidden-by-default' onclick = 'activeLesson.next.update()'>
+      <div class = 'response hidden-by-default'></div>
     </div>
   </div>
 </body>

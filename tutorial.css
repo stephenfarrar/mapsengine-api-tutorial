@@ -171,6 +171,25 @@ html, body {
   font-family:arial;
   font-size:13px;
 }
+.show-button{
+  background-color:#F8F8F8);
+  border: 1px solid #C6C6C6;
+  color: black;
+}
+.answer{
+  margin-top:10px;
+  display: block;
+  background-color: #F9EDBE;
+  color: black;
+  word-wrap: break-word;
+  border: 1px solid #FBCB43;
+  font-size: 12px;
+  padding: 10px;
+  font-family:arial;
+}
+.answer p{
+  margin: 0px;
+}
 .response{
   padding:10px;
   background-color: white;
