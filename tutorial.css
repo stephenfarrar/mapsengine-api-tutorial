@@ -1,7 +1,6 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;
 }
 .buttons {
   display: block;
@@ -65,10 +64,12 @@ html, body {
   vertical-align: middle;
   margin: 10px;
 }
+.content{
+  margin-bottom: 20px;
+}
 .lesson{
   display: block;
   margin: 10px;
-  margin-bottom: 20px;
   margin-left:300px;
   width: 650px;
   line-height: 1.5;
@@ -83,7 +84,6 @@ html, body {
 }
 .inventory{
   margin-top:10px;
-  display: block;
   background-color: #F9EDBE;
   color: black;
   word-wrap: break-word;
@@ -117,42 +117,34 @@ html, body {
 .url.redborder {
   border-color: #DD4B39;
 }
-.get-button{
-  float: right;
-  display: inline;
-  margin-top: 20px;
-  margin-right: 0px;
-  width: 80px;
-  height: 27px;
-  background-color: #4287FD;
-  color: white;
-  font-size: 11px;
-  font-family: arial;
-  border-radius: 2px;
-  border: 1px solid #4683EA;
-  font-weight: bold;
-}
-.next-button{
-  margin-left:568px;
-  display:none;
-}
 .pointer:hover{
   cursor: pointer;
 }
-.general-button{
+.kennedy-button{
   margin-top:10px;
   min-width: 80px;
   height: 27px;
   font-size: 11px;
   font-family: arial;
-  color: white;
   font-weight: bold;
-  background-color: #3d9400;
   border-radius: 2px;
-  border: 1px solid #29691d;
 }
-.menu{
-  display: block;  
+.get-button{
+  float: right;
+  display: inline;
+  margin-top: 20px;
+  margin-right: 0px;
+  background-color: #4287FD;
+  color: white;
+  border: 1px solid #4683EA;
+}
+.green-button{
+  background-color: #3d9400;
+  border: 1px solid #29691d;
+  color: white;
+}
+.right-aligned{
+  margin-left:568px;
 }
 .success{
   color:black;
@@ -161,7 +153,6 @@ html, body {
   color:#DD4B39;
 }
 .ribbon{
-  display:none;
   background-color: #3D9400;
   color: black;
   word-wrap: break-word;
@@ -174,7 +165,7 @@ html, body {
   margin-top:10px;
 }
 .message{
-  display:none;
+  display:block;
   margin-top:10px;
   height:auto;
   font-family:arial;
@@ -183,13 +174,7 @@ html, body {
 .show-button{
   background-color:#F8F8F8);
   border: 1px solid #C6C6C6;
-  margin-top:10px;
-  height: 19px;
   color: black;
-  font-family: arial;
-  font-weight: bold;
-  font-size: 11px;
-  border-radius: 2px;
 }
 .answer{
   margin-top:10px;
@@ -199,11 +184,13 @@ html, body {
   word-wrap: break-word;
   border: 1px solid #FBCB43;
   font-size: 12px;
-  padding: 5px;
+  padding: 10px;
   font-family:arial;
 }
+.answer p{
+  margin: 0px;
+}
 .response{
-  display: block;
   padding:10px;
   background-color: white;
   color: black;
