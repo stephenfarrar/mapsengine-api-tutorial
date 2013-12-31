@@ -113,8 +113,10 @@ Lesson.prototype.displaySuccessMessage = function() {
 }
 
 //If the input is wrong, do the error responses
-Lesson.prototype.displayErrorMessage = function() {
-  $(".message").html("You entered the wrong input. Please try again.");
+Lesson.prototype.displayErrorMessage = function(errorMessage) {
+  $(".message").html("You entered the wrong input. ");
+  $(".message").append(errorMessage);
+  $(".message").append(" Please try again.");
   
   //Display the message, hide the success ribbon
   $(".feedback").hide().fadeIn(fadeInTime).removeClass("success").addClass("failure");
@@ -367,7 +369,7 @@ function getText() {
       me.complete();
     },
     error: function(response) {
-      me.displayErrorMessage();
+      me.displayErrorMessage("Make sure that the spelling is correct, and there are no spaces between the text.");
     }
   });
 }
@@ -390,7 +392,7 @@ function testAPIKey() {
       me.complete();
     },
     error: function(response) {
-      me.displayErrorMessage();
+      me.displayErrorMessage("Make sure that you entered the right API Key from Google Developer's Console.");
     }
   });
 }
@@ -452,7 +454,7 @@ function checkCorrectness(lesson, addressString, correctAns){
             lesson.displaySuccessMessage();
             lesson.complete();
           } else {
-            lesson.displayErrorMessage();
+            lesson.displayErrorMessage("You did not do what the exercise is telling you to do. Make sure that you read the question carefully.");
           } 
         },
         error: function(response) {
@@ -460,17 +462,37 @@ function checkCorrectness(lesson, addressString, correctAns){
           //Output the HTTP status
           $data.append("HTTP Status: "+response.status);
           //call the display error message here to handle the response that is not JSON objects
-          lesson.displayErrorMessage();
+          lesson.displayErrorMessage("You did not enter a valid URL.");
           response = JSON.parse(response.responseText);
           var errorMess = response.error.errors[0];
           //Giving messages for different error reasons
           if (errorMess.reason === "authError") {
-            $data.append("\nYour authorization token is invalid. \nPlease check that the table can be viewed by general public\n\n");
+            lesson.displayErrorMessage("Your authorization token is invalid. Please check that the table can be viewed by general public.");
+          } else if (errorMess.reason === "dailyLimitExceededUnreg"){
+            lesson.displayErrorMessage("Your API Key is invalid. Make sure that you entered the right API Key and table ID.");
           } else if (errorMess.reason === "invalid") {
             var field = errorMess.location;
-            $data.append("\nInvalid value in the \""+field+"\" field.\nCheck whether you've given the right tableId\n\n");
+            lesson.displayErrorMessage("Invalid value in the \""+field+"\" field. Check whether you've given the right tableId and right values for the parameters.");
+          } else if (errorMess.reason === "required"){
+            lesson.displayErrorMessage("A required parameter has been left out of the request. Make sure that you entered all parameters needed.");
+          } else if (errorMess.reason === "notFound"){
+            lesson.displayErrorMessage("No results were found for your request. The asset might not exist, not a public asset, or it has been deleted from the Google Maps Engine.")
+          } else if (errorMess.reason === "insufficientPermissions"){
+            lesson.displayErrorMessage("You don't have the permission to do this request. Make sure that the scope of your access is correct.");
+          } else if (errorMess.reason === "limitExceeded"){
+            lesson.displayErrorMessage("The resource is too large to be accessed through the API.");
+          } else if (errorMess.reason === "duplicate"){
+            lesson.displayErrorMessage("The new feature you are trying to insert has an ID that already exists in the table.");
+          } else if (errorMess.reason === "rateLimitExceeded"|| errorMess.reason === "quotaExceeded"){
+            lesson.displayErrorMessage("You have exhausted the application's daily quota or its per-second rate limit. Please contact the Enterprise Support for higher limits.");
+          } else if (errorMess.reason === "unauthorized"){
+            lesson.displayErrorMessage("You didn't pass an authorization header with your request.");
+          } else if (errorMess.reason === "requestToolarge"){
+            lesson.displayErrorMessage("Your request contained too many features and/or vertices.");
+          } else if (errorMess.reason === "accessNotConfigured"){
+            lesson.displayErrorMessage("There is a per-IP or per-Referer restriction configured on the API Key and the request does not match these restrictions, or the Maps Engine API is not activated on the project ID.");
           } else {
-            $data.append("\nThe data cannot be processed. See the details below for the information regarding the error:\n\n");
+            lesson.displayErrorMessage("The data cannot be processed. Please check your request again to ensure that it is correct.");
           }
           var responseString = JSON.stringify(errorMess, null, 2);
           $data.append(responseString); 
