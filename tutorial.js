@@ -79,6 +79,20 @@ Lesson.prototype.displayInstructions = function() {
   $(".instructions").html(markdown.toHTML(this.instructions));
 }
 
+Lesson.prototype.showAnswer = function(){
+  var me = this;
+  if (!this.answer) {
+    // If the answers aren't loaded, load them.
+    $.get(this.divID+"-answer.md", function(response){
+      me.answer = response;
+      me.showAnswer();
+    });
+    return;
+  }
+  $(".answer").html(markdown.toHTML(this.answer));
+  //show the answer
+  $(".answer").show();
+}
 
 //If the input is right, do the success responses
 Lesson.prototype.displaySuccessMessage = function() {
@@ -96,6 +110,9 @@ Lesson.prototype.displaySuccessMessage = function() {
   $(".feedback").hide().fadeIn(fadeInTime).removeClass("failure").addClass("success");
   $(".ribbon").show();
   $(".message").show();
+  //hide the answer and the show answer button
+  $(".show-button").hide();
+  $(".answer").hide();
 
   //automatically scroll to the success message
   var successTop = $(".feedback").position().top;
@@ -120,7 +137,17 @@ Lesson.prototype.displayErrorMessage = function() {
   $(".feedback").hide().fadeIn(fadeInTime).removeClass("success").addClass("failure");
   $(".ribbon").hide();
   $(".message").show();
-    
+  
+  //Append the attempt made on the lesson
+  if(!localStorage[this.divID+'attempt']){
+    localStorage[this.divID+'attempt'] = 0;
+  }
+  localStorage[this.divID+'attempt']++;
+
+  //if there has been 3 attempt or more, show the answer button
+  if (localStorage[this.divID+'attempt']>=3){
+    $(".show-button").show();
+  }
   //automatically scroll to the error message
   var errorTop = $(".feedback").position().top;
   $("html, body").animate({scrollTop:errorTop-225},500);
