@@ -96,7 +96,7 @@ html, body {
 .url{
   display: inline-block;
   width: 555px;
-  min-height:24px;
+  min-height:21px;
   height: auto;
   word-wrap: break-word;
   font-size: 13px;
@@ -109,13 +109,23 @@ html, body {
   border: 1px solid black;
   color: black;
   overflow-y:hidden;
-  margin-top:20px
-}
-.url.placeholder {
-  color: gray;
+  margin-top:20px;
+  line-height: 1.5;
 }
 .url.redborder {
   border-color: #DD4B39;
+}
+.hidden-url-div{
+  display:none;
+  width: 555px;
+  min-height:21px;
+  height: auto;
+  word-wrap: break-word;
+  font-size: 13px;
+  font-family: monospace;
+  resize: none;
+  overflow-y:hidden;
+  line-height: 1.5;
 }
 .pointer:hover{
   cursor: pointer;
@@ -134,14 +144,21 @@ html, body {
   display: inline;
   margin-top: 20px;
   margin-right: 0px;
-  background-color: #4287FD;
+}
+.blue-button{
+  background-color:#4d90fe;
+  border: 1px solid #3079ed;
   color: white;
-  border: 1px solid #4683EA;
 }
 .green-button{
   background-color: #3d9400;
   border: 1px solid #29691d;
   color: white;
+}
+.gray-button{
+  background-color:#F8F8F8;
+  border: 1px solid #C6C6C6;
+  color: black;
 }
 .right-aligned{
   margin-left:568px;
@@ -170,6 +187,20 @@ html, body {
   height:auto;
   font-family:arial;
   font-size:13px;
+}
+.answer{
+  margin-top:10px;
+  display: block;
+  background-color: #F9EDBE;
+  color: black;
+  word-wrap: break-word;
+  border: 1px solid #FBCB43;
+  font-size: 12px;
+  padding: 10px;
+  font-family:arial;
+}
+.answer p{
+  margin: 0px;
 }
 .response{
   padding:10px;
