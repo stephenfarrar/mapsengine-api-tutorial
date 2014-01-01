@@ -12,25 +12,26 @@ html, body {
 .menu-button{
   display: block;
   position: relative;
+  color: #CCCCCC;
   background-color: white;
   text-align: left;
   background-repeat: no-repeat;
   background-image: none;
-  background-position: right;
+  background-position: left;
   background-size: 20px;
   border: none;
   font-family: Arial;
-  margin-bottom: 12px;
+  margin-bottom: 15px;
 }
 .chapter-button {
-  width: 280px;
+  margin-left: 20px;
   height: 24px;
   font-size: 14px;
   font-weight: bold;
 }
 .lesson-button {
-  width: 270px;
-  margin-left: 10px;
+  margin-left: 28px;
+  padding-left: 28px;
   height: 24px;
   font-size: 14px;
 }

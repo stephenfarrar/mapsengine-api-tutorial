@@ -1,7 +1,6 @@
 //Javascript file for tutorial
 //THE GLOBAL VARIABLES
 var activeLesson;
-
 var fadeInTime = 500;
 
 //object to store lesson information
@@ -60,16 +59,6 @@ Lesson.prototype.update = function() {
     $(".url").removeClass('redborder');
     //right aligned the green button
     $(".next-button").addClass('right-aligned');
-
-    //update buttons menu
-    if ($("#"+this.divID+'button').is(":hidden")) {
-      hideLessons('medium');
-      var lesson = this.chapter.lessons;
-      lesson.forEach(function(lesson) {
-        $('#' + lesson.divID + 'button').show('medium');
-      })
-    }
-
     //make text on button for active lesson red, and all others black
     chapters.forEach(function(chapter) {
       chapter.lessons.forEach(function(lesson) {
@@ -192,11 +181,11 @@ Lesson.prototype.complete = function() {
   localStorage[this.divID] = true;
   this.next.unlock();
   this.tick();
-  this.chapter.tickIfComplete();
+  this.chapter.checkIfComplete();
 }
 
 Lesson.prototype.tick = function() {
-   $('#'+this.divID+'button').css('background-image', 'url("UI-Mocks/Images/green-tick.jpg")');
+   $('#'+this.divID+'button').css('background-image', 'url("UI-Mocks/Images/ic_check.png")');
 }
 
 //marks a lesson as unlocked
@@ -218,18 +207,11 @@ function Chapter(divID, options) {
 
 //Chapter update, call update for the first lesson in the chapter
 Chapter.prototype.update = function() {
-  this.lessons.forEach(function(lesson) {
-    $('#' + lesson.divID + 'button').toggle('medium');
-  })
   this.lessons[0].update();
 }
 
-Chapter.prototype.tick = function() {
-   $('#'+this.divID+'button').css('background-image', 'url("UI-Mocks/Images/green-tick.jpg")');
-}
-
 //checks if a chapter is complete and, as a result, if the tutorial is also complete
-Chapter.prototype.tickIfComplete = function() {
+Chapter.prototype.checkIfComplete = function() {
   this.done = true;
   var me = this;
   this.lessons.forEach(function(lesson) {
@@ -238,7 +220,6 @@ Chapter.prototype.tickIfComplete = function() {
     }
   });
   if (this.done) {
-    me.tick();
     me.checkTutorialCompletion();
   }
 }
@@ -325,7 +306,6 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   });
 
   //The first page shown is the first lesson
-  hideLessons(0);
   loadState();
 });
 
@@ -374,16 +354,6 @@ function makeButton(object, objectClass){
   button.append(newButton);
 }
 
-//Hides the lesson buttons within the chapter
-function hideLessons(speed) {
-  chapters.forEach(function(chapters) {
-    var lessons = chapters.lessons;
-    lessons.forEach(function(lessons) {
-      $('#' + lessons.divID + 'button').hide(speed);
-    })
-  })
-}
-
 //Trim the white spaces in the user input
 function trim(string){
   return string.replace(/^\s+|\s+$/g, '');
@@ -407,9 +377,9 @@ function getText() {
   var me = this;
   jQuery.ajax({
   url: address,
-    dataType: 'html',
+    dataType: 'text',
     success: function(resource) {
-      $data.append(resource);
+      $data.text(resource);
       me.displaySuccessMessage();
       me.complete();
     },
