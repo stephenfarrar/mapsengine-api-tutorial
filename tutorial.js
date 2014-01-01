@@ -37,13 +37,13 @@ Lesson.prototype.update = function() {
   $('.hidden-by-default').hide();
   //display the instruction blurb
   this.displayInstructions();
-  //update and show the button
-  $('.green-button').attr('value', this.buttonValue);
+  //update the button value
+  $('.next-button').attr('value', this.buttonValue);
 
   //if it is an intro/final page
   if (!this.hasSubmit){
     //show the green button and removed the right aligned class
-    $(".green-button").show().removeClass("right-aligned");
+    $(".next-button").show().removeClass("right-aligned");
   } else {
     //it is not an intro/final page (lessons page)
     $('.response').empty();
@@ -59,7 +59,7 @@ Lesson.prototype.update = function() {
     //make the border black again
     $(".url").removeClass('redborder');
     //right aligned the green button
-    $(".green-button").addClass('right-aligned');
+    $(".next-button").addClass('right-aligned');
 
     //update buttons menu
     if ($("#"+this.divID+'button').is(":hidden")) {
@@ -134,7 +134,8 @@ Lesson.prototype.displaySuccessMessage = function() {
   $(".feedback").hide().fadeIn(fadeInTime).removeClass("failure").addClass("success");
   $(".ribbon").show();
   //hide show button and answer
-  $('.sometimes-hidden').hide();
+  $('.show-button').hide();
+  $('.answer').hide();
 
   //automatically scroll to the success message
   var successTop = $(".feedback").position().top;
@@ -145,7 +146,7 @@ Lesson.prototype.displaySuccessMessage = function() {
   showResponse();
 
   //Display the next button
-  $(".green-button").hide().fadeIn(fadeInTime);
+  $(".next-button").hide().fadeIn(fadeInTime);
 }
 
 //If the input is wrong, do the error responses
