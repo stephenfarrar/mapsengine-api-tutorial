@@ -42,14 +42,14 @@ Lesson.prototype.update = function() {
 
   //if it is an intro/final page
   if (!this.hasSubmit){
-    //the final page will not have next button, but it will have the menu and go to documentation button
-    if (this === finish){
-      $('.buttons').show();
-      $('.documentation-button').show();
-    } else {
+    if (this === introduction){
       //the intro page will have the next button
       //show the green button and removed the right aligned class
-      $(".next-button").show().removeClass("right-aligned");
+      $(".next-button").removeClass("right-aligned").show();
+    } else {
+      //the finish page will not have next button, but it will have the menu and go to documentation button
+      $('.buttons').show();
+      $('.documentation-button').show();
     }
   } else {
     //it is not an intro/final page (lessons page)
