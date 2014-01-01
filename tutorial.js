@@ -181,7 +181,7 @@ Lesson.prototype.complete = function() {
   localStorage[this.divID] = true;
   this.next.unlock();
   this.tick();
-  this.chapter.tickIfComplete();
+  this.chapter.checkIfComplete();
 }
 
 Lesson.prototype.tick = function() {
