@@ -218,7 +218,8 @@ html, body {
   border: 1px solid black;
   margin-top:10px;
 }
-img[alt=yes-cat-image] {
+img[alt=yes-cat-image], img[alt=highfive-cat-image]{
+  display:block;
   height: 300px;
 }
 *:focus {
