@@ -102,6 +102,8 @@ Lesson.prototype.showAnswer = function(){
     });
     return;
   }
+  //replace userAPIKey with the API Key stored in local storage
+  this.answer = this.answer.replace ("{userAPIKey}", localStorage['APIKey']);
   $(".answer").html(markdown.toHTML(this.answer));
   //show the answer
   $(".answer").show();
