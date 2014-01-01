@@ -252,6 +252,7 @@ var chapters = [
 
 //introduction and final page
 var introduction = new Lesson('introduction', {title: "Welcome!", buttonValue: "Yes, I am!"});
+var resume = new Lesson('resume', {title: "Welcome back!", buttonValue: "Resume"});
 var finish = new Lesson('finish', {title:'Congratulations!', buttonValue: "Go back to tutorial"});
 
 //Determining the next, and chapter for each lesson
@@ -331,12 +332,15 @@ function loadState() {
         lesson.complete();
       }
       if (lesson.divID === activeLessonId) {
-        lesson.update();
+        resume.next = lesson;
       }
     });
   });
   if (activeLessonId === "introduction"){
     introduction.update();
+  } else {
+    resume.unlock();
+    resume.update();
   }
 }
 
