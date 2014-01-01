@@ -1,7 +1,6 @@
 //Javascript file for tutorial
 //THE GLOBAL VARIABLES
 var activeLesson;
-
 var fadeInTime = 500;
 
 //object to store lesson information
@@ -211,12 +210,8 @@ Chapter.prototype.update = function() {
   this.lessons[0].update();
 }
 
-Chapter.prototype.tick = function() {
-   $('#'+this.divID+'button').css('background-image', 'url("UI-Mocks/Images/ic_check.png")');
-}
-
 //checks if a chapter is complete and, as a result, if the tutorial is also complete
-Chapter.prototype.tickIfComplete = function() {
+Chapter.prototype.checkIfComplete = function() {
   this.done = true;
   var me = this;
   this.lessons.forEach(function(lesson) {
@@ -225,7 +220,6 @@ Chapter.prototype.tickIfComplete = function() {
     }
   });
   if (this.done) {
-    me.tick();
     me.checkTutorialCompletion();
   }
 }
@@ -383,9 +377,9 @@ function getText() {
   var me = this;
   jQuery.ajax({
   url: address,
-    dataType: 'html',
+    dataType: 'text',
     success: function(resource) {
-      $data.append(resource);
+      $data.text(resource);
       me.displaySuccessMessage();
       me.complete();
     },
