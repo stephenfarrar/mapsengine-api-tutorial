@@ -60,16 +60,6 @@ Lesson.prototype.update = function() {
     $(".url").removeClass('redborder');
     //right aligned the green button
     $(".next-button").addClass('right-aligned');
-
-    //update buttons menu
-    if ($("#"+this.divID+'button').is(":hidden")) {
-      hideLessons('medium');
-      var lesson = this.chapter.lessons;
-      lesson.forEach(function(lesson) {
-        $('#' + lesson.divID + 'button').show('medium');
-      })
-    }
-
     //make text on button for active lesson red, and all others black
     chapters.forEach(function(chapter) {
       chapter.lessons.forEach(function(lesson) {
@@ -196,7 +186,7 @@ Lesson.prototype.complete = function() {
 }
 
 Lesson.prototype.tick = function() {
-   $('#'+this.divID+'button').css('background-image', 'url("UI-Mocks/Images/green-tick.jpg")');
+   $('#'+this.divID+'button').css('background-image', 'url("UI-Mocks/Images/ic_check.png")');
 }
 
 //marks a lesson as unlocked
@@ -218,14 +208,11 @@ function Chapter(divID, options) {
 
 //Chapter update, call update for the first lesson in the chapter
 Chapter.prototype.update = function() {
-  this.lessons.forEach(function(lesson) {
-    $('#' + lesson.divID + 'button').toggle('medium');
-  })
   this.lessons[0].update();
 }
 
 Chapter.prototype.tick = function() {
-   $('#'+this.divID+'button').css('background-image', 'url("UI-Mocks/Images/green-tick.jpg")');
+   $('#'+this.divID+'button').css('background-image', 'url("UI-Mocks/Images/ic_check.png")');
 }
 
 //checks if a chapter is complete and, as a result, if the tutorial is also complete
@@ -325,7 +312,6 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   });
 
   //The first page shown is the first lesson
-  hideLessons(0);
   loadState();
 });
 
@@ -372,16 +358,6 @@ function makeButton(object, objectClass){
       object.update();
     });
   button.append(newButton);
-}
-
-//Hides the lesson buttons within the chapter
-function hideLessons(speed) {
-  chapters.forEach(function(chapters) {
-    var lessons = chapters.lessons;
-    lessons.forEach(function(lessons) {
-      $('#' + lessons.divID + 'button').hide(speed);
-    })
-  })
 }
 
 //Trim the white spaces in the user input
