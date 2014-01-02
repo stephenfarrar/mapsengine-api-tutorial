@@ -468,7 +468,7 @@ function checkCorrectness(lesson, addressString, correctAns){
         dataType: 'json',
         success: function(resource2) {
           var resourceString = JSON.stringify(resource2, null, 2);
-          $data.append(resourceString);
+          $data.text(resourceString);
           //if the response user got is the correct response, then the user is right!
           if(resourceString === correctResourceString){
             lesson.displaySuccessMessage();
@@ -478,10 +478,6 @@ function checkCorrectness(lesson, addressString, correctAns){
           } 
         },
         error: function(response) {
-          $data.append("Wrong URL\n");
-          //Output the HTTP status
-          $data.append("HTTP Status: "+response.status);
-          
           //Try parsing the response
           var errorMess;
           try {
@@ -489,7 +485,7 @@ function checkCorrectness(lesson, addressString, correctAns){
             errorMess = response.error.errors[0];
             //append the response to the output area
             var responseString = JSON.stringify(errorMess, null, 2);
-            $data.append(responseString); 
+            $data.text(responseString); 
           } catch (e) {
             errorMess = "notJSONObject";
           }
