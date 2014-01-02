@@ -30,12 +30,14 @@ html, body {
   margin-left: 18px;
   height: 24px;
   font-size: 14px;
+  vertical-align: baseline;
 }
 .tick-image {
   margin-left: 28px;
   display: inline-block;
   height: 20px;
   visibility: hidden;
+  vertical-align: top;
 }
 /*define the colours for the left-menu text*/
 .locked{

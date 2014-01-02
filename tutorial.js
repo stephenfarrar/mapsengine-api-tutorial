@@ -361,7 +361,7 @@ function makeLesson(object, objectClass){
   var menu = $(".menu-area");
   //add lesson div
   var newDiv = $("<div>")
-    .addClass("lesson-div");
+    .addClass("lesson-div menu");
   menu.append(newDiv);
   //add tick image
   var newTick = $("<img>")
@@ -372,7 +372,7 @@ function makeLesson(object, objectClass){
   var newLink = $("<a>")
     .attr("id", object.divID+"menu")
     .text(object.title)
-    .addClass("menu " + objectClass + " locked pointer")
+    .addClass(objectClass + " locked pointer")
     .click(function(){
       object.update();
     });
