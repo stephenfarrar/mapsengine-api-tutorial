@@ -161,6 +161,12 @@ html, body {
   border: 1px solid #C6C6C6;
   color: black;
 }
+.restart-button{
+  display:inline-block;
+}
+.documentation-button{
+  display:inline-block;
+}
 .right-aligned{
   margin-left:568px;
 }
