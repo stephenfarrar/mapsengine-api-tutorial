@@ -20,6 +20,7 @@
       <div class = 'instructions'></div>
       <div class = "inventory hidden-by-default"></div>
       <div class = 'request hidden-by-default'>
+        <div class = "answer hidden-by-default"></div>
         <textarea class = 'url' placeholder="Enter your input here, press enter or click 'Get' to submit."></textarea>
         <div class = 'hidden-url-div'></div>
         <input type="button" value="Get" class="kennedy-button blue-button get-button pointer" onclick = 'activeLesson.submit()'/>
@@ -28,7 +29,6 @@
         <div class = "ribbon">Great work!</div>
         <div class = "message"></div>
         <input type = "button" class = 'kennedy-button gray-button show-button pointer hidden-by-default' value = 'Show Answer' onclick = 'activeLesson.showAnswer()'>
-        <div class = "answer hidden-by-default"></div>
       </div>
       <input type = 'button' class = 'kennedy-button green-button next-button pointer hidden-by-default' onclick = 'activeLesson.next.update()'>
       <div class = 'response hidden-by-default'></div>
