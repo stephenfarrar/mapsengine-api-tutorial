@@ -82,6 +82,8 @@ Lesson.prototype.update = function() {
     var storedUrl = localStorage[this.divID + 'input'];
     $(".url").val(storedUrl || "");
     setTextAreaHeight();
+    //if the input is empty, user should not be allowed to submit
+    disabledEmptyInput($(".url"));
   }
 }
 
@@ -280,22 +282,28 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   //store the input everytime it changes, to the respective local storage
   //onkeypress
   $input.keypress(function(event){
+    disabledEmptyInput($input);
     //enable submit by enter, not making the enter visible in the input
     if(event.which == 13){
       event.preventDefault();
-      activeLesson.submit();
+      //submit only if the input is not blank
+      if ($input.val() !== ""){
+        activeLesson.submit();
+      }
     }
     localStorage[activeLesson.divID+'input'] = $input.val();
     setTextAreaHeight();
   });
   //onkeyup -> handle backspaces
   $input.keyup(function(){
+    disabledEmptyInput($input);
     localStorage[activeLesson.divID+'input'] = $input.val();
     setTextAreaHeight();
   });
   //on cut, and also pasting with mouse
   $input.on('paste cut',function(){
     setTimeout(function(){
+      disabledEmptyInput($input);
       localStorage[activeLesson.divID+'input'] = $input.val();
       setTextAreaHeight();
     },0);
@@ -304,6 +312,14 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   //The first page shown is the first lesson
   loadState();
 });
+
+function disabledEmptyInput($input){
+  if ($input.val() === ""){
+    $('.get-button').attr('disabled','disabled').addClass("disabled-button");
+  } else {
+    $('.get-button').removeAttr('disabled').removeClass("disabled-button");
+  }
+}
 
 function setTextAreaHeight(){
   var $input = $(".url");
