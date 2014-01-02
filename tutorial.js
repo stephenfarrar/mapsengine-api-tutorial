@@ -114,6 +114,8 @@ Lesson.prototype.showAnswer = function(){
   $(".answer").html(markdown.toHTML(this.answer));
   //show the answer
   $(".answer").show();
+  //hide button once clicked
+  $(".show-button").hide();
 }
 
 //If the input is right, do the success responses
@@ -162,7 +164,7 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   this.attempt++;
 
   //if there has been 3 attempt or more, show the answer button
-  if (this.attempt>=3){
+  if ((this.attempt>=3) && ($('.answer').is(':hidden'))) {
     $(".show-button").show();
   }
 
