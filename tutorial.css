@@ -2,38 +2,40 @@ html, body {
   margin: 0;
   padding: 0;
 }
-.buttons {
+.menu-area {
   display: block;
   float: left;
   padding: 0px;
   width: 280px;
   background-color: #FFFFFF;
 }
-.menu-button{
+.menu {
   display: block;
   position: relative;
   color: #CCCCCC;
   background-color: white;
   text-align: left;
-  background-repeat: no-repeat;
-  background-image: none;
-  background-position: left;
-  background-size: 20px;
   border: none;
   font-family: Arial;
   margin-bottom: 15px;
 }
-.chapter-button {
-  margin-left: 20px;
+.chapter {
   height: 24px;
+  margin-left: 20px;
   font-size: 14px;
   font-weight: bold;
 }
-.lesson-button {
-  margin-left: 28px;
-  padding-left: 28px;
+.lesson-link {
+  display: inline-block;
+  margin-left: 18px;
   height: 24px;
   font-size: 14px;
+}
+.tick-image {
+  margin-left: 28px;
+  display: inline-block;
+  height: 20px;
+  visibility: hidden;
 }
 /*define the colours for the left-menu text*/
 .locked{
@@ -198,7 +200,7 @@ html, body {
   font-size:13px;
 }
 .answer{
-  margin-top:20px;
+  margin-top: 20px;
   display: block;
   word-wrap: break-word;
 }
