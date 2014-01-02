@@ -163,6 +163,9 @@ html, body {
   border: 1px solid #C6C6C6;
   color: black;
 }
+.show-button {
+  margin-top: 20px;
+}
 .right-aligned{
   margin-left:568px;
 }
