@@ -190,7 +190,6 @@ Lesson.prototype.complete = function() {
   localStorage[this.divID] = true;
   this.next.unlock();
   this.tick();
-  this.chapter.checkIfComplete();
 }
 
 Lesson.prototype.tick = function() {
@@ -217,20 +216,6 @@ function Chapter(divID, options) {
 //Chapter update, call update for the first lesson in the chapter
 Chapter.prototype.update = function() {
   this.lessons[0].update();
-}
-
-//checks if a chapter is complete and, as a result, if the tutorial is also complete
-Chapter.prototype.checkIfComplete = function() {
-  this.done = true;
-  var me = this;
-  this.lessons.forEach(function(lesson) {
-    if (!lesson.done) {
-      me.done = false;
-    }
-  });
-  if (this.done) {
-    me.tick();
-  }
 }
 
 //ARRAY OF CHAPTERS
