@@ -45,8 +45,10 @@ Lesson.prototype.update = function() {
       //the finish page will not have next button, but it will have the menu and go to documentation button
       $('.buttons').show();
       $('.documentation-button').show();
+      //store the current lesson (the finish page)
+      localStorage['currentLesson'] = activeLesson.divID;
     } else {
-      //the intro & resume page will have the next button
+      //the intro & resume page will have the next button, and not stored in the localstorage
       //show the green button and removed the right aligned class
       $(".next-button").removeClass("right-aligned").show();
     }
@@ -192,7 +194,6 @@ Lesson.prototype.complete = function() {
   localStorage[this.divID] = true;
   this.next.unlock();
   this.tick();
-  this.chapter.checkIfComplete();
 }
 
 Lesson.prototype.tick = function() {
@@ -213,26 +214,11 @@ function Chapter(divID, options) {
   this.divID = divID;
   this.lessons = options.lessons;
   this.title = options.title;
-  this.done = false;
 }
 
 //Chapter update, call update for the first lesson in the chapter
 Chapter.prototype.update = function() {
   this.lessons[0].update();
-}
-
-//checks if a chapter is complete and, as a result, if the tutorial is also complete
-Chapter.prototype.checkIfComplete = function() {
-  this.done = true;
-  var me = this;
-  this.lessons.forEach(function(lesson) {
-    if (!lesson.done) {
-      me.done = false;
-    }
-  });
-  if (this.done) {
-    me.tick();
-  }
 }
 
 //ARRAY OF CHAPTERS
@@ -350,6 +336,10 @@ function loadState() {
   if (activeLessonId === "introduction"){
     introduction.update();
   } else {
+    //if the user left at the final page
+    if (activeLessonId === "finish"){
+      resume.next = finish;
+    }
     resume.unlock();
     resume.update();
   }
