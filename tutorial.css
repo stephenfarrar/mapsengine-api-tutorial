@@ -166,6 +166,9 @@ html, body {
 .show-button {
   margin-top: 20px;
 }
+.kennedy-button:disabled{
+  opacity: 0.5;
+}
 .right-aligned{
   margin-left:568px;
 }
