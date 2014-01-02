@@ -85,12 +85,14 @@ html, body {
 }
 .inventory{
   margin-top:10px;
+}
+.butter-bar {
+  padding: 10px;
   background-color: #F9EDBE;
   color: black;
   word-wrap: break-word;
   border: 1px solid #FBCB43;
   font-size: 12px;
-  padding: 10px;
   font-family:arial;
   box-shadow: 4px 4px 8px #CCC;
 }
@@ -167,6 +169,12 @@ html, body {
 .documentation-button{
   display:inline-block;
 }
+.show-button {
+  margin-top: 20px;
+}
+.kennedy-button:disabled{
+  opacity: 0.5;
+}
 .right-aligned{
   margin-left:568px;
 }
@@ -186,7 +194,7 @@ html, body {
   font-weight:bold;
   color:white;
   border-radius:2px;
-  margin-top:20px;
+  margin-top:40px;
 }
 .message{
   display:block;
@@ -196,15 +204,9 @@ html, body {
   font-size:13px;
 }
 .answer{
-  margin-top:10px;
+  margin-top:20px;
   display: block;
-  background-color: #F9EDBE;
-  color: black;
   word-wrap: break-word;
-  border: 1px solid #FBCB43;
-  font-size: 12px;
-  padding: 10px;
-  font-family:arial;
 }
 .answer p{
   margin: 0px;

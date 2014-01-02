@@ -34,6 +34,8 @@ Lesson.prototype.update = function() {
   document.title = this.title;
   //hide the lesson elements
   $('.hidden-by-default').hide();
+  $('.invisible-by-default').css('visibility', 'hidden');
+  $('.show-button').show();
   //display the instruction blurb
   this.displayInstructions();
   //update the button value
@@ -45,9 +47,10 @@ Lesson.prototype.update = function() {
       //the finish page will not have next button, but it will have the menu and go to documentation button
       $('.buttons').show();
       $('.documentation-button').show();
-      $('.restart-button').show();
+      //store the current lesson (the finish page)
+      localStorage['currentLesson'] = activeLesson.divID;
     } else {
-      //the intro & resume page will have the next button
+      //the intro & resume page will have the next button, and not stored in the localstorage
       //show the green button and removed the right aligned class
       $(".next-button").removeClass("right-aligned").show();
     }
@@ -83,6 +86,8 @@ Lesson.prototype.update = function() {
     var storedUrl = localStorage[this.divID + 'input'];
     $(".url").val(storedUrl || "");
     setTextAreaHeight();
+    //if the input is empty, user should not be allowed to submit
+    disableOrEnableGetButton($(".url"));
   }
 }
 
@@ -113,8 +118,10 @@ Lesson.prototype.showAnswer = function(){
   //replace userAPIKey with the API Key stored in local storage
   this.answer = this.answer.replace ("{userAPIKey}", localStorage['APIKey']);
   $(".answer").html(markdown.toHTML(this.answer));
+  //hide button once clicked
+  $(".show-button").hide();
   //show the answer
-  $(".answer").show();
+  $(".answer").fadeIn(fadeInTime);
 }
 
 //If the input is right, do the success responses
@@ -132,9 +139,6 @@ Lesson.prototype.displaySuccessMessage = function() {
   //Display the success ribbon and message
   $(".feedback").hide().fadeIn(fadeInTime).removeClass("failure").addClass("success");
   $(".ribbon").show();
-  //hide show button and answer
-  $('.show-button').hide();
-  $('.answer').hide();
 
   //automatically scroll to the success message
   var successTop = $(".feedback").position().top;
@@ -163,8 +167,8 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   this.attempt++;
 
   //if there has been 3 attempt or more, show the answer button
-  if (this.attempt>=3){
-    $(".show-button").show();
+  if ((this.attempt>=3) && ($('.answer').is(':hidden'))) {
+    $(".show-button").css('visibility', 'visible');
   }
 
   //automatically scroll to the error message
@@ -211,7 +215,6 @@ function Chapter(divID, options) {
   this.divID = divID;
   this.lessons = options.lessons;
   this.title = options.title;
-  this.done = false;
 }
 
 //Chapter update, call update for the first lesson in the chapter
@@ -266,22 +269,28 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   //store the input everytime it changes, to the respective local storage
   //onkeypress
   $input.keypress(function(event){
+    disableOrEnableGetButton($input);
     //enable submit by enter, not making the enter visible in the input
     if(event.which == 13){
       event.preventDefault();
-      activeLesson.submit();
+      //submit only if the input is not blank
+      if ($input.val() !== ""){
+        activeLesson.submit();
+      }
     }
     localStorage[activeLesson.divID+'input'] = $input.val();
     setTextAreaHeight();
   });
   //onkeyup -> handle backspaces
   $input.keyup(function(){
+    disableOrEnableGetButton($input);
     localStorage[activeLesson.divID+'input'] = $input.val();
     setTextAreaHeight();
   });
   //on cut, and also pasting with mouse
   $input.on('paste cut',function(){
     setTimeout(function(){
+      disableOrEnableGetButton($input);
       localStorage[activeLesson.divID+'input'] = $input.val();
       setTextAreaHeight();
     },0);
@@ -290,6 +299,14 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   //The first page shown is the first lesson
   loadState();
 });
+
+function disableOrEnableGetButton($input){
+  if ($input.val() === ""){
+    $('.get-button').attr('disabled','disabled');
+  } else {
+    $('.get-button').removeAttr('disabled');
+  }
+}
 
 function setTextAreaHeight(){
   var $input = $(".url");
@@ -320,6 +337,10 @@ function loadState() {
   if (activeLessonId === "introduction"){
     introduction.update();
   } else {
+    //if the user left at the final page
+    if (activeLessonId === "finish"){
+      resume.next = finish;
+    }
     resume.unlock();
     resume.update();
   }
@@ -354,10 +375,6 @@ function populateInventory(){
             .append(localStorage['APIKey']);
 }
 
-function restartTutorial(){
-  localStorage.clear();
-  location.reload();
-}
 //*****************THE GME API FUNCTIONS**********************//
 function getText() {
   var string = $(".url").val();
