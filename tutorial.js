@@ -41,7 +41,7 @@ Lesson.prototype.update = function() {
 
   //if it is an intro/final page
   if (!this.hasSubmit){
-    if (this === introduction){
+    if (this === introduction || this === resume){
       //the intro page will have the next button
       //show the green button and removed the right aligned class
       $(".next-button").removeClass("right-aligned").show();
