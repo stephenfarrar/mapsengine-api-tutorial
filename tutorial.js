@@ -34,6 +34,8 @@ Lesson.prototype.update = function() {
   document.title = this.title;
   //hide the lesson elements
   $('.hidden-by-default').hide();
+  $('.invisible-by-default').css('visibility', 'hidden');
+  $('.show-button').show();
   //display the instruction blurb
   this.displayInstructions();
   //update the button value
@@ -116,8 +118,10 @@ Lesson.prototype.showAnswer = function(){
   //replace userAPIKey with the API Key stored in local storage
   this.answer = this.answer.replace ("{userAPIKey}", localStorage['APIKey']);
   $(".answer").html(markdown.toHTML(this.answer));
+  //hide button once clicked
+  $(".show-button").hide();
   //show the answer
-  $(".answer").show();
+  $(".answer").fadeIn(fadeInTime);
 }
 
 //If the input is right, do the success responses
@@ -135,9 +139,6 @@ Lesson.prototype.displaySuccessMessage = function() {
   //Display the success ribbon and message
   $(".feedback").hide().fadeIn(fadeInTime).removeClass("failure").addClass("success");
   $(".ribbon").show();
-  //hide show button and answer
-  $('.show-button').hide();
-  $('.answer').hide();
 
   //automatically scroll to the success message
   var successTop = $(".feedback").position().top;
@@ -166,8 +167,8 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   this.attempt++;
 
   //if there has been 3 attempt or more, show the answer button
-  if (this.attempt>=3){
-    $(".show-button").show();
+  if ((this.attempt>=3) && ($('.answer').is(':hidden'))) {
+    $(".show-button").css('visibility', 'visible');
   }
 
   //automatically scroll to the error message

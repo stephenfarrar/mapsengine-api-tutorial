@@ -18,8 +18,10 @@
     <div class = "buttons hidden-by-default"></div>
     <div class = 'lesson'>
       <div class = 'instructions'></div>
-      <div class = "inventory hidden-by-default"></div>
+      <div class = "inventory butter-bar hidden-by-default"></div>
       <div class = 'request hidden-by-default'>
+        <input type = "button" class = 'kennedy-button gray-button show-button right-aligned pointer invisible-by-default' value = 'Show Answer' onclick = 'activeLesson.showAnswer()'>
+        <div class = "answer butter-bar hidden-by-default"></div>
         <textarea class = 'url' placeholder="Enter your input here, press enter or click 'Get' to submit."></textarea>
         <div class = 'hidden-url-div'></div>
         <input type="button" value="Get" class="kennedy-button blue-button get-button pointer" onclick = 'activeLesson.submit()'/>
@@ -27,8 +29,6 @@
       <div class = "feedback hidden-by-default">
         <div class = "ribbon">Great work!</div>
         <div class = "message"></div>
-        <input type = "button" class = 'kennedy-button gray-button show-button pointer hidden-by-default' value = 'Show Answer' onclick = 'activeLesson.showAnswer()'>
-        <div class = "answer hidden-by-default"></div>
       </div>
       <a href = "https://developers.google.com/maps-engine"> 
         <input type = 'button' class = 'kennedy-button blue-button documentation-button pointer hidden-by-default' value = "Go to Documentation Page">
