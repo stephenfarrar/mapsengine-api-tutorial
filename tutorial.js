@@ -41,14 +41,14 @@ Lesson.prototype.update = function() {
 
   //if it is an intro/final page
   if (!this.hasSubmit){
-    if (this === introduction){
-      //the intro page will have the next button
-      //show the green button and removed the right aligned class
-      $(".next-button").removeClass("right-aligned").show();
-    } else {
+    if (this === finish){
       //the finish page will not have next button, but it will have the menu and go to documentation button
       $('.buttons').show();
       $('.documentation-button').show();
+    } else {
+      //the intro & resume page will have the next button
+      //show the green button and removed the right aligned class
+      $(".next-button").removeClass("right-aligned").show();
     }
   } else {
     //it is not an intro/final page (lessons page)
