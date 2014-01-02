@@ -41,8 +41,15 @@ Lesson.prototype.update = function() {
 
   //if it is an intro/final page
   if (!this.hasSubmit){
-    //show the green button and removed the right aligned class
-    $(".next-button").show().removeClass("right-aligned");
+    if (this === introduction){
+      //the intro page will have the next button
+      //show the green button and removed the right aligned class
+      $(".next-button").removeClass("right-aligned").show();
+    } else {
+      //the finish page will not have next button, but it will have the menu and go to documentation button
+      $('.buttons').show();
+      $('.documentation-button').show();
+    }
   } else {
     //it is not an intro/final page (lessons page)
     $('.response').empty();
@@ -222,20 +229,7 @@ Chapter.prototype.checkIfComplete = function() {
     }
   });
   if (this.done) {
-    me.checkTutorialCompletion();
-  }
-}
-
-Chapter.prototype.checkTutorialCompletion = function() {
-  var finished = true;
-  chapters.forEach(function(chapter) {
-    if (!chapter.done) {
-      finished = false;
-    }
-  });
-  //make sure user only sees completion message once
-  if (finished && !localStorage['finished']) {
-    localStorage['finished'] = true;
+    me.tick();
   }
 }
 
@@ -269,8 +263,7 @@ chapters.forEach(function(chapter){
 });
 //last lesson
 prevLesson.next = finish;
-//the final page have link to go back to tutorial.
-finish.next = chapters[0].lessons[0];
+//the final page does not need to have a next
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 google.maps.event.addDomListener(window, 'load', function initialize(){
