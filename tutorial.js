@@ -433,7 +433,7 @@ function testAPIKey() {
       me.complete();
     },
     error: function(response) {
-      me.displayErrorMessage("Make sure that you entered the right API Key from Google Developer's Console.");
+      me.displayErrorMessage("Make sure that you have both created a key and enabled the Maps Engine service.");
     }
   });
 }
