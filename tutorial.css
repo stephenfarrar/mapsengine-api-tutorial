@@ -1,0 +1,230 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+.buttons {
+  display: block;
+  float: left;
+  padding: 0px;
+  width: 280px;
+  background-color: #FFFFFF;
+}
+.menu-button{
+  display: block;
+  position: relative;
+  color: #CCCCCC;
+  background-color: white;
+  text-align: left;
+  background-repeat: no-repeat;
+  background-image: none;
+  background-position: left;
+  background-size: 20px;
+  border: none;
+  font-family: Arial;
+  margin-bottom: 15px;
+}
+.chapter-button {
+  margin-left: 20px;
+  height: 24px;
+  font-size: 14px;
+  font-weight: bold;
+}
+.lesson-button {
+  margin-left: 28px;
+  padding-left: 28px;
+  height: 24px;
+  font-size: 14px;
+}
+/*define the colours for the left-menu text*/
+.locked{
+  color: #CCCCCC;
+}
+.unlocked{
+  color: #000000;
+}
+.active{
+  color: #DD4B39;
+}
+.title-bar {
+  display: block;
+  width: 100%;
+  background-color: #F1F1F1;
+  border-bottom: 2px solid #EAEAEA;
+}
+.title {
+  display: inline;
+  font-weight: bold;
+  color: #737373;
+  font-family: arial;
+  font-size: 28px;
+  vertical-align: middle;
+}
+.maps-icon{
+  display: inline;
+  height: 55px;
+  vertical-align: middle;
+  margin: 10px;
+}
+.content{
+  margin-bottom: 20px;
+}
+.lesson{
+  display: block;
+  margin: 10px;
+  margin-left:300px;
+  width: 650px;
+  line-height: 1.5;
+}
+.instructions{
+  display: block;
+  height:auto;
+  word-wrap: break-word;
+  font-family: arial;
+  font-size: 13px;
+  margin-top: 20px;
+}
+.inventory{
+  margin-top:10px;
+}
+.butter-bar {
+  padding: 10px;
+  background-color: #F9EDBE;
+  color: black;
+  word-wrap: break-word;
+  border: 1px solid #FBCB43;
+  font-size: 12px;
+  font-family:arial;
+  box-shadow: 4px 4px 8px #CCC;
+}
+.url{
+  display: inline-block;
+  width: 555px;
+  min-height:21px;
+  height: auto;
+  word-wrap: break-word;
+  font-size: 13px;
+  font-family: monospace;
+  resize: none;
+  -moz-box-shadow: 4px 4px 8px #CCC;
+  -webkit-box-shadow: 4px 4px 8px #CCC;
+  box-shadow: 4px 4px 8px #CCC;
+  background-color:white;
+  border: 1px solid black;
+  color: black;
+  overflow-y:hidden;
+  margin-top:20px;
+  line-height: 1.5;
+}
+.url.redborder {
+  border-color: #DD4B39;
+}
+.hidden-url-div{
+  display:none;
+  width: 555px;
+  min-height:21px;
+  height: auto;
+  word-wrap: break-word;
+  font-size: 13px;
+  font-family: monospace;
+  resize: none;
+  overflow-y:hidden;
+  line-height: 1.5;
+}
+.pointer:hover{
+  cursor: pointer;
+}
+.kennedy-button{
+  margin-top:10px;
+  min-width: 80px;
+  height: 27px;
+  font-size: 11px;
+  font-family: arial;
+  font-weight: bold;
+  border-radius: 2px;
+}
+.get-button{
+  float: right;
+  display: inline;
+  margin-top: 20px;
+  margin-right: 0px;
+}
+.blue-button{
+  background-color:#4d90fe;
+  border: 1px solid #3079ed;
+  color: white;
+}
+.green-button{
+  background-color: #3d9400;
+  border: 1px solid #29691d;
+  color: white;
+}
+.gray-button{
+  background-color:#F8F8F8;
+  border: 1px solid #C6C6C6;
+  color: black;
+}
+.show-button {
+  margin-top: 20px;
+}
+.kennedy-button:disabled{
+  opacity: 0.5;
+}
+.right-aligned{
+  margin-left:568px;
+}
+.success{
+  color:black;
+}
+.failure{
+  color:#DD4B39;
+}
+.ribbon{
+  background-color: #3D9400;
+  color: black;
+  word-wrap: break-word;
+  font-size: 13px;
+  font-family:arial; 
+  padding: 10px;
+  font-weight:bold;
+  color:white;
+  border-radius:2px;
+  margin-top:40px;
+}
+.message{
+  display:block;
+  margin-top:10px;
+  height:auto;
+  font-family:arial;
+  font-size:13px;
+}
+.answer{
+  margin-top:20px;
+  display: block;
+  word-wrap: break-word;
+}
+.answer p{
+  margin: 0px;
+}
+.response{
+  padding:10px;
+  background-color: white;
+  color: black;
+  word-wrap: break-word;
+  font-size: 13px;
+  font-family: monospace;
+  white-space: pre;
+  height: 300px;
+  overflow-y:auto;
+  -moz-box-shadow: 4px 4px 8px #CCC;
+  -webkit-box-shadow: 4px 4px 8px #CCC;
+  box-shadow: 4px 4px 8px #CCC;
+  border: 1px solid black;
+  margin-top:10px;
+}
+img[alt=yes-cat-image], img[alt=highfive-cat-image]{
+  display:block;
+  height: 300px;
+}
+*:focus {
+    outline: 0;
+}
