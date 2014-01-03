@@ -300,7 +300,6 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   loadState();
 });
 
-
 function disableOrEnableGetButton($input){
   if ($input.val() === ""){
     $('.get-button').attr('disabled','disabled');
