@@ -1,2 +1,2 @@
-https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAujS4mL7zZxVwoO9dTqPFswl6glp_yvo0  
-Note: You can change the API Key in the URL with your own API Key.
+**Answer**  
+https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key={userAPIKey}
