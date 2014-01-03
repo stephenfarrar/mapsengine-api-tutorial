@@ -73,13 +73,13 @@ Lesson.prototype.update = function() {
     //make text on menu for active lesson red, and all others black
     chapters.forEach(function(chapter) {
       chapter.lessons.forEach(function(lesson) {
-        $("#"+lesson.divID+'menu').removeClass('active');
+        lesson.$menuDiv.removeClass('active');
         if (lesson.unlocked) {
-          $("#"+lesson.divID+'menu').addClass('unlocked');
+          lesson.$menuDiv.addClass('unlocked');
         }
       });
     });
-    $("#"+this.divID+'menu').removeClass('unlocked').addClass('active');
+    this.$menuDiv.removeClass('unlocked').addClass('active');
     //store the current lesson
     localStorage['currentLesson'] = activeLesson.divID;
     //update the input (placeholder/saved URL)
@@ -205,10 +205,34 @@ Lesson.prototype.tick = function() {
 Lesson.prototype.unlock = function(){
   this.unlocked = true;
   if (this.hasSubmit){
-    $("#"+this.divID+'menu').removeClass('locked').addClass('unlocked');
-    $("#"+this.chapter.divID+'menu').removeClass('locked').addClass('unlocked');
+    this.$menuDiv.removeClass('locked').addClass('unlocked');
+    this.chapter.$menuDiv.removeClass('locked').addClass('unlocked');
   }
 };
+
+Lesson.prototype.makeMenu = function() {
+  var me = this;
+  var menu = $(".menu-area");
+  //create lesson div
+  var newDiv = $("<div>")
+    .addClass("lesson-div menu locked");
+  //add tick image
+  var newTick = $("<img>")
+    .addClass(this.divID + "tick tick-image")
+    .attr('src', "UI-Mocks/Images/ic_check.png");
+  newDiv.append(newTick);
+  //add text
+  var newLink = $("<a>")
+    .text(this.title)
+    .addClass("lesson-link pointer")
+    .click(function(){
+      me.update();
+    });
+  newDiv.append(newLink);
+  menu.append(newDiv);
+  //add div to lesson object
+  this.$menuDiv = newDiv;
+}
 
 //Object to store chapter information
 function Chapter(divID, options) {
@@ -220,6 +244,15 @@ function Chapter(divID, options) {
 //Chapter update, call update for the first lesson in the chapter
 Chapter.prototype.update = function() {
   this.lessons[0].update();
+}
+
+Chapter.prototype.makeMenu = function() {
+  var menu = $(".menu-area");
+  var newHeader = $("<div>")
+    .text(this.title)
+    .addClass("menu chapter locked")
+  this.$menuDiv = newHeader;
+  menu.append(newHeader);
 }
 
 //ARRAY OF CHAPTERS
@@ -258,9 +291,9 @@ prevLesson.next = finish;
 google.maps.event.addDomListener(window, 'load', function initialize(){
   //create the HTML elements
   chapters.forEach(function(chapter){
-    makeChapter(chapter, "chapter ");
+    chapter.makeMenu();
     chapter.lessons.forEach(function(lesson){
-      makeLesson(lesson, "lesson-link");
+      lesson.makeMenu();
     });
   });
 
@@ -344,39 +377,6 @@ function loadState() {
     resume.unlock();
     resume.update();
   }
-}
-
-//Create the text for each chapter
-function makeChapter(object, objectClass){
-  var menu = $(".menu-area");
-  var newHeader = $("<div>")
-    .attr("id", object.divID+"menu")
-    .text(object.title)
-    .addClass("menu " + objectClass + " locked")
-  menu.append(newHeader);
-}
-
-//Create the menu link for each lesson
-function makeLesson(object, objectClass){
-  var menu = $(".menu-area");
-  //add lesson div
-  var newDiv = $("<div>")
-    .addClass("lesson-div menu");
-  menu.append(newDiv);
-  //add tick image
-  var newTick = $("<img>")
-    .addClass(object.divID + "tick tick-image")
-    .attr('src', "UI-Mocks/Images/ic_check.png");
-  newDiv.append(newTick);
-  //add text
-  var newLink = $("<a>")
-    .attr("id", object.divID+"menu")
-    .text(object.title)
-    .addClass(objectClass + " locked pointer")
-    .click(function(){
-      object.update();
-    });
-  newDiv.append(newLink);
 }
 
 //Trim the white spaces in the user input
