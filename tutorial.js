@@ -198,7 +198,7 @@ Lesson.prototype.complete = function() {
 }
 
 Lesson.prototype.tick = function() {
-   $('.'+this.divID+'tick').css('visibility', 'visible');
+   this.$tick.css('visibility', 'visible');
 }
 
 //marks a lesson as unlocked
@@ -216,11 +216,12 @@ Lesson.prototype.makeMenu = function() {
   //create lesson div
   var newDiv = $("<div>")
     .addClass("lesson-div menu locked");
-  //add tick image
+  //add tick image to div and object
   var newTick = $("<img>")
     .addClass(this.divID + "tick tick-image")
     .attr('src', "UI-Mocks/Images/ic_check.png");
   newDiv.append(newTick);
+  this.$tick = newTick;
   //add text
   var newLink = $("<a>")
     .text(this.title)
