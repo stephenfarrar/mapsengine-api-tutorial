@@ -81,6 +81,10 @@ html, body {
   font-size: 13px;
   margin-top: 20px;
 }
+code{
+  font-family: monospace;
+  background: #F9EDBE;
+}
 .inventory{
   margin-top:10px;
   display: block;
