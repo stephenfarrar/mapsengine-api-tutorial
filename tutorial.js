@@ -394,6 +394,7 @@ function populateInventory(){
             .append("your API Key: ")
             .append(localStorage['APIKey']);
 }
+
 //*****************THE GME API FUNCTIONS**********************//
 function getText() {
   var string = $(".url").val();
@@ -433,7 +434,7 @@ function testAPIKey() {
       me.complete();
     },
     error: function(response) {
-      me.displayErrorMessage("Make sure that you entered the right API Key from Google Developer's Console.");
+      me.displayErrorMessage("Make sure that you have both created a key and enabled the Maps Engine service.");
     }
   });
 }
@@ -494,7 +495,7 @@ function checkCorrectness(lesson, addressString, correctAns){
             lesson.displaySuccessMessage();
             lesson.complete();
           } else {
-            lesson.displayErrorMessage("You did not do what the exercise is telling you to do. Make sure that you read the question carefully.");
+            lesson.displayErrorMessage("Make sure that you read and follow the instruction carefully.");
           } 
         },
         error: function(response) {
@@ -512,16 +513,32 @@ function checkCorrectness(lesson, addressString, correctAns){
          
           //Giving messages for different error reasons
           if (errorMess === "notJSONObject"){
-            lesson.displayErrorMessage("You did not enter a valid URL.");
+            lesson.displayErrorMessage("The URL is not a valid Google Maps Engine API URL.");
           } else if (errorMess.reason === "authError") {
-            lesson.displayErrorMessage("Your authorization token is invalid. Please check that the table can be viewed by general public.");
+            lesson.displayErrorMessage("Your authorization token is invalid. Make sure that the table can be viewed by general public.");
           } else if (errorMess.reason === "keyInvalid"){
-            lesson.displayErrorMessage("Your API Key is invalid. Make sure that you entered the right API Key and table ID.");
+            //if it contains curly braces, ask user to remove them
+            if (jQuery.inArray('{'),addressString!==-1 || jQuery.inArray('}'),addressString!==-1){
+              lesson.displayErrorMessage("The API Key used in the URL is invalid. Check that you've removed the curly braces({ }) surrounding the API Key in your URL.");
+            } else {
+              lesson.displayErrorMessage("The API Key used in the URL is invalid. Make sure that you entered the right API Key and table ID.");
+            }
           } else if (errorMess.reason === "dailyLimitExceededUnreg"){
             lesson.displayErrorMessage("There might be something wrong with your 'key' parameter. Make sure that you entered it correctly.");
           } else if (errorMess.reason === "invalid") {
             var field = errorMess.location;
-            lesson.displayErrorMessage("Invalid value in the \""+field+"\" field. Check whether you've given the right tableId and right values for the parameters.");
+            //if the error is not in table ID, give user information about the parameter error
+            if (field!=="id"){
+              lesson.displayErrorMessage("Invalid value in the \""+field+"\" field. Check whether you've given the right values for the parameters.");
+            }
+            else {
+              ////if it contains curly braces, ask user to remove them
+              if (jQuery.inArray('{'),addressString!==-1 || jQuery.inArray('}'),addressString!==-1){
+                lesson.displayErrorMessage("The table ID used in the URL is invalid. Check that you've removed the curly braces({ }) surrounding the table ID in your URL.");
+              } else {
+                lesson.displayErrorMessage("The table ID used in the URL is invalid. Check whether you've given the right table ID.");
+              }
+            }
           } else if (errorMess.reason === "required"){
             lesson.displayErrorMessage("A required parameter has been left out of the request. Make sure that you entered all parameters needed.");
           } else if (errorMess.reason === "notFound"){
@@ -541,7 +558,7 @@ function checkCorrectness(lesson, addressString, correctAns){
           } else if (errorMess.reason === "accessNotConfigured"){
             lesson.displayErrorMessage("There is a per-IP or per-Referer restriction configured on the API Key and the request does not match these restrictions, or the Maps Engine API is not activated on the project ID.");
           } else {
-            lesson.displayErrorMessage("The data cannot be processed. Please check your request again to ensure that it is correct.");
+            lesson.displayErrorMessage("The data you requested cannot be processed. Please check your request again to ensure that it is correct.");
           }
         }
       });
