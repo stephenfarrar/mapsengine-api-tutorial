@@ -45,7 +45,7 @@ Lesson.prototype.update = function() {
   if (!this.hasSubmit){
     if (this === finish){
       //the finish page will not have next button, but it will have the menu and go to documentation button
-      $('.buttons').show();
+      $('.menu-area').show();
       $('.documentation-button').show();
       //store the current lesson (the finish page)
       localStorage['currentLesson'] = activeLesson.divID;
@@ -58,7 +58,7 @@ Lesson.prototype.update = function() {
     //it is not an intro/final page (lessons page)
     $('.response').empty();
     //show the necessary element for lesson
-    $('.buttons').show();
+    $('.menu-area').show();
     $(".request").show();
     //show inventory if needed
     if(this.showInventory){
@@ -70,16 +70,16 @@ Lesson.prototype.update = function() {
     $(".url").removeClass('redborder');
     //right aligned the green button
     $(".next-button").addClass('right-aligned');
-    //make text on button for active lesson red, and all others black
+    //make text on menu for active lesson red, and all others black
     chapters.forEach(function(chapter) {
       chapter.lessons.forEach(function(lesson) {
-        $("#"+lesson.divID+'button').removeClass('active');
+        lesson.$menuDiv.removeClass('active');
         if (lesson.unlocked) {
-          $("#"+lesson.divID+'button').addClass('unlocked');
+          lesson.$menuDiv.addClass('unlocked');
         }
       });
     });
-    $("#"+this.divID+'button').removeClass('unlocked').addClass('active');
+    this.$menuDiv.removeClass('unlocked').addClass('active');
     //store the current lesson
     localStorage['currentLesson'] = activeLesson.divID;
     //update the input (placeholder/saved URL)
@@ -198,17 +198,42 @@ Lesson.prototype.complete = function() {
 }
 
 Lesson.prototype.tick = function() {
-   $('#'+this.divID+'button').css('background-image', 'url("UI-Mocks/Images/ic_check.png")');
+   this.$tick.css('visibility', 'visible');
 }
 
 //marks a lesson as unlocked
 Lesson.prototype.unlock = function(){
   this.unlocked = true;
   if (this.hasSubmit){
-    $("#"+this.divID+'button').removeClass('locked').addClass('unlocked');
-    $("#"+this.chapter.divID+'button').removeClass('locked').addClass('unlocked');
+    this.$menuDiv.removeClass('locked').addClass('unlocked');
+    this.chapter.$menuDiv.removeClass('locked').addClass('unlocked');
   }
 };
+
+Lesson.prototype.makeMenu = function() {
+  var me = this;
+  var menu = $(".menu-area");
+  //create lesson div
+  var newDiv = $("<div>")
+    .addClass("lesson-div menu locked");
+  //add tick image to div and object
+  var newTick = $("<img>")
+    .addClass(this.divID + "tick tick-image")
+    .attr('src', "UI-Mocks/Images/ic_check.png");
+  newDiv.append(newTick);
+  this.$tick = newTick;
+  //add text
+  var newLink = $("<a>")
+    .text(this.title)
+    .addClass("lesson-link pointer")
+    .click(function(){
+      me.update();
+    });
+  newDiv.append(newLink);
+  menu.append(newDiv);
+  //add div to lesson object
+  this.$menuDiv = newDiv;
+}
 
 //Object to store chapter information
 function Chapter(divID, options) {
@@ -220,6 +245,15 @@ function Chapter(divID, options) {
 //Chapter update, call update for the first lesson in the chapter
 Chapter.prototype.update = function() {
   this.lessons[0].update();
+}
+
+Chapter.prototype.makeMenu = function() {
+  var menu = $(".menu-area");
+  var newHeader = $("<div>")
+    .text(this.title)
+    .addClass("menu chapter locked")
+  this.$menuDiv = newHeader;
+  menu.append(newHeader);
 }
 
 //ARRAY OF CHAPTERS
@@ -258,9 +292,9 @@ prevLesson.next = finish;
 google.maps.event.addDomListener(window, 'load', function initialize(){
   //create the HTML elements
   chapters.forEach(function(chapter){
-    makeButton(chapter, "chapter-button");
+    chapter.makeMenu();
     chapter.lessons.forEach(function(lesson){
-      makeButton(lesson, "lesson-button");
+      lesson.makeMenu();
     });
   });
 
@@ -344,20 +378,6 @@ function loadState() {
     resume.unlock();
     resume.update();
   }
-}
-
-//Create the menu button for each lesson & chapter
-function makeButton(object, objectClass){
-  var button = $(".buttons");
-  var newButton = $("<input>")
-    .attr("type", "button")
-    .attr("id", object.divID+"button")
-    .attr("value", object.title)
-    .addClass("menu-button " + objectClass + " locked")
-    .click(function(){
-      object.update();
-    });
-  button.append(newButton);
 }
 
 //Trim the white spaces in the user input
