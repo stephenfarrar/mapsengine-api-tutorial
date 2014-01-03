@@ -89,7 +89,10 @@ html, body {
 }
 code{
   font-family: monospace;
-  background: #F9EDBE;
+  background: #F8F8F8;
+  padding: 2px;
+  border: 1px solid #C6C6C6;
+  border-radius:4px;
 }
 .inventory{
   margin-top:10px;
