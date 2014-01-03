@@ -269,7 +269,6 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   //store the input everytime it changes, to the respective local storage
   //onkeypress
   $input.keypress(function(event){
-    removeNewLineCharacter($input);
     disableOrEnableGetButton($input);
     //enable submit by enter, not making the enter visible in the input
     if(event.which == 13){
@@ -284,7 +283,6 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   });
   //onkeyup -> handle backspaces
   $input.keyup(function(){
-    removeNewLineCharacter($input);
     disableOrEnableGetButton($input);
     localStorage[activeLesson.divID+'input'] = $input.val();
     setTextAreaHeight();
@@ -292,7 +290,6 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   //on cut, and also pasting with mouse
   $input.on('paste cut',function(){
     setTimeout(function(){
-      removeNewLineCharacter($input);
       disableOrEnableGetButton($input);
       localStorage[activeLesson.divID+'input'] = $input.val();
       setTextAreaHeight();
@@ -303,9 +300,7 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
   loadState();
 });
 
-function removeNewLineCharacter($input){
-  $input.val($input.val().replace(/\r?\n/g,""));
-}
+
 function disableOrEnableGetButton($input){
   if ($input.val() === ""){
     $('.get-button').attr('disabled','disabled');

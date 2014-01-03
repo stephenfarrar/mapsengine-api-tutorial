@@ -129,6 +129,7 @@ html, body {
   resize: none;
   overflow-y:hidden;
   line-height: 1.5;
+  white-space: pre;
 }
 .pointer:hover{
   cursor: pointer;
