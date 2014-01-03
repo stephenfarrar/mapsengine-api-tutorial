@@ -374,7 +374,6 @@ function populateInventory(){
             .append("your API Key: ")
             .append(localStorage['APIKey']);
 }
-
 //*****************THE GME API FUNCTIONS**********************//
 function getText() {
   var string = $(".url").val();
