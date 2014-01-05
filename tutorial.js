@@ -178,6 +178,9 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   $(".url").addClass("redborder");
 
   showResponse();
+
+  //Hide the next button
+  $(".next-button").hide();
 }
 
 function showResponse(){
