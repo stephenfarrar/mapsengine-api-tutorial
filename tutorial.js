@@ -403,7 +403,7 @@ function getText() {
   var string = $(".url").val();
   var address = trim(string);
   var $data = $('.response-div');
-  $data.empty().css({ whiteSpace: 'pre' });
+  $data.empty();
   var me = this;
   jQuery.ajax({
   url: address,
@@ -479,7 +479,7 @@ function executeQueries(){
 function checkCorrectness(lesson, addressString, correctAns){
   var $data = $('.response-div');
   //style the output div
-  $data.empty().css({ whiteSpace: 'pre' });
+  $data.empty()
   //Get the response with the correct URL
   jQuery.ajax({
     url: correctAns,
