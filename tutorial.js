@@ -518,7 +518,7 @@ function checkCorrectness(lesson, addressString, correctAns){
           if (errorMess === "notJSONObject"){
             lesson.displayErrorMessage("The URL is not a valid Google Maps Engine API URL.");
           } else if (errorMess.reason === "authError") {
-            lesson.displayErrorMessage("It appears that your authorization token is invalid. Make sure that the table can be viewed by general public.");
+            lesson.displayErrorMessage("It appears that your authorization token is invalid. Make sure that you entered the correct header for this request.");
           } else if (errorMess.reason === "keyInvalid"){
             //if it contains curly braces, ask user to remove them
             if (jQuery.inArray('{',addressString)!==-1 || jQuery.inArray('}',addressString)!==-1){
