@@ -293,8 +293,7 @@ prevLesson.next = finish;
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 google.maps.event.addDomListener(window, 'load', function initialize(){
-
-  //create the HTML elements
+  //create the chapter + lesson buttons
   chapters.forEach(function(chapter){
     chapter.makeMenu();
     chapter.lessons.forEach(function(lesson){
