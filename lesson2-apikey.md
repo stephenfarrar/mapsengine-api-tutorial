@@ -1,4 +1,8 @@
 ##API Key##  
-Before you can get started you will need an API key. The Google Maps Engine API requires each user to have a unique API key in order to access data stored in GME projects. To obtain an API key, go to the [Google Developers' Console](https://cloud.google.com/console-canary#/flows/enableapi?apiid=mapsengine) and follow the prompts to create a project and a browser key.  
+Before you can get started you will need an API key. The Google Maps Engine API requires each user to have a unique API key in order to access data stored in GME projects. To obtain an API key, you will need to follow these steps:  
 
-Once you have a key, paste it in the input box.
+1. You will need a Google account. If you do not already have one, go [here](https://accounts.google.com/SignUp) and create an account.  
+2. Once you have signed up, go to the [Google Developers' Console](https://cloud.google.com/console#/flows/enableapi?apiid=mapsengine) and sign in.  
+3. Select 'Create a new project' from the dropdown list and click 'Continue'.  
+4. Next, under Public API access, click the 'Create New Key' button to make your API key. Make sure you select 'Browser key' from the options then click 'Create'.  
+5. You should now see your API key. Copy and paste it below.  
