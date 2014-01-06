@@ -56,7 +56,7 @@ Lesson.prototype.update = function() {
     }
   } else {
     //it is not an intro/final page (lessons page)
-    $('.response').empty();
+    $('.response-div').empty();
     //show the necessary element for lesson
     $('.menu-area').show();
     $(".request").show();
@@ -185,7 +185,7 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
 
 function showResponse(){
    //Display the response 
-  if (!$(".response").text()){
+  if (!$(".response-div").text()){
     //if there is no response (for API Key lessons, etc., do not display output)
     $(".response").hide();
   } else{
@@ -402,7 +402,7 @@ function populateInventory(){
 function getText() {
   var string = $(".url").val();
   var address = trim(string);
-  var $data = $('.response');
+  var $data = $('.response-div');
   $data.empty().css({ whiteSpace: 'pre' });
   var me = this;
   jQuery.ajax({
@@ -424,7 +424,7 @@ function testAPIKey() {
   //get user input
   var userKey = $(".url").val();
   var me = this;
-  var $data = $('.response');
+  var $data = $('.response-div');
   $data.empty();
   //use user's API Key to do a HTTP request, if it works then it is a valid API Key
   jQuery.ajax({
@@ -477,7 +477,7 @@ function executeQueries(){
 
 //*****************CHECKING CORRECT INPUT*******************//
 function checkCorrectness(lesson, addressString, correctAns){
-  var $data = $('.response');
+  var $data = $('.response-div');
   //style the output div
   $data.empty().css({ whiteSpace: 'pre' });
   //Get the response with the correct URL
