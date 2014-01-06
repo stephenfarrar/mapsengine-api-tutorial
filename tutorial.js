@@ -407,7 +407,7 @@ function createDevDocLinkMenu(){
     .addClass("devdoc-div menu unlocked");
   //add text
   var newLink = $("<a>")
-    .text("GME API Documentation Page")
+    .text("GME API Documentation")
     .addClass("pointer")
     .click(function(){
       window.open("https://developers.google.com/maps-engine",'_blank');
