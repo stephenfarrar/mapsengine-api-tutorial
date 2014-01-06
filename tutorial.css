@@ -12,12 +12,22 @@ html, body {
 .menu {
   display: block;
   position: relative;
-  color: #CCCCCC;
   background-color: white;
   text-align: left;
   border: none;
   font-family: Arial;
   margin-bottom: 15px;
+}
+.menu.devdoc-div{
+  border-top: 1px solid #EBEBEB;
+  height: 24px;
+  margin-left: 20px;
+  font-size: 14px;
+  padding-top: 16px;
+  color: #1155CC;
+}
+.menu.devdoc-div:active{
+  color: #DD4B39;
 }
 .chapter {
   height: 24px;

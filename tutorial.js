@@ -293,6 +293,7 @@ prevLesson.next = finish;
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 google.maps.event.addDomListener(window, 'load', function initialize(){
+
   //create the HTML elements
   chapters.forEach(function(chapter){
     chapter.makeMenu();
@@ -300,6 +301,8 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
       lesson.makeMenu();
     });
   });
+  //create the menu to go to documentation page
+  createDevDocLinkMenu();
 
   var $input = $(".url");
 
@@ -398,6 +401,21 @@ function populateInventory(){
             .append(localStorage['APIKey']);
 }
 
+function createDevDocLinkMenu(){
+  var menu = $(".menu-area");
+  //create devDoc div
+  var newDiv = $("<div>")
+    .addClass("devdoc-div menu unlocked");
+  //add text
+  var newLink = $("<a>")
+    .text("GME API Documentation Page")
+    .addClass("pointer")
+    .click(function(){
+      window.open("https://developers.google.com/maps-engine",'_blank');
+    });
+  newDiv.append(newLink);
+  menu.append(newDiv);
+}
 //*****************THE GME API FUNCTIONS**********************//
 function getText() {
   var string = $(".url").val();
