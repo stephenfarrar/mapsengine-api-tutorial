@@ -17,7 +17,7 @@ html, body {
   font-family: Arial;
   margin-bottom: 15px;
 }
-.menu.devdoc-div{
+.menu.documentation-link{
   border-top: 1px solid #EBEBEB;
   height: 24px;
   margin-left: 20px;
@@ -25,7 +25,7 @@ html, body {
   padding-top: 16px;
   color: #1155CC;
 }
-.menu.devdoc-div:active{
+.menu.documentation-link:active{
   color: #DD4B39;
 }
 .no-underline{
