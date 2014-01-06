@@ -58,26 +58,6 @@ html, body {
 .active{
   color: #DD4B39;
 }
-.title-bar {
-  display: block;
-  width: 100%;
-  background-color: #F1F1F1;
-  border-bottom: 2px solid #EAEAEA;
-}
-.title {
-  display: inline;
-  font-weight: bold;
-  color: #737373;
-  font-family: arial;
-  font-size: 28px;
-  vertical-align: middle;
-}
-.maps-icon{
-  display: inline;
-  height: 55px;
-  vertical-align: middle;
-  margin: 10px;
-}
 .content{
   margin-bottom: 20px;
 }
