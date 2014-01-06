@@ -215,7 +215,7 @@ Lesson.prototype.unlock = function(){
 
 Lesson.prototype.makeMenu = function() {
   var me = this;
-  var menu = $(".menu-area");
+  var menu = $(".lesson-menu");
   //create lesson div
   var newDiv = $("<div>")
     .addClass("lesson-div menu locked");
@@ -251,7 +251,7 @@ Chapter.prototype.update = function() {
 }
 
 Chapter.prototype.makeMenu = function() {
-  var menu = $(".menu-area");
+  var menu = $(".lesson-menu");
   var newHeader = $("<div>")
     .text(this.title)
     .addClass("menu chapter locked")
@@ -293,7 +293,7 @@ prevLesson.next = finish;
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 google.maps.event.addDomListener(window, 'load', function initialize(){
-  //create the HTML elements
+  //create the chapter + lesson buttons
   chapters.forEach(function(chapter){
     chapter.makeMenu();
     chapter.lessons.forEach(function(lesson){
