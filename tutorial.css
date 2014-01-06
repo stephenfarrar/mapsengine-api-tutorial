@@ -28,6 +28,9 @@ html, body {
 .menu.devdoc-div:active{
   color: #DD4B39;
 }
+.no-underline{
+  text-decoration: none;
+}
 .chapter {
   height: 24px;
   margin-left: 20px;

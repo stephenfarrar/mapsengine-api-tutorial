@@ -215,7 +215,7 @@ Lesson.prototype.unlock = function(){
 
 Lesson.prototype.makeMenu = function() {
   var me = this;
-  var menu = $(".menu-area");
+  var menu = $(".lesson-menu");
   //create lesson div
   var newDiv = $("<div>")
     .addClass("lesson-div menu locked");
@@ -251,7 +251,7 @@ Chapter.prototype.update = function() {
 }
 
 Chapter.prototype.makeMenu = function() {
-  var menu = $(".menu-area");
+  var menu = $(".lesson-menu");
   var newHeader = $("<div>")
     .text(this.title)
     .addClass("menu chapter locked")
@@ -300,8 +300,6 @@ google.maps.event.addDomListener(window, 'load', function initialize(){
       lesson.makeMenu();
     });
   });
-  //create the menu to go to documentation page
-  createDevDocLinkMenu();
 
   var $input = $(".url");
 
@@ -400,21 +398,6 @@ function populateInventory(){
             .append(localStorage['APIKey']);
 }
 
-function createDevDocLinkMenu(){
-  var menu = $(".menu-area");
-  //create devDoc div
-  var newDiv = $("<div>")
-    .addClass("devdoc-div menu unlocked");
-  //add text
-  var newLink = $("<a>")
-    .text("GME API Documentation")
-    .addClass("pointer")
-    .click(function(){
-      window.open("https://developers.google.com/maps-engine",'_blank');
-    });
-  newDiv.append(newLink);
-  menu.append(newDiv);
-}
 //*****************THE GME API FUNCTIONS**********************//
 function getText() {
   var string = $(".url").val();
