@@ -539,7 +539,7 @@ function checkCorrectness(lesson, addressString, correctAns){
               if (jQuery.inArray('{',addressString)!==-1 || jQuery.inArray('}',addressString)!==-1){
                 lesson.displayErrorMessage("Check that you've removed the curly braces({ }) surrounding the table ID in your URL.");
               } else {
-                lesson.displayErrorMessage("The table ID used in the URL is invalid. Check whether you've given the right table ID.");
+                lesson.displayErrorMessage("The table ID used in the URL is invalid. Check whether you've given the right table ID and make sure that the table has been made public. To make your table public, you can follow the instructions in <a href = \"https:\/\/support.google.com/mapsengine/answer/3164737?hl=en\" target=\"_blank\" class='link pointer no-underline'>this link</a>.");
               }
             }
           } else if (errorMess.reason === "required"){
