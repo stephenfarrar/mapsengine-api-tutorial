@@ -1,0 +1,21 @@
+application: google.com:mapsengine-api-tutorial
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /resources
+  static_dir: resources
+
+- url: /images
+  static_dir: resources/images
+
+- url: /.*
+  script: tutorial.application
+
+libraries:
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest
