@@ -96,7 +96,7 @@ Lesson.prototype.displayInstructions = function() {
   var me = this;
   if (!this.instructions) {
     // If the instructions aren't loaded, load them.
-    $.get(this.divID+".md", function(response){
+    $.get("resources/"+this.divID+".txt", function(response){
       me.instructions = response;
       me.displayInstructions();
     });
@@ -109,7 +109,7 @@ Lesson.prototype.showAnswer = function(){
   var me = this;
   if (!this.answer) {
     // If the answers aren't loaded, load them.
-    $.get(this.divID+"-answer.md", function(response){
+    $.get("resources/"+this.divID+"-answer.txt", function(response){
       me.answer = response;
       me.showAnswer();
     });
@@ -129,7 +129,7 @@ Lesson.prototype.displaySuccessMessage = function() {
   var me = this;
   if (!this.successMessage) {
     // If the success message aren't loaded, load them.
-    $.get(this.divID+"-success.md", function(response){
+    $.get("resources/"+this.divID+"-success.txt", function(response){
       me.successMessage = response;
       me.displaySuccessMessage();
     });
@@ -222,7 +222,7 @@ Lesson.prototype.makeMenu = function() {
   //add tick image to div and object
   var newTick = $("<img>")
     .addClass(this.divID + "tick tick-image")
-    .attr('src', "UI-Mocks/Images/ic_check.png");
+    .attr('src', "images/ic_check.png");
   newDiv.append(newTick);
   this.$tick = newTick;
   //add text
@@ -292,7 +292,7 @@ prevLesson.next = finish;
 //the final page does not need to have a next
 
 //*****************THE GLOBAL FUNCTIONS**********************//
-google.maps.event.addDomListener(window, 'load', function initialize(){
+$(window).load(function() {
   //create the chapter + lesson buttons
   chapters.forEach(function(chapter){
     chapter.makeMenu();
@@ -401,12 +401,13 @@ function populateInventory(){
 //*****************THE GME API FUNCTIONS**********************//
 function getText() {
   var string = $(".url").val();
-  var address = trim(string);
+  //the .txt file must exist in a directory and be referenced this way
+  var address = "resources/" + trim(string);
   var $data = $('.response-div');
   $data.empty();
   var me = this;
   jQuery.ajax({
-  url: address,
+    url: address,
     dataType: 'text',
     success: function(resource) {
       $data.text(resource);
