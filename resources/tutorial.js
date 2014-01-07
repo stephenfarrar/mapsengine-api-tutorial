@@ -96,7 +96,7 @@ Lesson.prototype.displayInstructions = function() {
   var me = this;
   if (!this.instructions) {
     // If the instructions aren't loaded, load them.
-    $.get("resources/"+this.divID+".md", function(response){
+    $.get("resources/"+this.divID+".txt", function(response){
       me.instructions = response;
       me.displayInstructions();
     });
@@ -109,7 +109,7 @@ Lesson.prototype.showAnswer = function(){
   var me = this;
   if (!this.answer) {
     // If the answers aren't loaded, load them.
-    $.get("resources/"+this.divID+"-answer.md", function(response){
+    $.get("resources/"+this.divID+"-answer.txt", function(response){
       me.answer = response;
       me.showAnswer();
     });
@@ -129,7 +129,7 @@ Lesson.prototype.displaySuccessMessage = function() {
   var me = this;
   if (!this.successMessage) {
     // If the success message aren't loaded, load them.
-    $.get("resources/"+this.divID+"-success.md", function(response){
+    $.get("resources/"+this.divID+"-success.txt", function(response){
       me.successMessage = response;
       me.displaySuccessMessage();
     });
