@@ -449,7 +449,7 @@ function testGetTable() {
   var string = $(".url").val();
 
   var address = trim(string);
-  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067?version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38";
   //the Get Table is currently NOT AVAILABLE in v1, will someday be available and this 2 line codes needs to be removed
   address = address.replace("v1","search_tt");
   correctAns = correctAns.replace("v1","search_tt");
@@ -461,7 +461,7 @@ function executeListInput(){
   //get user input and trim it
   var string = $(".url").val();
   var address = trim(string);
-  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0";
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38";
   checkCorrectness(this, address, correctAns);
 }
 
@@ -471,7 +471,7 @@ function executeQueries(){
   //get user input and trim it
   var string = $(".url").val();
   var address = trim(string);
-  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0&where=Population<2000000";
+  var correctAns = "https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38&where=Population<2000000";
   checkCorrectness(this, address, correctAns);
 }
 
