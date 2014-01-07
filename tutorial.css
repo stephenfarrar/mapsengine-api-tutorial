@@ -239,9 +239,11 @@ code{
   height: 300px;
   overflow-y:auto;
 }
-img[alt=yes-cat-image], img[alt=highfive-cat-image]{
+img[alt=introduction-cat-image], img[alt=finish-cat-image]{
   display:block;
   height: 300px;
+  margin-top:20px;
+  margin-bottom:20px;
 }
 *:focus {
     outline: 0;
