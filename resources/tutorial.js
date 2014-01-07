@@ -292,7 +292,7 @@ prevLesson.next = finish;
 //the final page does not need to have a next
 
 //*****************THE GLOBAL FUNCTIONS**********************//
-google.maps.event.addDomListener(window, 'load', function initialize(){
+$(window).load(function() {
   //create the chapter + lesson buttons
   chapters.forEach(function(chapter){
     chapter.makeMenu();
