@@ -210,6 +210,23 @@ code{
   margin: 0px;
 }
 .response{
+  -moz-box-shadow: 4px 4px 8px #CCC;
+  -webkit-box-shadow: 4px 4px 8px #CCC;
+  box-shadow: 4px 4px 8px #CCC;
+  border: 1px solid #999999;
+  margin-top:20px;
+}
+.response-header{
+  padding:3px;
+  padding-left:10px;
+  background-color: #CCCCCC;
+  color: black;
+  font-size: 13px;
+  font-family: arial;
+  font-weight:bold;
+  border-bottom: 1px solid #999999;
+}
+.response-div{
   padding:10px;
   background-color: white;
   color: black;
@@ -219,11 +236,6 @@ code{
   white-space: pre;
   height: 300px;
   overflow-y:auto;
-  -moz-box-shadow: 4px 4px 8px #CCC;
-  -webkit-box-shadow: 4px 4px 8px #CCC;
-  box-shadow: 4px 4px 8px #CCC;
-  border: 1px solid black;
-  margin-top:10px;
 }
 img[alt=yes-cat-image], img[alt=highfive-cat-image]{
   display:block;
