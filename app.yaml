@@ -1,4 +1,4 @@
-application: google.com:mapsengine-api-tutorial
+application: mapsengine-api-tutorial
 version: 1
 runtime: python27
 api_version: 1
