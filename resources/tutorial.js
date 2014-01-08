@@ -93,63 +93,42 @@ Lesson.prototype.update = function() {
 
 // Displays the instructions, possibly loading them from the markdown file.
 Lesson.prototype.displayInstructions = function() {
-  var me = this;
-  if (!this.instructions) {
-    // If the instructions aren't loaded, load them.
-    $.get("resources/"+this.divID+".txt", function(response){
-      me.instructions = response;
-      me.displayInstructions();
-    });
-    return;
+  if (this.instructions) {
+    $(".instructions").html(markdown.toHTML(this.instructions));
   }
-  $(".instructions").html(markdown.toHTML(this.instructions));
 }
 
 Lesson.prototype.showAnswer = function(){
-  var me = this;
-  if (!this.answer) {
-    // If the answers aren't loaded, load them.
-    $.get("resources/"+this.divID+"-answer.txt", function(response){
-      me.answer = response;
-      me.showAnswer();
-    });
-    return;
+  if (this.answer) {
+    //replace userAPIKey with the API Key stored in local storage
+    this.answer = this.answer.replace("{userAPIKey}", localStorage['APIKey']);
+    $(".answer").html(markdown.toHTML(this.answer));
+    //hide button once clicked
+    $(".show-button").hide();
+    //show the answer
+    $(".answer").fadeIn(fadeInTime);
   }
-  //replace userAPIKey with the API Key stored in local storage
-  this.answer = this.answer.replace ("{userAPIKey}", localStorage['APIKey']);
-  $(".answer").html(markdown.toHTML(this.answer));
-  //hide button once clicked
-  $(".show-button").hide();
-  //show the answer
-  $(".answer").fadeIn(fadeInTime);
 }
 
 //If the input is right, do the success responses
 Lesson.prototype.displaySuccessMessage = function() {
-  var me = this;
-  if (!this.successMessage) {
-    // If the success message aren't loaded, load them.
-    $.get("resources/"+this.divID+"-success.txt", function(response){
-      me.successMessage = response;
-      me.displaySuccessMessage();
-    });
-    return;
+  if (this.successMessage) {
+    $(".message").html(markdown.toHTML(this.successMessage));
+    //Display the success ribbon and message
+    $(".feedback").hide().fadeIn(fadeInTime).removeClass("failure").addClass("success");
+    $(".ribbon").show();
+
+    //automatically scroll to the success message
+    var successTop = $(".feedback").position().top;
+    $("html, body").animate({scrollTop:successTop-25},500);
+    //change border colour to black
+    $(".url").removeClass('redborder');
+    
+    showResponse();
+
+    //Display the next button
+    $(".next-button").hide().fadeIn(fadeInTime);
   }
-  $(".message").html(markdown.toHTML(this.successMessage));
-  //Display the success ribbon and message
-  $(".feedback").hide().fadeIn(fadeInTime).removeClass("failure").addClass("success");
-  $(".ribbon").show();
-
-  //automatically scroll to the success message
-  var successTop = $(".feedback").position().top;
-  $("html, body").animate({scrollTop:successTop-25},500);
-  //change border colour to black
-  $(".url").removeClass('redborder');
-  
-  showResponse();
-
-  //Display the next button
-  $(".next-button").hide().fadeIn(fadeInTime);
 }
 
 //If the input is wrong, do the error responses
@@ -238,6 +217,31 @@ Lesson.prototype.makeMenu = function() {
   this.$menuDiv = newDiv;
 }
 
+//load lesson markdown
+Lesson.prototype.loadInstruction = function(){
+  var me = this;
+  $.get("resources/"+this.divID+".txt", function(response){
+    me.instructions = response;
+  });
+}
+//load success message markdown
+Lesson.prototype.loadSuccessMessage = function(){
+  var me = this;
+  $.get("resources/"+this.divID+"-success.txt", function(response){
+    me.successMessage = response;
+  });
+}
+//load the answers
+Lesson.prototype.loadAnswer = function(){
+  var me = this;
+  $.get("resources/"+this.divID+"-answer.txt", function(response){
+    me.answer = response;
+    if (me.divID === "lesson5-queries") {
+      loadState();
+    }
+  });
+}
+
 //Object to store chapter information
 function Chapter(divID, options) {
   this.divID = divID;
@@ -293,11 +297,19 @@ prevLesson.next = finish;
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 $(window).load(function() {
-  //create the chapter + lesson buttons
+  //load the markdown files for the introduction, resume, and finish page
+  introduction.loadInstruction();
+  resume.loadInstruction();
+  finish.loadInstruction();
+  //create the chapter + lesson buttons + load markdown files for lessons
   chapters.forEach(function(chapter){
     chapter.makeMenu();
     chapter.lessons.forEach(function(lesson){
       lesson.makeMenu();
+      //load the markdown files for each lesson
+      lesson.loadInstruction();
+      lesson.loadSuccessMessage();
+      lesson.loadAnswer();
     });
   });
 
@@ -332,9 +344,6 @@ $(window).load(function() {
       setTextAreaHeight();
     },0);
   });
-
-  //The first page shown is the first lesson
-  loadState();
 });
 
 function disableOrEnableGetButton($input){
