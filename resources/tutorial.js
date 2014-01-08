@@ -117,6 +117,8 @@ Lesson.prototype.showAnswer = function(){
   }
   //replace userAPIKey with the API Key stored in local storage
   this.answer = this.answer.replace ("{userAPIKey}", localStorage['APIKey']);
+  //escape all of "_" characters in the API Key
+  this.answer = this.answer.replace (/_/g,"\\_");
   $(".answer").html(markdown.toHTML(this.answer));
   //hide button once clicked
   $(".show-button").hide();
@@ -422,8 +424,8 @@ function getText() {
 
 //*****************THE API Key FUNCTIONS**********************//
 function testAPIKey() {
-  //get user input
-  var userKey = $(".url").val();
+  //get user input & trim it
+  var userKey = trim($(".url").val());
   var me = this;
   var $data = $('.response-div');
   $data.empty();
