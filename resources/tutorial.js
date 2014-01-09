@@ -2,6 +2,7 @@
 //THE GLOBAL VARIABLES
 var activeLesson;
 var fadeInTime = 500;
+var pendingFiles = {};
 
 //object to store lesson information
 function Lesson(divID, options) {
@@ -220,25 +221,34 @@ Lesson.prototype.makeMenu = function() {
 //load lesson markdown
 Lesson.prototype.loadInstruction = function(){
   var me = this;
-  $.get("resources/"+this.divID+".txt", function(response){
+  var filename = this.divID + ".txt";
+  pendingFiles[filename] = true;
+  $.get("resources/"+filename, function(response){
     me.instructions = response;
+    delete pendingFiles[filename];
+    checkNoFilesPending();
   });
 }
 //load success message markdown
 Lesson.prototype.loadSuccessMessage = function(){
   var me = this;
-  $.get("resources/"+this.divID+"-success.txt", function(response){
+  var filename = this.divID + "-success.txt";
+  pendingFiles[filename] = true;
+  $.get("resources/"+filename, function(response){
     me.successMessage = response;
+    delete pendingFiles[filename];
+    checkNoFilesPending();
   });
 }
 //load the answers
 Lesson.prototype.loadAnswer = function(){
   var me = this;
-  $.get("resources/"+this.divID+"-answer.txt", function(response){
+  var filename = this.divID + "-answer.txt";
+  pendingFiles[filename] = true;
+  $.get("resources/"+filename, function(response){
     me.answer = response;
-    if (me.divID === "lesson5-queries") {
-      loadState();
-    }
+    delete pendingFiles[filename];
+    checkNoFilesPending();
   });
 }
 
@@ -345,6 +355,12 @@ $(window).load(function() {
     },0);
   });
 });
+
+function checkNoFilesPending() {
+  if (jQuery.isEmptyObject(pendingFiles)) {
+    loadState();
+  }
+}
 
 function disableOrEnableGetButton($input){
   if ($input.val() === ""){
