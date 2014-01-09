@@ -116,10 +116,12 @@ Lesson.prototype.showAnswer = function(){
     return;
   }
   //replace userAPIKey with the API Key stored in local storage
-  this.answer = this.answer.replace ("{userAPIKey}", localStorage['APIKey']);
-  //escape all of "_" characters in the API Key
-  this.answer = this.answer.replace (/_/g,"\\_");
-  $(".answer").html(markdown.toHTML(this.answer));
+  //change the markdown files to HTML and combined with the API Key
+  var htmlAnswer = markdown.toHTML(this.answer);
+  var htmlKey =  $("<span>").text(localStorage['APIKey']).html();
+  htmlAnswer = htmlAnswer.replace("{userAPIKey}", htmlKey);
+  //change the html of answer div
+  $(".answer").html(htmlAnswer);
   //hide button once clicked
   $(".show-button").hide();
   //show the answer
