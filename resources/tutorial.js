@@ -26,7 +26,7 @@ function Lesson(divID, options) {
 }
 
 Lesson.prototype.update = function() {
-  //if the lesson is still unlocked, it can't be accessed
+  //if the lesson is still locked, it can't be accessed
   if (!this.unlocked) return;
   //else, the lesson can be accessed
   //scroll to top of the page
@@ -286,14 +286,14 @@ var chapters = [
   new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
     new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, showInventory:true}),
     new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput, showInventory:true}),
-    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, showInventory:true}),
+    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, showInventory:true})
   ]})
 ];
 
 //introduction and final page
 var introduction = new Lesson('introduction', {title: "Welcome!", buttonValue: "Yes, I am!"});
 var resume = new Lesson('resume', {title: "Welcome back!", buttonValue: "Resume"});
-var finish = new Lesson('finish', {title:'Congratulations!', buttonValue: "Go back to tutorial"});
+var finish = new Lesson('finish', {title:'Congratulations!'});
 
 //Determining the next, and chapter for each lesson
 var prevLesson = chapters[0].lessons[0]; //first lesson
@@ -328,7 +328,6 @@ $(window).load(function() {
   });
 
   var $input = $(".url");
-
   //store the input everytime it changes, to the respective local storage
   //onkeypress
   $input.keypress(function(event){
@@ -391,18 +390,21 @@ function loadState() {
   populateInventory();
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
-      //if lesson is completed, stored as 'true'
+      //restore user completion information
       if (localStorage[lesson.divID]) {
         lesson.complete();
       }
+      //add resume point
       if (lesson.divID === activeLessonId) {
         resume.next = lesson;
       }
     });
   });
   if (activeLessonId === "introduction"){
+    //if the user has not started yet
     introduction.update();
   } else {
+    //the user has started previously
     //if the user left at the final page
     if (activeLessonId === "finish"){
       resume.next = finish;
@@ -473,7 +475,6 @@ function testAPIKey() {
 }
 
 //*****************THE Get Table FUNCTIONS**********************//
-  
 function testGetTable() {
   //get user input and trim it
   var string = $(".url").val();
@@ -496,7 +497,6 @@ function executeListInput(){
 }
 
 //*****************THE Query FUNCTIONS**********************//
-
 function executeQueries(){
   //get user input and trim it
   var string = $(".url").val();
@@ -565,7 +565,7 @@ function checkCorrectness(lesson, addressString, correctAns){
               lesson.displayErrorMessage("Check whether you've given the right values for the parameters, in particular, the \""+field+"\" field.");
             }
             else {
-              ////if it contains curly braces, ask user to remove them
+              //if it contains curly braces, ask user to remove them
               if (jQuery.inArray('{',addressString)!==-1 || jQuery.inArray('}',addressString)!==-1){
                 lesson.displayErrorMessage("Check that you've removed the curly braces({ }) surrounding the table ID in your URL.");
               } else {
