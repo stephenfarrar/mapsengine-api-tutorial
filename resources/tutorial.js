@@ -91,7 +91,8 @@ Lesson.prototype.update = function() {
     disableOrEnableGetButton($(".url"));
   }
   //set up analytics for the page visited by the user (number of times the page visited)
-  ga('send', 'pageview', {
+  ga('send', {
+    'hitType': 'pageview',
     'page': this.divID
   });
 }
@@ -117,7 +118,12 @@ Lesson.prototype.showAnswer = function(){
     //show the answer
     $(".answer").fadeIn(fadeInTime);
     //set up analytics for show answer button (how many times users click it)
-    ga('send','event','show answer button','display',this.divID);
+    ga('send', {
+       'hitType': 'event',
+       'eventCategory': 'help',
+       'eventAction': 'show answer',
+       'eventLabel': this.divID,
+    });
   }
 }
 
@@ -141,7 +147,12 @@ Lesson.prototype.displaySuccessMessage = function() {
     $(".next-button").hide().fadeIn(fadeInTime);
 
     //set up analytics to indicate success (how many times)
-    ga('send','event','success','display',this.divID);
+    ga('send', {
+       'hitType': 'event',
+       'eventCategory': 'submit',
+       'eventAction': 'success',
+       'eventLabel': this.divID,
+    });
   }
 }
 
@@ -176,7 +187,12 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   $(".next-button").hide();
 
   //Set up analytics to indicate failure (how many times)
-  ga('send','event','failure','click',this.divID);
+  ga('send', {
+     'hitType': 'event',
+     'eventCategory': 'submit',
+     'eventAction': 'failure',
+     'eventLabel': this.divID,
+  });
 }
 
 function showResponse(){
@@ -372,11 +388,21 @@ $(window).load(function() {
 
   //set up analytics to indicate how many times users go to the documentation page using the final page button
   $('.documentation-button').on('click', function() {
-    ga('send', 'event', 'Go to documentation page', 'click', 'final page button');
+    ga('send', {
+      'hitType': 'event',
+      'eventCategory': 'readTheDocs',
+      'eventAction': 'finalPageButton',
+    });
   });
+
   //set up analytics to indicate how many times users go to the documentation page while visiting a specific lesson
   $('.documentation-link').on('click', function() {
-    ga('send', 'event', 'Go to documentation page', 'click', activeLesson.divID+' - link on the menu bar');
+    ga('send', {
+      'hitType': 'event',
+      'eventCategory': 'readTheDocs',
+      'eventAction': 'navigationMenu',
+      'eventLabel': activeLesson.divID,
+    });
   });
 });
 
