@@ -90,6 +90,10 @@ Lesson.prototype.update = function() {
     //if the input is empty, user should not be allowed to submit
     disableOrEnableGetButton($(".url"));
   }
+  //create analytics for the page visited by the user (number of times the page visited)
+  ga('send', 'pageview', {
+    'page': this.divID
+  });
 }
 
 // Displays the instructions, possibly loading them from the markdown file.
@@ -112,6 +116,8 @@ Lesson.prototype.showAnswer = function(){
     $(".show-button").hide();
     //show the answer
     $(".answer").fadeIn(fadeInTime);
+    //set up analytics for show answer button (how many times users click it)
+    ga('send','event','show answer button','display',this.divID);
   }
 }
 
@@ -133,6 +139,9 @@ Lesson.prototype.displaySuccessMessage = function() {
 
     //Display the next button
     $(".next-button").hide().fadeIn(fadeInTime);
+
+    //Set up analytics to indicate success (how many times)
+    ga('send','event','success','display',this.divID);
   }
 }
 
@@ -165,6 +174,9 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
 
   //Hide the next button
   $(".next-button").hide();
+
+  //Set up analytics to indicate failure (how many times)
+  ga('send','event','failure','click',this.divID);
 }
 
 function showResponse(){
@@ -356,6 +368,15 @@ $(window).load(function() {
       localStorage[activeLesson.divID+'input'] = $input.val();
       setTextAreaHeight();
     },0);
+  });
+
+  //analytics to indicate how many times users go to the documentation page using the final page button
+  $('.documentation-button').on('click', function() {
+    ga('send', 'event', 'Go to documentation page', 'click', 'final page button');
+  });
+  //analytics to indicate how many times users go to the documentation page while visiting a specific lesson
+  $('.documentation-link').on('click', function() {
+    ga('send', 'event', 'Go to documentation page', 'click', activeLesson.divID+' - link on the menu bar');
   });
 });
 
