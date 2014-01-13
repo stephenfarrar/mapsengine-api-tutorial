@@ -34,7 +34,6 @@ Lesson.prototype.update = function() {
   activeLesson = this;
   document.title = this.title;
   //hide the lesson elements
-  $('.request').show();
   $('.hidden-by-default').hide();
   $('.invisible-by-default').css('visibility', 'hidden');
   $('.show-button').show();
