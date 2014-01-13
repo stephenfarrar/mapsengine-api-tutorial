@@ -613,7 +613,7 @@ function checkCorrectness(lesson, addressString, correctAns){
 //*****************THE Login FUNCTIONS*******************//
 function authorizeUser() {
   var me = this;
-  var additionalParams = {
+  gapi.auth.signIn({
     'callback': function(authResult) {
       if (authResult['status']['signed_in']) {
         $('.login-button').hide();
@@ -623,6 +623,5 @@ function authorizeUser() {
         me.displayErrorMessage("You need to grant this tutorial permissions if you wish to continue.")
       }
     }
-  };
-  gapi.auth.signIn(additionalParams);
+  });
 }
