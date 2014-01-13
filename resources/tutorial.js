@@ -17,11 +17,16 @@ function Lesson(divID, options) {
     //it is an intro/final page
     this.hasSubmit = false;
   }
+  if (options.update) {
+    this.update = options.update;
+  }
   //done is TRUE if: the user has submitted correctly
   this.done = false;
   this.unlocked = false;
   if (options.showInventory){
     this.showInventory = options.showInventory;
+  } else {
+    this.showInventory = false;
   }
 }
 
@@ -37,25 +42,11 @@ Lesson.prototype.update = function() {
   $('.hidden-by-default').hide();
   $('.invisible-by-default').css('visibility', 'hidden');
   $('.show-button').show();
+  $('.next-button').attr('value', this.buttonValue);
   //display the instruction blurb
   this.displayInstructions();
-  //update the button value
-  $('.next-button').attr('value', this.buttonValue);
-  //if it is an intro/final page
-  if (!this.hasSubmit){
-    if (this === finish){
-      //the finish page will not have next button, but it will have the menu and go to documentation button
-      $('.menu-area').show();
-      $('.documentation-button').show();
-      //store the current lesson (the finish page)
-      localStorage['currentLesson'] = activeLesson.divID;
-    } else {
-      //the intro & resume page will have the next button, and not stored in the localstorage
-      //show the green button and removed the right aligned class
-      $(".next-button").removeClass("right-aligned").show();
-    }
-  } else {
-    //it is not an intro/final page (lessons page)
+  //a number of elements are common to the lessons
+  if (this.hasSubmit) {
     $('.response-div').empty();
     //show the necessary element for lesson
     $('.menu-area').show();
@@ -88,10 +79,6 @@ Lesson.prototype.update = function() {
     setTextAreaHeight();
     //if the input is empty, user should not be allowed to submit
     disableOrEnableGetButton($(".url"));
-    if (this.divID === 'lesson6-login') {
-      $('.request').hide();
-      $('.login-button').show();
-    }
   }
 }
 
@@ -280,26 +267,57 @@ Chapter.prototype.makeMenu = function() {
   menu.append(newHeader);
 }
 
-//ARRAY OF CHAPTERS
+// An array of the chapters and lessons.
 var chapters = [
   new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
-    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText, showInventory:false}),
-    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, showInventory:false})
+    new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText}),
+    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey})
   ]}),
   new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
     new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, showInventory:true}),
-    new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput, showInventory:true}),
-    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, showInventory:true})
+    new Lesson('lesson4-listfeatures', {title: 'List Features', submit: executeListInput, showInventory:true}),
+    new Lesson('lesson5-queries', {title: 'Queries', submit: executeQueries, showInventory:true})
   ]}),
   new Chapter('chapter2-authorization', {title: 'Authorization', lessons: [
-    new Lesson('lesson6-login', {title: 'Login and Authorization', submit: authorizeUser, showInventory:false})
+    new Lesson('lesson6-login', {
+      title: 'Login and Authorization', 
+      submit: authorizeUser,
+      update: function() {
+        Lesson.prototype.update.call(this);
+        $('.request').hide();
+        $('.login-button').show();
+      }
+    })
   ]})
 ];
 
-//introduction and final page
-var introduction = new Lesson('introduction', {title: "Welcome!", buttonValue: "Yes, I am!"});
-var resume = new Lesson('resume', {title: "Welcome back!", buttonValue: "Resume"});
-var finish = new Lesson('finish', {title:'Congratulations!'});
+var introduction = new Lesson('introduction', {
+  title: 'Welcome!',
+  buttonValue: 'Yes, I am!',
+  update: function() {
+    Lesson.prototype.update.call(this);
+    $('.next-button').removeClass('right-aligned').show();
+  }
+});
+var resume = new Lesson('resume', {
+  title: 'Welcome back!',
+  buttonValue: 'Resume',
+  update: function() {
+    Lesson.prototype.update.call(this);
+    $('.next-button').removeClass('right-aligned').show();
+  }
+});
+var finish = new Lesson('finish', {
+  title:'Congratulations!',
+  update: function() {
+    Lesson.prototype.update.call(this);
+    // The finish page will not have next button, but it will have the menu and go to documentation button.
+    $('.menu-area').show();
+    $('.documentation-button').show();
+    // Store the current lesson (the finish page).
+    localStorage['currentLesson'] = activeLesson.divID;
+  }
+});
 
 //Determining the next, and chapter for each lesson
 var prevLesson = chapters[0].lessons[0]; //first lesson
