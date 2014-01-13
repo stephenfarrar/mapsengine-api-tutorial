@@ -34,6 +34,7 @@ Lesson.prototype.update = function() {
   activeLesson = this;
   document.title = this.title;
   //hide the lesson elements
+  $('.request').show();
   $('.hidden-by-default').hide();
   $('.invisible-by-default').css('visibility', 'hidden');
   $('.show-button').show();
@@ -41,7 +42,6 @@ Lesson.prototype.update = function() {
   this.displayInstructions();
   //update the button value
   $('.next-button').attr('value', this.buttonValue);
-
   //if it is an intro/final page
   if (!this.hasSubmit){
     if (this === finish){
@@ -89,6 +89,10 @@ Lesson.prototype.update = function() {
     setTextAreaHeight();
     //if the input is empty, user should not be allowed to submit
     disableOrEnableGetButton($(".url"));
+    if (this.divID === 'lesson6-login') {
+      $('.request').hide();
+      $('.login-button').show();
+    }
   }
 }
 
@@ -287,6 +291,9 @@ var chapters = [
     new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, showInventory:true}),
     new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput, showInventory:true}),
     new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, showInventory:true})
+  ]}),
+  new Chapter('chapter2-authorization', {title: 'Authorization', lessons: [
+    new Lesson('lesson6-login', {title: 'Login and Authorization', submit: authorizeUser, showInventory:false})
   ]})
 ];
 
@@ -357,6 +364,11 @@ $(window).load(function() {
       setTextAreaHeight();
     },0);
   });
+  var po = document.createElement('script');
+  po.type = 'text/javascript'; po.async = true;
+  po.src = 'https://apis.google.com/js/client:plusone.js?onload=render';
+  var s = document.getElementsByTagName('script')[0];
+  s.parentNode.insertBefore(po, s);
 });
 
 function checkNoFilesPending() {
@@ -597,4 +609,21 @@ function checkCorrectness(lesson, addressString, correctAns){
       });
     }
   });
+}
+
+//*****************THE Login FUNCTIONS*******************//
+function authorizeUser() {
+  var me = this;
+  var additionalParams = {
+    'callback': function(authResult) {
+      if (authResult['status']['signed_in']) {
+        $('.login-button').hide();
+        me.displaySuccessMessage();
+        me.complete();
+      } else {
+        me.displayErrorMessage("You need to grant this tutorial permissions if you wish to continue.")
+      }
+    }
+  };
+  gapi.auth.signIn(additionalParams);
 }
