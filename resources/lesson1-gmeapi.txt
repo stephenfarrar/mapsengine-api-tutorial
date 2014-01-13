@@ -3,5 +3,5 @@ Google Maps Engine hosts location-based data and allows you to access it in a nu
 
 Reading data requires a GET request which returns a standard HTTP response as well as other information about the map data. This is achieved using structured URLs just the same as you would enter into your browser, but works like any other request.
 
-**EXERCISE**
+**EXERCISE**  
 Enter: `alice-in-wonderland.txt` into the box below and click "Submit" and see the response!
