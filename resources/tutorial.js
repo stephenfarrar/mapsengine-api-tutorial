@@ -2,6 +2,7 @@
 //THE GLOBAL VARIABLES
 var activeLesson;
 var fadeInTime = 500;
+var pendingFiles = {};
 
 //object to store lesson information
 function Lesson(divID, options) {
@@ -25,7 +26,7 @@ function Lesson(divID, options) {
 }
 
 Lesson.prototype.update = function() {
-  //if the lesson is still unlocked, it can't be accessed
+  //if the lesson is still locked, it can't be accessed
   if (!this.unlocked) return;
   //else, the lesson can be accessed
   //scroll to top of the page
@@ -93,63 +94,46 @@ Lesson.prototype.update = function() {
 
 // Displays the instructions, possibly loading them from the markdown file.
 Lesson.prototype.displayInstructions = function() {
-  var me = this;
-  if (!this.instructions) {
-    // If the instructions aren't loaded, load them.
-    $.get("resources/"+this.divID+".txt", function(response){
-      me.instructions = response;
-      me.displayInstructions();
-    });
-    return;
+  if (this.instructions) {
+    $(".instructions").html(markdown.toHTML(this.instructions));
   }
-  $(".instructions").html(markdown.toHTML(this.instructions));
 }
 
 Lesson.prototype.showAnswer = function(){
-  var me = this;
-  if (!this.answer) {
-    // If the answers aren't loaded, load them.
-    $.get("resources/"+this.divID+"-answer.txt", function(response){
-      me.answer = response;
-      me.showAnswer();
-    });
-    return;
+  if (this.answer) {
+    //replace userAPIKey with the API Key stored in local storage
+    //change the markdown files to HTML and combined with the API Key
+    var htmlAnswer = markdown.toHTML(this.answer);
+    var htmlKey =  $("<span>").text(localStorage['APIKey']).html();
+    htmlAnswer = htmlAnswer.replace("{userAPIKey}", htmlKey);
+    //change the html of answer div
+    $(".answer").html(htmlAnswer);
+    //hide button once clicked
+    $(".show-button").hide();
+    //show the answer
+    $(".answer").fadeIn(fadeInTime);
   }
-  //replace userAPIKey with the API Key stored in local storage
-  this.answer = this.answer.replace ("{userAPIKey}", localStorage['APIKey']);
-  $(".answer").html(markdown.toHTML(this.answer));
-  //hide button once clicked
-  $(".show-button").hide();
-  //show the answer
-  $(".answer").fadeIn(fadeInTime);
 }
 
 //If the input is right, do the success responses
 Lesson.prototype.displaySuccessMessage = function() {
-  var me = this;
-  if (!this.successMessage) {
-    // If the success message aren't loaded, load them.
-    $.get("resources/"+this.divID+"-success.txt", function(response){
-      me.successMessage = response;
-      me.displaySuccessMessage();
-    });
-    return;
+  if (this.successMessage) {
+    $(".message").html(markdown.toHTML(this.successMessage));
+    //Display the success ribbon and message
+    $(".feedback").hide().fadeIn(fadeInTime).removeClass("failure").addClass("success");
+    $(".ribbon").show();
+
+    //automatically scroll to the success message
+    var successTop = $(".feedback").position().top;
+    $("html, body").animate({scrollTop:successTop-25},500);
+    //change border colour to black
+    $(".url").removeClass('redborder');
+    
+    showResponse();
+
+    //Display the next button
+    $(".next-button").hide().fadeIn(fadeInTime);
   }
-  $(".message").html(markdown.toHTML(this.successMessage));
-  //Display the success ribbon and message
-  $(".feedback").hide().fadeIn(fadeInTime).removeClass("failure").addClass("success");
-  $(".ribbon").show();
-
-  //automatically scroll to the success message
-  var successTop = $(".feedback").position().top;
-  $("html, body").animate({scrollTop:successTop-25},500);
-  //change border colour to black
-  $(".url").removeClass('redborder');
-  
-  showResponse();
-
-  //Display the next button
-  $(".next-button").hide().fadeIn(fadeInTime);
 }
 
 //If the input is wrong, do the error responses
@@ -238,6 +222,40 @@ Lesson.prototype.makeMenu = function() {
   this.$menuDiv = newDiv;
 }
 
+//load lesson markdown
+Lesson.prototype.loadInstruction = function(){
+  var me = this;
+  var filename = this.divID + ".txt";
+  pendingFiles[filename] = true;
+  $.get("resources/"+filename, function(response){
+    me.instructions = response;
+    delete pendingFiles[filename];
+    checkNoFilesPending();
+  });
+}
+//load success message markdown
+Lesson.prototype.loadSuccessMessage = function(){
+  var me = this;
+  var filename = this.divID + "-success.txt";
+  pendingFiles[filename] = true;
+  $.get("resources/"+filename, function(response){
+    me.successMessage = response;
+    delete pendingFiles[filename];
+    checkNoFilesPending();
+  });
+}
+//load the answers
+Lesson.prototype.loadAnswer = function(){
+  var me = this;
+  var filename = this.divID + "-answer.txt";
+  pendingFiles[filename] = true;
+  $.get("resources/"+filename, function(response){
+    me.answer = response;
+    delete pendingFiles[filename];
+    checkNoFilesPending();
+  });
+}
+
 //Object to store chapter information
 function Chapter(divID, options) {
   this.divID = divID;
@@ -268,14 +286,14 @@ var chapters = [
   new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
     new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, showInventory:true}),
     new Lesson("lesson4-listfeatures", {title: "List Features", submit: executeListInput, showInventory:true}),
-    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, showInventory:true}),
+    new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, showInventory:true})
   ]})
 ];
 
 //introduction and final page
 var introduction = new Lesson('introduction', {title: "Welcome!", buttonValue: "Yes, I am!"});
 var resume = new Lesson('resume', {title: "Welcome back!", buttonValue: "Resume"});
-var finish = new Lesson('finish', {title:'Congratulations!', buttonValue: "Go back to tutorial"});
+var finish = new Lesson('finish', {title:'Congratulations!'});
 
 //Determining the next, and chapter for each lesson
 var prevLesson = chapters[0].lessons[0]; //first lesson
@@ -293,16 +311,23 @@ prevLesson.next = finish;
 
 //*****************THE GLOBAL FUNCTIONS**********************//
 $(window).load(function() {
-  //create the chapter + lesson buttons
+  //load the markdown files for the introduction, resume, and finish page
+  introduction.loadInstruction();
+  resume.loadInstruction();
+  finish.loadInstruction();
+  //create the chapter + lesson buttons + load markdown files for lessons
   chapters.forEach(function(chapter){
     chapter.makeMenu();
     chapter.lessons.forEach(function(lesson){
       lesson.makeMenu();
+      //load the markdown files for each lesson
+      lesson.loadInstruction();
+      lesson.loadSuccessMessage();
+      lesson.loadAnswer();
     });
   });
 
   var $input = $(".url");
-
   //store the input everytime it changes, to the respective local storage
   //onkeypress
   $input.keypress(function(event){
@@ -332,10 +357,13 @@ $(window).load(function() {
       setTextAreaHeight();
     },0);
   });
-
-  //The first page shown is the first lesson
-  loadState();
 });
+
+function checkNoFilesPending() {
+  if (jQuery.isEmptyObject(pendingFiles)) {
+    loadState();
+  }
+}
 
 function disableOrEnableGetButton($input){
   if ($input.val() === ""){
@@ -362,18 +390,21 @@ function loadState() {
   populateInventory();
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
-      //if lesson is completed, stored as 'true'
+      //restore user completion information
       if (localStorage[lesson.divID]) {
         lesson.complete();
       }
+      //add resume point
       if (lesson.divID === activeLessonId) {
         resume.next = lesson;
       }
     });
   });
   if (activeLessonId === "introduction"){
+    //if the user has not started yet
     introduction.update();
   } else {
+    //the user has started previously
     //if the user left at the final page
     if (activeLessonId === "finish"){
       resume.next = finish;
@@ -422,8 +453,8 @@ function getText() {
 
 //*****************THE API Key FUNCTIONS**********************//
 function testAPIKey() {
-  //get user input
-  var userKey = $(".url").val();
+  //get user input & trim it
+  var userKey = trim($(".url").val());
   var me = this;
   var $data = $('.response-div');
   $data.empty();
@@ -444,7 +475,6 @@ function testAPIKey() {
 }
 
 //*****************THE Get Table FUNCTIONS**********************//
-  
 function testGetTable() {
   //get user input and trim it
   var string = $(".url").val();
@@ -467,7 +497,6 @@ function executeListInput(){
 }
 
 //*****************THE Query FUNCTIONS**********************//
-
 function executeQueries(){
   //get user input and trim it
   var string = $(".url").val();
@@ -536,7 +565,7 @@ function checkCorrectness(lesson, addressString, correctAns){
               lesson.displayErrorMessage("Check whether you've given the right values for the parameters, in particular, the \""+field+"\" field.");
             }
             else {
-              ////if it contains curly braces, ask user to remove them
+              //if it contains curly braces, ask user to remove them
               if (jQuery.inArray('{',addressString)!==-1 || jQuery.inArray('}',addressString)!==-1){
                 lesson.displayErrorMessage("Check that you've removed the curly braces({ }) surrounding the table ID in your URL.");
               } else {

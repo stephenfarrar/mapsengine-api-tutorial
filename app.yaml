@@ -12,7 +12,8 @@ handlers:
   static_dir: resources/images
 
 - url: /.*
-  script: tutorial.application
+  static_files: tutorial.html
+  upload: tutorial.html
 
 libraries:
 - name: webapp2
