@@ -234,7 +234,7 @@ Lesson.prototype.complete = function() {
  * Adding tick to the navigation menu.
  */
 Lesson.prototype.tick = function() {
-   this.tick.css('visibility', 'visible');
+   this.tickImage.css('visibility', 'visible');
 };
 
 /**
@@ -262,7 +262,7 @@ Lesson.prototype.makeMenu = function() {
       .addClass(this.elementId + 'tick tick-image')
       .attr('src', 'images/ic_check.png');
   newDiv.append(newTick);
-  this.tick = newTick;
+  this.tickImage = newTick;
   // Add text.
   var newLink = $('<a>')
       .text(this.title)
