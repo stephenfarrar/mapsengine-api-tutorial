@@ -1,263 +1,324 @@
-html, body {
-  margin: 0;
-  padding: 0;
-}
 .hidden-by-default {
   display: none;
 }
-.project-list {
-  margin: 10px;
-  padding: 8px;
-  width: 300px;
-  height: 40px;
-  background-color: #FFFFFF;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
-  -webkit-background-clip: padding-box; /* for Safari */
-  background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
-}
-.menu-area {
-  float: left;
-  padding: 0px;
-  background-color: #FFFFFF;
-}
-.menu {
-  display: block;
-  position: relative;
-  background-color: white;
-  text-align: left;
-  border: none;
-  font-family: Arial;
-  margin-bottom: 15px;
-}
-.menu.documentation-link{
-  border-top: 1px solid #EBEBEB;
-  height: 24px;
-  margin-left: 20px;
-  font-size: 14px;
-  padding-top: 16px;
-}
-.link{
+
+/* Link */
+a:link {
   color: #1155CC;
-}
-.link:active{
-  color: #DD4B39;
-}
-.no-underline{
   text-decoration: none;
 }
-.chapter {
-  height: 24px;
-  margin-left: 20px;
-  font-size: 14px;
-  font-weight: bold;
+
+a:visited {
+  color: #6611CC;
 }
-.lesson-link {
-  display: inline-block;
-  margin-left: 18px;
-  height: 24px;
-  font-size: 14px;
-  vertical-align: baseline;
+
+a:hover {
+  cursor: pointer;
+  text-decoration: underline;
 }
-.tick-image {
-  margin-left: 28px;
-  display: inline-block;
-  height: 20px;
-  visibility: hidden;
-  vertical-align: top;
-}
-/*define the colours for the left-menu text*/
-.locked{
-  color: #CCCCCC;
-}
-.unlocked{
-  color: #000000;
-}
-.active{
+
+a:active {
   color: #DD4B39;
 }
-.content{
+
+/* HTML Content  */
+.content {
   margin-bottom: 20px;
 }
-.lesson{
+
+/* Navigation  */
+.menu-area {
+  background-color: #FFFFFF;
+  float: left;
+  padding: 0px;
+}
+
+.menu {
+  background-color: white;
+  border: none;
   display: block;
-  margin: 10px;
-  margin-left:300px;
-  width: 650px;
-  line-height: 1.5;
+  font-family: Arial;
+  margin-bottom: 15px;
+  position: relative;
+  text-align: left;
 }
-.instructions{
-  display: block;
-  height:auto;
-  word-wrap: break-word;
-  font-family: arial;
-  font-size: 13px;
-  margin-top: 20px;
+
+.menu.documentation-link {
+  border-top: 1px solid #EBEBEB;
+  font-size: 14px;
+  height: 24px;
+  margin-left: 20px;
+  padding-top: 16px;
 }
-code{
-  font-family: monospace;
-  background: #F8F8F8;
-  padding: 2px;
-  border: 1px solid #C6C6C6;
-  border-radius:4px;
+
+.chapter {
+  font-size: 14px;
+  font-weight: bold;
+  height: 24px;
+  margin-left: 20px;
 }
-.inventory{
-  margin-top:10px;
-}
-.butter-bar {
-  padding: 10px;
-  background-color: #F9EDBE;
-  color: black;
-  word-wrap: break-word;
-  border: 1px solid #FBCB43;
-  font-size: 12px;
-  font-family:arial;
-  box-shadow: 4px 4px 8px #CCC;
-}
-.url{
+
+.lesson-link {
   display: inline-block;
-  width: 555px;
-  min-height:21px;
-  height: auto;
-  word-wrap: break-word;
-  font-size: 13px;
-  font-family: monospace;
-  resize: none;
-  -moz-box-shadow: 4px 4px 8px #CCC;
-  -webkit-box-shadow: 4px 4px 8px #CCC;
-  box-shadow: 4px 4px 8px #CCC;
-  background-color:white;
-  border: 1px solid black;
-  color: black;
-  overflow-y:hidden;
-  margin-top:20px;
-  line-height: 1.5;
+  font-size: 14px;
+  height: 24px;
+  margin-left: 18px;
+  vertical-align: baseline;
 }
-.url.redborder {
-  border-color: #DD4B39;
+
+.tick-image {
+  display: inline-block;
+  height: 20px;
+  margin-left: 28px;
+  vertical-align: top;
+  visibility: hidden;
 }
-.hidden-url-div{
-  display:none;
-  width: 555px;
-  min-height:21px;
-  height: auto;
-  word-wrap: break-word;
-  font-size: 13px;
-  font-family: monospace;
-  resize: none;
-  overflow-y:hidden;
-  line-height: 1.5;
-  white-space: pre;
+
+/* Navigation Colour */
+.locked {
+  color: #CCCCCC;
 }
-.pointer:hover{
+
+.unlocked {
+  color: #000000;
+}
+
+.active {
+  color: #DD4B39;
+}
+
+/* Buttons */
+.pointer:hover {
   cursor: pointer;
 }
-.kennedy-button{
-  margin-top:10px;
-  min-width: 80px;
-  height: 27px;
-  font-size: 11px;
+
+.kennedy-button {
+  border-radius: 2px;
   font-family: arial;
   font-weight: bold;
-  border-radius: 2px;
+  font-size: 11px;
+  height: 27px;
+  margin-top: 10px;
+  min-width: 80px;
 }
-.get-button{
-  float: right;
+
+.get-button {
   display: inline;
-  margin-top: 20px;
+  float: right;
   margin-right: 0px;
+  margin-top: 20px;
 }
-.blue-button{
-  background-color:#4d90fe;
+
+.blue-button {
+  background-color: #4d90fe;
   border: 1px solid #3079ed;
   color: white;
 }
-.green-button{
+
+.green-button {
   background-color: #3d9400;
   border: 1px solid #29691d;
   color: white;
 }
-.gray-button{
-  background-color:#F8F8F8;
+
+.gray-button {
+  background-color: #F8F8F8;
   border: 1px solid #C6C6C6;
   color: black;
 }
+
 .show-button {
   margin-top: 20px;
 }
-.kennedy-button:disabled{
+
+.kennedy-button:disabled {
   opacity: 0.5;
 }
-.right-aligned{
-  margin-left:568px;
+
+.right-aligned {
+  margin-left: 568px;
 }
-.success{
-  color:black;
-}
-.failure{
-  color:#DD4B39;
-}
-.ribbon{
-  background-color: #3D9400;
-  color: black;
-  word-wrap: break-word;
-  font-size: 13px;
-  font-family:arial; 
-  padding: 10px;
-  font-weight:bold;
-  color:white;
-  border-radius:2px;
-  margin-top:40px;
-}
-.message{
-  display:block;
-  margin-top:10px;
-  height:auto;
-  font-family:arial;
-  font-size:13px;
-}
-.answer{
-  margin-top: 20px;
+
+/* Lesson  */
+.lesson {
   display: block;
+  line-height: 1.5;
+  margin: 10px;
+  margin-left: 300px;
+  width: 650px;
+}
+
+/* Instruction Area  */
+.instructions {
+  display: block;
+  font-family: arial;
+  font-size: 13px;
+  height: auto;
+  margin-top: 20px;
   word-wrap: break-word;
 }
-.answer p{
-  margin: 0px;
+
+/* `Code` In Markdown */
+code {
+  background: #F8F8F8;
+  border: 1px solid #C6C6C6;
+  border-radius: 4px;
+  font-family: monospace;
+  padding: 2px;
 }
-.response{
+
+/* Inventory Area*/
+.inventory {
+  margin-top: 10px;
+}
+
+.butter-bar {
+  background-color: #F9EDBE;
+  border: 1px solid #FBCB43;
+  box-shadow: 4px 4px 8px #CCC;
   -moz-box-shadow: 4px 4px 8px #CCC;
   -webkit-box-shadow: 4px 4px 8px #CCC;
-  box-shadow: 4px 4px 8px #CCC;
-  border: 1px solid #999999;
-  margin-top:20px;
-}
-.response-header{
-  padding:3px;
-  padding-left:10px;
-  background-color: #CCCCCC;
   color: black;
-  font-size: 13px;
   font-family: arial;
-  font-weight:bold;
-  border-bottom: 1px solid #999999;
+  font-size: 12px;
+  padding: 10px;
+  word-wrap: break-word;
 }
-.response-div{
-  padding:10px;
+
+/* Answer */
+.answer {
+  display: block;
+  margin-top: 20px;
+  word-wrap: break-word;
+}
+
+.answer p {
+  margin: 0px;
+}
+
+/* URL input */
+.url {
+  background-color: white;
+  border: 1px solid black;
+  box-shadow: 4px 4px 8px #CCC;
+  -moz-box-shadow: 4px 4px 8px #CCC;
+  -webkit-box-shadow: 4px 4px 8px #CCC;
+  color: black;
+  display: inline-block;
+  font-family: monospace;
+  font-size: 13px;
+  height: auto;
+  line-height: 1.5;
+  margin-top: 20px;
+  min-height: 21px;
+  overflow-y: hidden;
+  resize: none;
+  width: 555px;
+  word-wrap: break-word;
+}
+
+.url.redborder {
+  border-color: #DD4B39;
+}
+
+.hidden-url-div {
+  display: none;
+  font-family: monospace;
+  font-size: 13px;
+  height: auto;
+  line-height: 1.5;
+  min-height: 21px;
+  overflow-y: hidden;
+  resize: none;
+  white-space: pre;
+  width: 555px;
+  word-wrap: break-word;
+}
+
+/* Project List Dropdown */
+.project-list {
+  background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+  background-color: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  height: 40px;
+  margin: 10px;
+  padding: 8px;
+  -webkit-background-clip: padding-box; /* for Safari */
+  width: 300px;
+}
+
+/* Success Ribbon */
+.ribbon {
+  background-color: #3D9400;
+  border-radius: 2px;
+  color: white;
+  font-family: arial;
+  font-size: 13px;
+  font-weight: bold;
+  margin-top: 40px;
+  padding: 10px;
+  word-wrap: break-word;
+}
+
+/* Success/Failure Message */
+.success {
+  color: black;
+}
+
+.failure {
+  color: #DD4B39;
+}
+
+.message {
+  display: block;
+  font-family: arial;
+  font-size: 13px;
+  height: auto;
+  margin-top: 10px;
+}
+
+/* Output area */
+.response {
+  border: 1px solid #999999;
+  box-shadow: 4px 4px 8px #CCC;
+  -moz-box-shadow: 4px 4px 8px #CCC;
+  -webkit-box-shadow: 4px 4px 8px #CCC;
+  margin-top: 20px;
+}
+
+.response-header {
+  background-color: #CCCCCC;
+  border-bottom: 1px solid #999999;
+  color: black;
+  font-family: arial;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 3px;
+  padding-left: 10px;
+}
+
+.response-div {
   background-color: white;
   color: black;
-  word-wrap: break-word;
-  font-size: 13px;
   font-family: monospace;
+  font-size: 13px;
+  height: 300px;
+  overflow-y: auto;
+  padding: 10px;
   white-space: pre;
-  height: 300px;
-  overflow-y:auto;
+  word-wrap: break-word;
 }
-img[alt=introduction-cat-image], img[alt=finish-cat-image]{
-  display:block;
+
+/* Cat images */
+img[alt=introduction-cat-image], img[alt=finish-cat-image] {
+  display: block;
   height: 300px;
-  margin-top:20px;
-  margin-bottom:20px;
+  margin-bottom: 20px;
+  margin-top: 20px;
 }
+
+/*  of elements on focus */
 *:focus {
-    outline: 0;
+  outline: 0;
 }
