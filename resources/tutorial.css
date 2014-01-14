@@ -230,7 +230,7 @@ code {
   min-height: 21px;
   overflow-y: hidden;
   resize: none;
-  white-space: pre;
+  white-space: pre-wrap;
   width: 555px;
   word-wrap: break-word;
 }
