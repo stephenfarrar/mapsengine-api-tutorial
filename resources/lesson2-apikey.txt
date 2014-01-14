@@ -5,7 +5,7 @@ Before you can get started you will need an API key. The Google Maps Engine API 
 2. Once you have signed up, go to the [Google Developers' Console](https://cloud.google.com/console#/flows/enableapi?apiid=mapsengine) and sign in.  
 3. Select 'Create a new project' from the dropdown list and click 'Continue'.  
 4. Next, under Public API access, click the 'Create New Key' button to make your API key. Make sure you select 'Browser key' from the options then click 'Create'.  
-5. You should now see your API key.
+5. You should now see your API key, a long string similar to this: A9IaS9A7Rm1b9IsfSfFA_7RVpCo3_LMk7P2hlXX.
 
 **EXERCISE**  
 Copy your API Key and paste it in the box below.
