@@ -1,8 +1,4 @@
 // Javascript file for tutorial.
-// The global variables.
-var activeLesson;
-var fadeInTime = 500;
-var pendingFiles = {};
 
 /**
  * Create object to store lesson information.
@@ -153,7 +149,7 @@ Lesson.prototype.displaySuccessMessage = function() {
     $('.ribbon').show();
     // Automatically scroll to the success message.
     var successTop = $('.feedback').position().top;
-    $('html, body').animate({scrollTop: successTop - 25}, 500);
+    $('body').animate({scrollTop: successTop - 25}, 500);
     // Change border colour to black.
     $('.url').removeClass('alert');
     // Show the output if there is any.
@@ -192,7 +188,7 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   }
   // Automatically scroll to the error message.
   var errorTop = $('.feedback').position().top;
-  $('html, body').animate({scrollTop: errorTop - 225}, 500);
+  $('body').animate({scrollTop: errorTop - 225}, 500);
   // Change border colour to red.
   $('.url').addClass('alert');
   // Show the output if there is any.
@@ -234,7 +230,7 @@ Lesson.prototype.complete = function() {
  * Adding tick to the navigation menu.
  */
 Lesson.prototype.tick = function() {
-   this.$tick.css('visibility', 'visible');
+   this.tick.css('visibility', 'visible');
 };
 
 /**
@@ -262,7 +258,7 @@ Lesson.prototype.makeMenu = function() {
       .addClass(this.elementId + 'tick tick-image')
       .attr('src', 'images/ic_check.png');
   newDiv.append(newTick);
-  this.$tick = newTick;
+  this.tick = newTick;
   // Add text.
   var newLink = $('<a>')
       .text(this.title)
@@ -345,6 +341,11 @@ Chapter.prototype.makeMenu = function() {
   this.menuElement = newHeader;
   menu.append(newHeader);
 };
+
+// The global variables.
+var activeLesson;
+var fadeInTime = 500;
+var pendingFiles = {};
 
 // Array of chapters, with the corresponding lessons.
 var chapters = [
@@ -551,18 +552,11 @@ function loadState() {
 }
 
 /**
- * Trim the white spaces in the user input.
- */
-function trim(string) {
-  return string.replace(/^\s+|\s+$/g, '');
-}
-
-/**
  * Updating the inventory box.
  */
 function populateInventory() {
-  var $inventory = $('.inventory');
-  $inventory.empty()
+  var inventory = $('.inventory');
+  inventory.empty()
       .append('<b>Helpful information</b><br>')
       .append('table ID: 15474835347274181123-14495543923251622067<br>')
       .append('your API Key: ')
@@ -575,15 +569,15 @@ function populateInventory() {
 function getText() {
   var string = $('.url').val();
   // The .txt file must exist in a directory and be referenced this way.
-  var address = 'resources/' + trim(string);
-  var $data = $('.response-content');
-  $data.empty();
+  var address = 'resources/' + $.trim(string);
+  var data = $('.response-content');
+  data.empty();
   var me = this;
   $.ajax({
     url: address,
     dataType: 'text',
     success: function(resource) {
-      $data.text(resource);
+      data.text(resource);
       me.displaySuccessMessage();
       me.complete();
     },
@@ -599,10 +593,10 @@ function getText() {
  */
 function testAPIKey() {
   // Get user input & trim it.
-  var userKey = trim($('.url').val());
+  var userKey = $.trim($('.url').val());
   var me = this;
-  var $data = $('.response-content');
-  $data.empty();
+  var data = $('.response-content');
+  data.empty();
   // Use user's API Key to do a HTTP request.
   // If it works then it is a valid API Key.
   $.ajax({
@@ -629,7 +623,7 @@ function testAPIKey() {
 function testGetTable() {
   // Get user input and trim it.
   var string = $('.url').val();
-  var address = trim(string);
+  var address = $.trim(string);
   var correctAns = 'https://www.googleapis.com/mapsengine/v1/tables/' + 
       '15474835347274181123-14495543923251622067?' +
       'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38';
@@ -646,7 +640,7 @@ function testGetTable() {
 function executeListInput() {
   // Get user input and trim it.
   var string = $('.url').val();
-  var address = trim(string);
+  var address = $.trim(string);
   var correctAns = 'https://www.googleapis.com/mapsengine/v1/tables/' +
       '15474835347274181123-14495543923251622067/features?' +
       'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38';
@@ -659,7 +653,7 @@ function executeListInput() {
 function executeQueries() {
   // Get user input and trim it.
   var string = $('.url').val();
-  var address = trim(string);
+  var address = $.trim(string);
   var correctAns = 'https://www.googleapis.com/mapsengine/v1/tables/' +
       '15474835347274181123-14495543923251622067/features?' +
       'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38&' +
@@ -671,9 +665,9 @@ function executeQueries() {
  * Checking the correctness of user's input using the GME API.
  */
 function checkCorrectness(lesson, addressString, correctAns) {
-  var $data = $('.response-content');
+  var data = $('.response-content');
   // Empty the output area.
-  $data.empty();
+  data.empty();
   // Get the response with the correct URL.
   $.ajax({
     url: correctAns,
@@ -686,7 +680,7 @@ function checkCorrectness(lesson, addressString, correctAns) {
         dataType: 'json',
         success: function(resource2) {
           var resourceString = JSON.stringify(resource2, null, 2);
-          $data.text(resourceString);
+          data.text(resourceString);
           // If the response is the correct response, then the user is right.
           if (resourceString == correctResourceString) {
             lesson.displaySuccessMessage();
@@ -705,7 +699,7 @@ function checkCorrectness(lesson, addressString, correctAns) {
             errorMess = response.error.errors[0];
             // Append the response to the output area.
             var responseString = JSON.stringify(errorMess, null, 2);
-            $data.text(responseString); 
+            data.text(responseString); 
           } catch (e) {
             errorMess = 'notJSONObject';
           }
@@ -750,7 +744,7 @@ function checkCorrectness(lesson, addressString, correctAns) {
                     'invalid. Check whether you have given the right table ' +
                     'ID and make sure that the table has been made public. ' +
                     'To make your table public, you can follow the ' +
-                    'instructions in <a href = ' +
+                    'instructions in <a href=' +
                     '\"//support.google.com/mapsengine/answer/3164737?hl=en\"' +
                     '>this link</a>.');
               }
