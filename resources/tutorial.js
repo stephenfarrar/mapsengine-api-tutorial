@@ -324,13 +324,13 @@ var chapters = [
         $('.v2-button').attr('value', 'Select').show();
         setInterval(function() {
           gapi.client.request({
-            path: "/mapsengine/v1/projects/",
-            method: "GET",
+            path: '/mapsengine/v1/projects/',
+            method: 'GET',
             callback: function(jsonBody) {
               var $list = $('.project-list')
               $list.empty();
               jsonBody.projects.forEach(function(project) {
-                var listItem = $("<option>").attr('value', project.id)
+                var listItem = $('<option>').attr('value', project.id)
                                             .text(project.name);
                 $list.append(listItem);
               });
@@ -432,12 +432,6 @@ $(window).load(function() {
       setTextAreaHeight();
     },0);
   });
-  // Loads the Google+ API.
-  var po = document.createElement('script');
-  po.type = 'text/javascript'; po.async = true;
-  po.src = 'https://apis.google.com/js/client:plusone.js?onload=render';
-  var s = document.getElementsByTagName('script')[0];
-  s.parentNode.insertBefore(po, s);
 
   //set up analytics to indicate how many times users go to the documentation page using the final page button
   $('.documentation-button').on('click', function() {
