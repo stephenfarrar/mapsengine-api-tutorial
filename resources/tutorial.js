@@ -1,4 +1,8 @@
 // Javascript file for tutorial.
+// The global variables.
+var activeLesson;
+var fadeInTime = 500;
+var pendingFiles = {};
 
 /**
  * Create object to store lesson information.
@@ -341,11 +345,6 @@ Chapter.prototype.makeMenu = function() {
   this.menuElement = newHeader;
   menu.append(newHeader);
 };
-
-// The global variables.
-var activeLesson;
-var fadeInTime = 500;
-var pendingFiles = {};
 
 // Array of chapters, with the corresponding lessons.
 var chapters = [
