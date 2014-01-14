@@ -480,7 +480,7 @@ function populateInventory(){
 function getText() {
   var string = $(".url").val();
   //the .txt file must exist in a directory and be referenced this way
-  var address = "resources/" + trim(string);
+  var address = trim(string);
   var $data = $('.response-div');
   $data.empty();
   var me = this;
