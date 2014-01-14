@@ -80,6 +80,11 @@ Lesson.prototype.update = function() {
     //if the input is empty, user should not be allowed to submit
     disableOrEnableGetButton($(".url"));
   }
+  //set up analytics for the page visited by the user (number of times the page visited)
+  ga('send', {
+    'hitType': 'pageview',
+    'page': this.divID
+  });
 }
 
 // Displays the instructions, possibly loading them from the markdown file.
@@ -102,6 +107,13 @@ Lesson.prototype.showAnswer = function(){
     $(".show-button").hide();
     //show the answer
     $(".answer").fadeIn(fadeInTime);
+    //set up analytics for show answer button (how many times users click it)
+    ga('send', {
+       'hitType': 'event',
+       'eventCategory': 'help',
+       'eventAction': 'show answer',
+       'eventLabel': this.divID,
+    });
   }
 }
 
@@ -123,6 +135,14 @@ Lesson.prototype.displaySuccessMessage = function() {
 
     //Display the next button
     $(".next-button").hide().fadeIn(fadeInTime);
+
+    //set up analytics to indicate success (how many times)
+    ga('send', {
+       'hitType': 'event',
+       'eventCategory': 'submit',
+       'eventAction': 'success',
+       'eventLabel': this.divID,
+    });
   }
 }
 
@@ -155,6 +175,14 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
 
   //Hide the next button
   $(".next-button").hide();
+
+  //Set up analytics to indicate failure (how many times)
+  ga('send', {
+     'hitType': 'event',
+     'eventCategory': 'submit',
+     'eventAction': 'failure',
+     'eventLabel': this.divID,
+  });
 }
 
 function showResponse(){
@@ -381,11 +409,25 @@ $(window).load(function() {
       setTextAreaHeight();
     },0);
   });
-  var po = document.createElement('script');
-  po.type = 'text/javascript'; po.async = true;
-  po.src = 'https://apis.google.com/js/client:plusone.js?onload=render';
-  var s = document.getElementsByTagName('script')[0];
-  s.parentNode.insertBefore(po, s);
+
+  //set up analytics to indicate how many times users go to the documentation page using the final page button
+  $('.documentation-button').on('click', function() {
+    ga('send', {
+      'hitType': 'event',
+      'eventCategory': 'readTheDocs',
+      'eventAction': 'finalPageButton',
+    });
+  });
+
+  //set up analytics to indicate how many times users go to the documentation page while visiting a specific lesson
+  $('.documentation-link').on('click', function() {
+    ga('send', {
+      'hitType': 'event',
+      'eventCategory': 'readTheDocs',
+      'eventAction': 'navigationMenu',
+      'eventLabel': activeLesson.divID,
+    });
+  });
 });
 
 function checkNoFilesPending() {
@@ -598,7 +640,7 @@ function checkCorrectness(lesson, addressString, correctAns){
               if (jQuery.inArray('{',addressString)!==-1 || jQuery.inArray('}',addressString)!==-1){
                 lesson.displayErrorMessage("Check that you've removed the curly braces({ }) surrounding the table ID in your URL.");
               } else {
-                lesson.displayErrorMessage("The table ID used in the URL is invalid. Check whether you've given the right table ID and make sure that the table has been made public. To make your table public, you can follow the instructions in <a href = \"https:\/\/support.google.com/mapsengine/answer/3164737?hl=en\" target=\"_blank\" class='link pointer no-underline'>this link</a>.");
+                lesson.displayErrorMessage("The table ID used in the URL is invalid. Check whether you've given the right table ID and make sure that the table has been made public. To make your table public, you can follow the instructions in <a href = \"https:\/\/support.google.com/mapsengine/answer/3164737?hl=en\">this link</a>.");
               }
             }
           } else if (errorMess.reason === "required"){
