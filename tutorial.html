@@ -32,17 +32,21 @@
         <div class = 'hidden-url-div'></div>
         <input type="button" value="Get" class="kennedy-button blue-button get-button pointer" onclick = 'activeLesson.submit()'/>
       </div>
+      <!--OTHER BUTTONS/LINKS-->
+      <form class = 'project-menu hidden-by-default'>
+        <select class = 'project-list'>
+        </select>
+      </form>
+      <input type = 'button' class = 'kennedy-button blue-button login-button pointer hidden-by-default' value = "Sign In" onclick = 'activeLesson.submit()'/>
+      <a href = "https://developers.google.com/maps-engine" target = "_blank"> 
+        <input type = 'button' class = 'kennedy-button blue-button documentation-button pointer hidden-by-default' value = "Go to Documentation Page">
+      </a>
       <!--FEEDBACK-->
       <div class = "feedback hidden-by-default">
         <div class = "ribbon">Great work!</div>
         <div class = "message"></div>
       </div>
-      <!--OTHER BUTTONS/LINKS-->
       <input type = 'button' class = 'kennedy-button green-button next-button pointer hidden-by-default' onclick = 'activeLesson.next.update()'>
-      <input type = 'button' class = 'kennedy-button blue-button login-button pointer hidden-by-default' value = "Sign In" onclick = 'activeLesson.submit()'/>
-      <a href = "https://developers.google.com/maps-engine" target = "_blank"> 
-        <input type = 'button' class = 'kennedy-button blue-button documentation-button pointer hidden-by-default' value = "Go to Documentation Page">
-      </a>
       <!--RESPONSE-->
       <div class = 'response hidden-by-default'>
         <div class = 'response-header'>Response</div>

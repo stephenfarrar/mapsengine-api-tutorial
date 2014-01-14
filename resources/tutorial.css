@@ -5,6 +5,17 @@ html, body {
 .hidden-by-default {
   display: none;
 }
+.project-list {
+  margin: 10px;
+  padding: 8px;
+  width: 300px;
+  height: 40px;
+  background-color: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  -webkit-background-clip: padding-box; /* for Safari */
+  background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+}
 .menu-area {
   float: left;
   padding: 0px;
@@ -156,6 +167,7 @@ code{
   margin-top: 20px;
   margin-right: 0px;
 }
+
 .blue-button{
   background-color:#4d90fe;
   border: 1px solid #3079ed;

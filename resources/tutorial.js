@@ -17,6 +17,9 @@ function Lesson(divID, options) {
     //it is an intro/final page
     this.hasSubmit = false;
   }
+  if (options.update) {
+    this.update = options.update;
+  }
   //done is TRUE if: the user has submitted correctly
   this.done = false;
   this.unlocked = false;
@@ -90,7 +93,7 @@ Lesson.prototype.update = function() {
     disableOrEnableGetButton($(".url"));
     if (this.divID === 'lesson6-login') {
       $('.request').hide();
-      $('.login-button').show();
+      $('.login-button').attr('value', 'Sign In').show();
     }
   }
 }
@@ -292,8 +295,31 @@ var chapters = [
     new Lesson("lesson5-queries", {title: "Queries", submit: executeQueries, showInventory:true})
   ]}),
   new Chapter('chapter2-authorization', {title: 'Authorization', lessons: [
-    new Lesson('lesson6-login', {title: 'Login and Authorization', submit: authorizeUser, showInventory:false})
-  ]})
+    new Lesson('lesson6-login', {title: 'Login and Authorization', submit: authorizeUser, showInventory:false}),
+    new Lesson('lesson7-project', {title: 'Create a Free Project', submit: storeProjectID, showInventory:false,
+      update: function() {
+        Lesson.prototype.update.call(this);
+        $('.request').hide();
+        $('.project-menu').show();
+        $('.login-button').attr('value', 'Select').show();
+        setInterval(function() {
+          gapi.client.request({
+            path: "/mapsengine/v1/projects/",
+            method: "GET",
+            callback: function(jsonBody) {
+              var $list = $('.project-list')
+              $list.empty();
+              jsonBody.projects.forEach(function(project) {
+                var listItem = $("<option>").attr('value', project.id)
+                                            .text(project.name);
+                $list.append(listItem);
+              });
+            }
+          });
+        }, 5000); //5 seconds
+      }
+    })
+  ]}),
 ];
 
 //introduction and final page
@@ -624,4 +650,16 @@ function authorizeUser() {
       }
     }
   });
+}
+
+function storeProjectID() {
+  var me = this;
+  var projectID = $('.project-list').val();
+  if (projectID) {
+    localStorage['projectID'] = projectID;
+    me.complete();
+    me.displaySuccessMessage();
+  } else {
+    me.displayErrorMessage('You need to select a project from the dropdown list. It may take a few seconds for new projects to appear.')
+  }
 }
