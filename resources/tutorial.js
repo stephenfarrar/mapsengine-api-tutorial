@@ -96,7 +96,7 @@ Lesson.prototype.update = function() {
     $('.url').val(storedUrl || '');
     setTextAreaHeight();
     // If the input is empty, user should not be allowed to submit.
-    toggleGetButton($('.url'));
+    toggleSubmitButton($('.url'));
   }
   // Set up analytics for the page visited by the user (number of times the page
   // is visited).
@@ -432,7 +432,7 @@ $(window).load(function() {
   var input = $('.url');
   // Input might change on keypress.
   input.keypress(function(event) {
-    toggleGetButton(input);
+    toggleSubmitButton(input);
     // Enable submit by enter, not making the enter visible in the input.
     if (event.which == 13) {
       event.preventDefault();
@@ -446,14 +446,14 @@ $(window).load(function() {
   });
   // Input might change on keyup (handle backspace).
   input.keyup(function() {
-    toggleGetButton(input);
+    toggleSubmitButton(input);
     localStorage[activeLesson.elementId+'input'] = input.val();
     setTextAreaHeight();
   });
   // Input might change on cut/paste act.
   input.on('paste cut',function() {
     setTimeout(function() {
-      toggleGetButton(input);
+      toggleSubmitButton(input);
       localStorage[activeLesson.elementId+'input'] = input.val();
       setTextAreaHeight();
     }, 0);
