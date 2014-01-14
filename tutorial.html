@@ -1,62 +1,49 @@
 <!--HTML file for tutorial-->
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Introduction</title>
-  <link href="resources/tutorial.css" rel="stylesheet" type="text/css" />
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
-  <script src="resources/markdown.js"></script>
-  <script type="text/javascript" src="resources/tutorial.js"></script>
-  <base target="_blank">
-  <script>
-    (function(i,s,o,g,r,a,m){
-      i['GoogleAnalyticsObject']=r;
-      i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)
-      },
-      i[r].l=1*new Date();
-      a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];
-      a.async=1;
-      a.src=g;
-      m.parentNode.insertBefore(a,m)
-    })
-    (window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-47071139-1', 'mapsengine-api-tutorial.appspot.com');
-  </script>
-</head>
-<body>
-  <div class = 'content'>
-    <div class = 'menu-area hidden-by-default'>
-      <div class = "lesson-menu"></div>
-      <a href = "https://developers.google.com/maps-engine" target = "_blank" class = "no-underline pointer">
-        <div class = "documentation-link menu link">GME API Documentation</div>
-      </a>
-    </div>
-    <div class = 'lesson'>
-      <div class = 'instructions'></div>
-      <div class = "inventory butter-bar hidden-by-default"></div>
-      <div class = 'request hidden-by-default'>
-        <input type = "button" class = 'kennedy-button gray-button show-button right-aligned pointer invisible-by-default' value = 'Show Answer' onclick = 'activeLesson.showAnswer()'>
-        <div class = "answer butter-bar hidden-by-default"></div>
-        <textarea class = 'url' placeholder="Enter your input here, press enter or click 'Get' to submit."></textarea>
-        <div class = 'hidden-url-div'></div>
-        <input type="button" value="Get" class="kennedy-button blue-button get-button pointer" onclick = 'activeLesson.submit()'/>
+  <head>
+    <title>Introduction</title>
+    <link rel="stylesheet" href="resources/tutorial.css"/>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="resources/markdown.js"></script>
+    <script src="resources/tutorial.js"></script>
+    <base target="_blank">
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-47071139-1', 'mapsengine-api-tutorial.appspot.com');
+    </script>
+  </head>
+  <body>
+    <div class="content">
+      <div class="menu-area hidden-by-default">
+        <div class="lesson-menu"></div>
+        <div class="documentation-link menu">
+          <a href="https://developers.google.com/maps-engine">GME API Documentation</a>
+        </div>
       </div>
-      <div class = "feedback hidden-by-default">
-        <div class = "ribbon">Great work!</div>
-        <div class = "message"></div>
-      </div>
-      <a href = "https://developers.google.com/maps-engine" target = "_blank"> 
-        <input type = 'button' class = 'kennedy-button blue-button documentation-button pointer hidden-by-default' value = "Go to Documentation Page">
-      </a>
-      <input type = 'button' class = 'kennedy-button green-button next-button pointer hidden-by-default' onclick = 'activeLesson.next.update()'>
-      <div class = 'response hidden-by-default'>
-        <div class = 'response-header'>Response</div>
-        <div class = 'response-div'></div>
+      <div class="lesson">
+        <div class="instructions"></div>
+        <div class="inventory butter-bar hidden-by-default"></div>
+        <div class="request hidden-by-default">
+          <input type="button" class="kennedy-button gray-button show-button right-aligned pointer invisible-by-default" value="Show Answer" onclick="activeLesson.showAnswer()">
+          <div class="answer butter-bar hidden-by-default"></div>
+          <textarea class="url" placeholder="Enter your input here, press enter or click 'Get' to submit."></textarea>
+          <div class="hidden-url-div"></div>
+          <input type="button" value="Get" class="kennedy-button blue-button get-button pointer" onclick="activeLesson.submit()"/>
+        </div>
+        <div class="feedback hidden-by-default">
+          <div class="ribbon">Great work!</div>
+          <div class="message"></div>
+        </div>
+        <a href="https://developers.google.com/maps-engine"> 
+          <input type="button" class="kennedy-button blue-button documentation-button pointer hidden-by-default" value="Go to Documentation Page">
+        </a>
+        <input type="button" class="kennedy-button green-button next-button pointer hidden-by-default" onclick="activeLesson.next.update()">
+        <div class="response hidden-by-default">
+          <div class="response-header">Response</div>
+          <div class="response-div"></div>
+        </div>
       </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>
