@@ -1,0 +1,1 @@
+You now have your own private project which has a unique projectID. Using this ID, you can add tables of data to this project. Click 'Next Lesson' to find out how!

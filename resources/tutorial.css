@@ -235,6 +235,19 @@ code {
   word-wrap: break-word;
 }
 
+/* Project List Dropdown */
+.project-list {
+  background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+  background-color: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  height: 40px;
+  margin: 10px;
+  padding: 8px;
+  -webkit-background-clip: padding-box; /* for Safari */
+  width: 300px;
+}
+
 /* Success Ribbon */
 .ribbon {
   background-color: #3D9400;

@@ -312,8 +312,31 @@ var chapters = [
       submit: authorizeUser,
       update: function() {
         Lesson.prototype.update.call(this);
+        $('.v2-button').attr('value', 'Sign In').show();
         $('.request').hide();
-        $('.login-button').show();
+      }
+    }),
+    new Lesson('lesson7-project', {title: 'Create a Free Project', submit: storeProjectID,
+      update: function() {
+        Lesson.prototype.update.call(this);
+        $('.request').hide();
+        $('.project-menu').show();
+        $('.v2-button').attr('value', 'Select').show();
+        setInterval(function() {
+          gapi.client.request({
+            path: '/mapsengine/v1/projects/',
+            method: 'GET',
+            callback: function(jsonBody) {
+              var $list = $('.project-list')
+              $list.empty();
+              jsonBody.projects.forEach(function(project) {
+                var listItem = $('<option>').attr('value', project.id)
+                                            .text(project.name);
+                $list.append(listItem);
+              });
+            }
+          });
+        }, 5000); //5 seconds
       }
     })
   ]})
@@ -676,7 +699,7 @@ function authorizeUser() {
   gapi.auth.signIn({
     'callback': function(authResult) {
       if (authResult['status']['signed_in']) {
-        $('.login-button').hide();
+        $('.v2-button').hide();
         me.displaySuccessMessage();
         me.complete();
       } else {
@@ -685,3 +708,15 @@ function authorizeUser() {
     }
   });
 }
+
+function storeProjectID() {
+  var me = this;
+  var projectID = $('.project-list').val();
+  if (projectID) {
+    localStorage['projectID'] = projectID;
+    me.complete();
+    me.displaySuccessMessage();
+  } else {
+    me.displayErrorMessage('You need to select a project from the dropdown list. It may take a few seconds for new projects to appear.')
+  }
+} 

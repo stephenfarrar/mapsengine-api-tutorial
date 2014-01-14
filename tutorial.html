@@ -8,6 +8,7 @@
     <meta name="google-signin-cookiepolicy" content="single_host_origin" />
     <link href="resources/tutorial.css" rel="stylesheet" type="text/css" />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://apis.google.com/js/client:plusone.js?onload=render" type="text/javascript" async="true"></script>
     <script src="resources/markdown.js"></script>
     <script src="resources/tutorial.js"></script>
     <base target="_blank">
@@ -37,6 +38,11 @@
           <div class="hidden-url-div"></div>
           <input type="button" value="Get" class="kennedy-button blue-button get-button pointer" onclick="activeLesson.submit()"/>
         </div>
+        <form class="project-menu hidden-by-default">
+          <select class="project-list">
+          </select>
+        </form>
+        <input type="button" class="kennedy-button blue-button v2-button pointer hidden-by-default" value="Sign In" onclick="activeLesson.submit()"/>
         <!--FEEDBACK-->
         <div class="feedback hidden-by-default">
           <div class="ribbon">Great work!</div>
@@ -44,7 +50,6 @@
         </div>
         <!--OTHER BUTTONS/LINKS-->
         <input type="button" class="kennedy-button green-button next-button pointer hidden-by-default" onclick="activeLesson.next.update()">
-        <input type="button" class="kennedy-button blue-button login-button pointer hidden-by-default" value="Sign In" onclick="activeLesson.submit()"/>
         <a href="https://developers.google.com/maps-engine"> 
           <input type="button" class="kennedy-button blue-button documentation-button pointer hidden-by-default" value="Go to Documentation Page">
         </a>
