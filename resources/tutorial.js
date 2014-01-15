@@ -566,9 +566,8 @@ function populateInventory() {
  * GME API submit function.
  */
 function getText() {
-  var string = $('.url').val();
   // The .txt file must exist in a directory and be referenced this way.
-  var address = 'resources/' + $.trim(string);
+  var address = 'resources/' + $.trim($('.url').val());
   var data = $('.response-content');
   data.empty();
   var me = this;
@@ -621,8 +620,7 @@ function testAPIKey() {
  */
 function testGetTable() {
   // Get user input and trim it.
-  var string = $('.url').val();
-  var address = $.trim(string);
+  var address = $.trim($('.url').val());
   var correctAns = 'https://www.googleapis.com/mapsengine/v1/tables/' + 
       '15474835347274181123-14495543923251622067?' +
       'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38';
@@ -638,8 +636,7 @@ function testGetTable() {
  */
 function executeListInput() {
   // Get user input and trim it.
-  var string = $('.url').val();
-  var address = $.trim(string);
+  var address = $.trim($('.url').val());
   var correctAns = 'https://www.googleapis.com/mapsengine/v1/tables/' +
       '15474835347274181123-14495543923251622067/features?' +
       'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38';
@@ -651,8 +648,7 @@ function executeListInput() {
  */
 function executeQueries() {
   // Get user input and trim it.
-  var string = $('.url').val();
-  var address = $.trim(string);
+  var address = $.trim($('.url').val());
   var correctAns = 'https://www.googleapis.com/mapsengine/v1/tables/' +
       '15474835347274181123-14495543923251622067/features?' +
       'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38&' +
