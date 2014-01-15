@@ -1,4 +1,3 @@
-<!--HTML file for tutorial-->
 <!DOCTYPE html>
 <html>
   <head>
@@ -18,30 +17,30 @@
       <div class="menu-area hidden-by-default">
         <div class="lesson-menu"></div>
         <div class="documentation-link menu">
-          <a href="https://developers.google.com/maps-engine">GME API Documentation</a>
+          <a href="//developers.google.com/maps-engine">GME API Documentation</a>
         </div>
       </div>
       <div class="lesson">
         <div class="instructions"></div>
         <div class="inventory butter-bar hidden-by-default"></div>
         <div class="request hidden-by-default">
-          <input type="button" class="kennedy-button gray-button show-button right-aligned pointer invisible-by-default" value="Show Answer" onclick="activeLesson.showAnswer()">
+          <input type="button" id="show-button" class="kennedy-button gray-button lesson-button pointer invisible-by-default" value="Show Answer" onclick="activeLesson.showAnswer()">
           <div class="answer butter-bar hidden-by-default"></div>
           <textarea class="url" placeholder="Enter your input here, press enter or click 'Get' to submit."></textarea>
-          <div class="hidden-url-div"></div>
-          <input type="button" value="Get" class="kennedy-button blue-button get-button pointer" onclick="activeLesson.submit()"/>
+          <div class="hidden-url-element"></div>
+          <input type="button" class="kennedy-button blue-button submit-button pointer" onclick="activeLesson.submit()"/>
         </div>
         <div class="feedback hidden-by-default">
           <div class="ribbon">Great work!</div>
           <div class="message"></div>
         </div>
-        <a href="https://developers.google.com/maps-engine"> 
+        <a href="//developers.google.com/maps-engine"> 
           <input type="button" class="kennedy-button blue-button documentation-button pointer hidden-by-default" value="Go to Documentation Page">
         </a>
         <input type="button" class="kennedy-button green-button next-button pointer hidden-by-default" onclick="activeLesson.next.update()">
         <div class="response hidden-by-default">
           <div class="response-header">Response</div>
-          <div class="response-div"></div>
+          <div class="response-content"></div>
         </div>
       </div>
     </div>
