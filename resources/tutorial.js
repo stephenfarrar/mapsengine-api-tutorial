@@ -740,7 +740,7 @@ function checkCorrectness(lesson, addressString, correctAns) {
                     'ID and make sure that the table has been made public. ' +
                     'To make your table public, you can follow the ' +
                     'instructions in <a href=' +
-                    '\"//support.google.com/mapsengine/answer/3164737?hl=en\"' +
+                    '"//support.google.com/mapsengine/answer/3164737?hl=en"' +
                     '>this link</a>.');
               }
             }
