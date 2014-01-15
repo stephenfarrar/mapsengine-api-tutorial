@@ -53,7 +53,7 @@ Lesson.prototype.update = function() {
     //show the necessary element for lesson
     $('.menu-area').show();
     $('.request').show();
-    $(".url").show();
+    $('.url').show();
     //show inventory if needed
     if(this.showInventory){
       $(".inventory").show();
