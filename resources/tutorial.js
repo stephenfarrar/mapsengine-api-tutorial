@@ -8,7 +8,8 @@ var pendingFiles = {};
 function Lesson(divID, options) {
   this.divID = divID;
   this.title = options.title;
-  this.buttonValue = options.buttonValue||"Next Lesson";
+  this.buttonValue = options.buttonValue || 'Next Lesson';
+  this.submitButtonValue = options.submitButtonValue || 'Get';
   if (options.submit) {
     this.submit = options.submit;
     //if it has a submission, then it must be a lesson
@@ -43,6 +44,7 @@ Lesson.prototype.update = function() {
   $('.invisible-by-default').css('visibility', 'hidden');
   $('.show-button').show();
   $('.next-button').attr('value', this.buttonValue);
+  $('.submit-button').attr('value', this.submitButtonValue);
   //display the instruction blurb
   this.displayInstructions();
   //a number of elements are common to the lessons
@@ -50,7 +52,8 @@ Lesson.prototype.update = function() {
     $('.response-div').empty();
     //show the necessary element for lesson
     $('.menu-area').show();
-    $(".request").show();
+    $('.request').show();
+    $('.url').show();
     //show inventory if needed
     if(this.showInventory){
       $(".inventory").show();
@@ -299,7 +302,7 @@ Chapter.prototype.makeMenu = function() {
 var chapters = [
   new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
     new Lesson('lesson1-gmeapi', {title: 'GME API', submit: getText}),
-    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey})
+    new Lesson('lesson2-apikey', {title: 'API Key', submit: testAPIKey, submitButtonValue: 'Submit'})
   ]}),
   new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
     new Lesson('lesson3-gettable', {title: 'Get Table', submit: testGetTable, showInventory:true}),
@@ -310,29 +313,32 @@ var chapters = [
     new Lesson('lesson6-login', {
       title: 'Login and Authorization', 
       submit: authorizeUser,
+      submitButtonValue: 'Sign In',
       update: function() {
         Lesson.prototype.update.call(this);
-        $('.v2-button').attr('value', 'Sign In').show();
-        $('.request').hide();
+        $('.submit-button').show().removeAttr('disabled');
+        $('.url').hide();
       }
     }),
-    new Lesson('lesson7-project', {title: 'Create a Free Project', submit: storeProjectID,
+    new Lesson('lesson7-project', {title: 'Create a Free Project',
+      submit: storeProjectID,
+      submitButtonValue: 'Select',
       update: function() {
         Lesson.prototype.update.call(this);
-        $('.request').hide();
+        $('.url').hide();
         $('.project-menu').show();
-        $('.v2-button').attr('value', 'Select').show();
+        $('.submit-button').show().removeAttr('disabled');
         setInterval(function() {
           gapi.client.request({
             path: '/mapsengine/v1/projects/',
             method: 'GET',
             callback: function(jsonBody) {
-              var $list = $('.project-list')
-              $list.empty();
+              var list = $('.project-list')
+              list.empty();
               jsonBody.projects.forEach(function(project) {
                 var listItem = $('<option>').attr('value', project.id)
-                                            .text(project.name);
-                $list.append(listItem);
+                    .text(project.name);
+                list.append(listItem);
               });
             }
           });
@@ -461,9 +467,9 @@ function checkNoFilesPending() {
 
 function disableOrEnableGetButton($input){
   if ($input.val() === ""){
-    $('.get-button').attr('disabled','disabled');
+    $('.submit-button').attr('disabled','disabled');
   } else {
-    $('.get-button').removeAttr('disabled');
+    $('.submit-button').removeAttr('disabled');
   }
 }
 
@@ -697,9 +703,10 @@ function checkCorrectness(lesson, addressString, correctAns){
 function authorizeUser() {
   var me = this;
   gapi.auth.signIn({
+    'immediate': true,
     'callback': function(authResult) {
       if (authResult['status']['signed_in']) {
-        $('.v2-button').hide();
+        $('.request').hide();
         me.displaySuccessMessage();
         me.complete();
       } else {
