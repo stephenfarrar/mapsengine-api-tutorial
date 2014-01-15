@@ -2,7 +2,7 @@
 In addition to viewing a table's attributes, you can also request the table's features using a GET request. A feature is an entity in the real world that has some location, represented by geographical coordinates and other properties and stored as a row in the table. For example, a feature in the 'Famous Cities' table in the previous lesson would be a city.  
 
 The basic URL to request a features list is:  
-`https://www.googleapis.com/mapsengine/v1/tables/{tableId}/features?version=published&key={APIkey} `  
+`https://www.googleapis.com/mapsengine/v1/tables/{tableId}/features?version=published&key={APIkey}`  
 
 **EXERCISE**  
 Try to modify the URL above to list the features in the 'Famous Cities' table. Use the table ID = 15474835347274181123-14495543923251622067 and your valid API Key for the URL, then click get.
