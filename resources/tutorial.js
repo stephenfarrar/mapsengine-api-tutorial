@@ -708,8 +708,8 @@ function checkCorrectness(lesson, addressString, correctAns) {
                 'header for this request.');
           } else if (errorMess.reason == 'keyInvalid') {
             // If it contains curly braces, ask user to remove them.
-            if ($.inArray('{', addressString) !== -1 || 
-                $.inArray('}', addressString) !== -1) {
+            if (addressString.indexOf('{') != -1 || 
+                addressString.indexOf('}') != -1) {
               lesson.displayErrorMessage('Check that you have removed the ' +
                   'curly braces({ }) surrounding the API Key in your URL.');
             } else {
@@ -730,8 +730,8 @@ function checkCorrectness(lesson, addressString, correctAns) {
                   'the \''+field+'\' field.');
             } else {
               // If it contains curly braces, ask user to remove them.
-              if ($.inArray('{', addressString) !== -1 || 
-                  $.inArray('}', addressString) !== -1) {
+              if (addressString.indexOf('{') != -1 || 
+                  addressString.indexOf('}') != -1) {
                 lesson.displayErrorMessage('Check that you have removed the ' +
                     'curly braces({ }) surrounding the table ID in your URL.');
               } else {
