@@ -1,5 +1,5 @@
 ##Get Table##  
-The GME API stores data in tables where each column represents an attribute and each row represents an individual feature. The attributes each have a name and a type which indicates what form the data takes (string, integer etc.). Once a table is created, you can view the names of all attributes and their types (known as a **schema**), and also some basic information of the table using the 'Get Table' operation.
+The GME API stores data in tables where each column represents an attribute and each row represents an individual feature. The attributes each have a name and a type which indicates what form the data takes (string, integer etc.). Once a table is created, you can view the names of all attributes and their types (known as a **schema**) using the 'Get Table' operation.
 
 As you know, accessing data occurs through HTTP requests. The GME API does this through URLs which can be typed into your browser. The basic URL to make a ‘Get Table’ request for public data is:   
 `https://www.googleapis.com/mapsengine/v1/tables/{tableID}?version=published&key={APIkey}`  
