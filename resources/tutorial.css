@@ -158,6 +158,12 @@ a:active {
   word-wrap: break-word;
 }
 
+.instructions h3 {
+  font-size: 14px;
+  margin: 0px;
+  margin-top:40px;
+}
+
 /* `Code` In Markdown */
 code {
   background: #F8F8F8;
@@ -165,22 +171,6 @@ code {
   border-radius: 4px;
   font-family: monospace;
   padding: 2px;
-}
-
-.butter-bar code {
-  background: none;
-  border: none;
-}
-
-.instructions h3 {
-  font-size: 14px;
-  margin: 0px;
-  margin-top:40px;
-}
-
-.butter-bar h3 {
-  font-size: 13px;
-  margin: 0px;
 }
 
 /* Inventory Area*/
@@ -199,6 +189,16 @@ code {
   font-size: 12px;
   padding: 10px;
   word-wrap: break-word;
+}
+
+.butter-bar h3 {
+  font-size: 13px;
+  margin: 0px;
+}
+
+.butter-bar code {
+  background: none;
+  border: none;
 }
 
 /* Answer */
