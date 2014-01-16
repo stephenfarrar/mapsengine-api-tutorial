@@ -167,6 +167,22 @@ code {
   padding: 2px;
 }
 
+.butter-bar code {
+  background: none;
+  border: none;
+}
+
+.instructions h3 {
+  font-size: 14px;
+  margin: 0px;
+  margin-top:40px;
+}
+
+.butter-bar h3 {
+  font-size: 13px;
+  margin: 0px;
+}
+
 /* Inventory Area*/
 .inventory {
   margin-top: 10px;
@@ -303,6 +319,12 @@ img[alt=introduction-cat-image], img[alt=finish-cat-image] {
   height: 300px;
   margin-bottom: 20px;
   margin-top: 20px;
+}
+
+/* Table image */
+img[alt=table] {
+  display: block;
+  width: 650px;
 }
 
 /*  of elements on focus */

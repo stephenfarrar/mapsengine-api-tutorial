@@ -556,34 +556,40 @@ function loadState() {
 function populateInventory() {
   var inventory = $('.inventory');
   inventory.empty()
-      .append('<b>Helpful information</b><br>')
-      .append('table ID: 15474835347274181123-14495543923251622067<br>')
-      .append('your API Key: ')
-      .append(localStorage['APIKey']);
+      .append('<h3>Helpful information</h3>')
+      .append('<b>table ID: </b>')
+      .append('<code>15474835347274181123-14495543923251622067</code><br>')
+      .append('<b>your API Key: </b>')
+      .append('<code>'+localStorage['APIKey']+'</code>');
 }
 
 /**
  * GME API submit function.
  */
 function getText() {
-  // The .txt file must exist in a directory and be referenced this way.
-  var address = 'resources/' + $.trim($('.url').val());
+  // Get user input & trim it.
+  var address =  $.trim($('.url').val());
+  var me = this;
   var data = $('.response-content');
   data.empty();
-  var me = this;
-  $.ajax({
-    url: address,
-    dataType: 'text',
-    success: function(resource) {
-      data.text(resource);
-      me.displaySuccessMessage();
-      me.complete();
-    },
-    error: function(response) {
-      me.displayErrorMessage('Make sure that the spelling is correct, ' + 
-          'and there are no spaces between the text.');
-    }
-  });
+  if (address == 'mapsengine-api-tutorial.appspot.com/resources/' +
+         'alice-in-wonderland.txt') {
+    // The user entered the correct input.  
+    $.ajax({
+      url: 'resources/alice-in-wonderland.txt',
+      dataType: 'text',
+      success: function(resource) {
+        data.text(resource);
+        me.displaySuccessMessage();
+        me.complete();
+      }
+    });
+  } else {
+    // The user entered incorrect input.
+    me.displayErrorMessage('Make sure that the spelling is correct, ' + 
+        'all letters are in lowercase, and there are no spaces between the ' +
+        'text. Don\'t forget to add "/" between the path and the filename.');
+  } 
 }
 
 /**
