@@ -20,11 +20,16 @@ function Lesson(elementId, options) {
     // It is an intro/final page.
     this.hasSubmit = false;
   }
+  if (options.update) {
+    this.update = options.update;
+  }
   // Done is 'true' if the user has submitted correctly.
   this.done = false;
   this.unlocked = false;
   if (options.showInventory) {
     this.showInventory = options.showInventory;
+  } else {
+    this.showInventory = false;
   }
 }
 
@@ -41,34 +46,19 @@ Lesson.prototype.update = function() {
   // Hide the lesson elements.
   $('.hidden-by-default').hide();
   $('.invisible-by-default').css('visibility', 'hidden');
-  $('#show-button').show();
-  // Display the instruction blurb.
-  this.displayInstructions();
-  // Update the button value.
+  // Update the buttons.
+  $('.show-button').show();
   $('.next-button').attr('value', this.buttonValue);
   $('.submit-button').attr('value', this.submitButtonValue);
-  // Categorize the lesson object.
-  if (!this.hasSubmit) {
-    // It is an introduction/resume/final page.
-    if (this.elementId == finish.elementId) {
-      // The finish page will not have next button.
-      // It will have the menu and go to documentation button.
-      $('.menu-area').show();
-      $('.documentation-button').show();
-      // Store the current lesson (the finish page).
-      localStorage['currentLesson'] = activeLesson.elementId;
-    } else {
-      // The intro & resume page will have the next button, and not stored in
-      // the localstorage.
-      // Show the green button and removed the right aligned class.
-      $('.next-button').removeClass('lesson-button').show();
-    }
-  } else {
-    // It is not an introduction/resume/final page (lessons page).
+  // Display the instruction blurb.
+  this.displayInstructions();
+  // Show a number of elements that are common to the lessons.
+  if (this.hasSubmit) {
     $('.response-content').empty();
-    // Show the necessary elements for lesson.
+    // Show the necessary element for lesson.
     $('.menu-area').show();
     $('.request').show();
+    $('.url').show();
     // Show inventory if needed.
     if (this.showInventory) {
       $('.inventory').show();
@@ -377,19 +367,74 @@ var chapters = [
         submit: executeQueries,
         showInventory: true
     })
+  ]}),
+  new Chapter('chapter2-authorization', {title: 'Authorization', lessons: [
+    new Lesson('lesson6-login', {
+        title: 'Login and Authorization', 
+        submit: authorizeUser,
+        submitButtonValue: 'Sign In',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          $('.submit-button').show().removeAttr('disabled');
+          $('.url').hide();
+        }
+    }),
+    new Lesson('lesson7-project', {
+        title: 'Create a Free Project',
+        submit: storeProjectID,
+        submitButtonValue: 'Select',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          $('.url').hide();
+          $('.project-menu').show();
+          $('.submit-button').show().removeAttr('disabled');
+          setInterval(function() {
+            gapi.client.request({
+              path: '/mapsengine/v1/projects/',
+              method: 'GET',
+              callback: function(jsonBody) {
+                var list = $('.project-list')
+                list.empty();
+                jsonBody.projects.forEach(function(project) {
+                  var listItem = $('<option>').attr('value', project.id)
+                      .text(project.name);
+                  list.append(listItem);
+                });
+              }
+            });
+          }, 5000); //5 seconds
+        }
+    })
   ]})
 ];
 
-// Introduction, resume and final page lessons.
 var introduction = new Lesson('introduction', {
-    title: 'Welcome!',
-    buttonValue: 'Yes, I am!'
+  title: 'Welcome!',
+  buttonValue: 'Yes, I am!',
+  update: function() {
+    Lesson.prototype.update.call(this);
+    $('.next-button').removeClass('right-aligned').show();
+  }
 });
 var resume = new Lesson('resume', {
-    title: 'Welcome back!',
-    buttonValue: 'Resume'
+  title: 'Welcome back!',
+  buttonValue: 'Resume',
+  update: function() {
+    Lesson.prototype.update.call(this);
+    $('.next-button').removeClass('right-aligned').show();
+  }
 });
-var finish = new Lesson('finish', {title: 'Congratulations!'});
+var finish = new Lesson('finish', {
+  title:'Congratulations!',
+  update: function() {
+    Lesson.prototype.update.call(this);
+    // The finish page will not have next button, but it will have the menu and go to documentation button.
+    $('.menu-area').show();
+    $('.documentation-button').show();
+    // Store the current lesson (the finish page).
+    localStorage['currentLesson'] = activeLesson.divID;
+  }
+});
 
 // Determining the next, and chapter for each lesson.
 // Introduction page points to the first lesson.
@@ -793,3 +838,36 @@ function checkCorrectness(lesson, addressString, correctAns) {
     }
   });
 }
+
+/**
+ * Login functions.
+ */
+function authorizeUser() {
+  var me = this;
+  gapi.auth.signIn({
+    'immediate': true,
+    'callback': function(authResult) {
+      if (authResult['status']['signed_in']) {
+        $('.request').hide();
+        me.displaySuccessMessage();
+        me.complete();
+      } else {
+        me.displayErrorMessage('You need to grant this tutorial permissions ' +
+            'if you wish to continue.');
+      }
+    }
+  });
+}
+
+function storeProjectID() {
+  var me = this;
+  var projectID = $('.project-list').val();
+  if (projectID) {
+    localStorage['projectID'] = projectID;
+    me.complete();
+    me.displaySuccessMessage();
+  } else {
+    me.displayErrorMessage('You need to select a project from the dropdown ' +
+        'list. It may take a few seconds for new projects to appear.');
+  }
+} 

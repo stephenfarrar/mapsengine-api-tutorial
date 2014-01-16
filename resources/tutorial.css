@@ -21,12 +21,12 @@ a:active {
   color: #DD4B39;
 }
 
-/* HTML Content  */
+/* HTML Content */
 .content {
   margin-bottom: 20px;
 }
 
-/* Navigation  */
+/* Navigation */
 .menu-area {
   background-color: #FFFFFF;
   float: left;
@@ -139,7 +139,7 @@ a:active {
   margin-left: 568px;
 }
 
-/* Lesson  */
+/* Lesson */
 .lesson {
   display: block;
   line-height: 1.5;
@@ -148,7 +148,7 @@ a:active {
   width: 650px;
 }
 
-/* Instruction Area  */
+/* Instruction Area */
 .instructions {
   display: block;
   font-family: arial;
@@ -173,7 +173,7 @@ code {
   padding: 2px;
 }
 
-/* Inventory Area*/
+/* Inventory Area */
 .inventory {
   margin-top: 10px;
 }
@@ -252,6 +252,19 @@ code {
   word-wrap: break-word;
 }
 
+/* Project List Dropdown */
+.project-list {
+  background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+  background-color: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  height: 40px;
+  margin: 10px;
+  padding: 8px;
+  -webkit-background-clip: padding-box; /* for Safari */
+  width: 300px;
+}
+
 /* Success Ribbon */
 .ribbon {
   background-color: #3D9400;
@@ -328,7 +341,7 @@ img[alt=table] {
   width: 650px;
 }
 
-/*  of elements on focus */
+/* Style of elements on focus */
 *:focus {
   outline: 0;
 }
