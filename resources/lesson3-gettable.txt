@@ -1,5 +1,5 @@
 ##Get Table##  
-Google Maps Engine stores data in tables, like the one below, where each column represents an attribute (Name, Country, Rating) and each row represents a feature. The attributes each have a name and a type which indicates what form the data takes (string, integer etc.). This information is stored in a **schema**, an example of which can be seen next to the table.
+Google Maps Engine stores data in tables, like the one below, where each column represents an attribute (Name, Country, Rating) and each row represents a feature. The attributes each have a name and a type which indicates what form the data takes (string, integer etc.). This information is stored in a _schema_, an example of which can be seen next to the table.
 
 ![table](images/table.png)
 
