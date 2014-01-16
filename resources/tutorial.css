@@ -341,7 +341,7 @@ img[alt=table] {
   width: 650px;
 }
 
-/* Style of elements on focus */
+/* Styling of elements on focus */
 *:focus {
   outline: 0;
 }
