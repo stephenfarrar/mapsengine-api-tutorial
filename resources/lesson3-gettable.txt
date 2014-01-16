@@ -8,5 +8,5 @@ To see information about a table, including its schema, you can use a ‘Get Tab
 
 The parameter `version=published` is required to specify that a table is publically accessible. If you have a table and wish to make it public, you can follow the instructions in [this link](//support.google.com/mapsengine/answer/3164737?hl=en). The parameter `key={APIkey}` is compulsory as a form of authentication in any public data request.
 
-**EXERCISE**  
-Copy the above URL into the input box below and replace {tableID} with this ID from an existing table: 15474835347274181123-14495543923251622067 and {APIkey} with your API Key from the previous lesson.
+###Exercise###  
+Copy the above URL into the input box below and replace `{tableID}` with this ID from an existing table: `15474835347274181123-14495543923251622067` and `{APIkey}` with your API Key from the previous lesson.

@@ -3,5 +3,5 @@ Google Maps Engine hosts location-based data and allows you to access it in a nu
 
 In order to read data from the Maps Engine, you send a standard HTTP GET request. This takes the form of a structured URL that uses paths and parameters, just the same as you would enter into your browser. The information requested is then returned to you in the HTTP response.
 
-**EXERCISE**  
-Structure a GET request for the file `alice-in-wonderland.txt` hosted at `mapsengine-api-tutorial.appspot.com/resources`. Click the button to send the request and GET the file. 
+###Exercise###  
+Structure a GET request for the file `alice-in-wonderland.txt` hosted at `mapsengine-api-tutorial.appspot.com/resources`. Click the button to send the request and GET the file.

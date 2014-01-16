@@ -556,10 +556,11 @@ function loadState() {
 function populateInventory() {
   var inventory = $('.inventory');
   inventory.empty()
-      .append('<b>Helpful information</b><br>')
-      .append('table ID: 15474835347274181123-14495543923251622067<br>')
-      .append('your API Key: ')
-      .append(localStorage['APIKey']);
+      .append('<h3>Helpful information</h3>')
+      .append('<b>table ID: </b>')
+      .append('<code>15474835347274181123-14495543923251622067</code><br>')
+      .append('<b>your API Key: </b>')
+      .append($('<code>').text(localStorage['APIKey']));
 }
 
 /**
