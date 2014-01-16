@@ -47,7 +47,7 @@ Lesson.prototype.update = function() {
   $('.hidden-by-default').hide();
   $('.invisible-by-default').css('visibility', 'hidden');
   // Update the buttons.
-  $('.show-button').show();
+  $('#show-button').show();
   $('.next-button').attr('value', this.buttonValue);
   $('.submit-button').attr('value', this.submitButtonValue);
   // Display the instruction blurb.
