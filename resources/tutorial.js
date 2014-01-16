@@ -35,7 +35,7 @@ Lesson.prototype.update = function() {
   // If the lesson is still locked, it can't be accessed.
   if (!this.unlocked) return;
   // Else, the lesson can be accessed. Scroll to top of the page.
-  $('body').animate({scrollTop: 0}, 500);
+  $('html', 'body').animate({scrollTop: 0}, 500);
   activeLesson = this;
   document.title = this.title;
   // Hide the lesson elements.
@@ -153,7 +153,7 @@ Lesson.prototype.displaySuccessMessage = function() {
     $('.ribbon').show();
     // Automatically scroll to the success message.
     var successTop = $('.feedback').position().top;
-    $('body').animate({scrollTop: successTop - 25}, 500);
+    $('html', 'body').animate({scrollTop: successTop - 25}, 500);
     // Change border colour to black.
     $('.url').removeClass('alert');
     // Show the output if there is any.
@@ -192,7 +192,7 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   }
   // Automatically scroll to the error message.
   var errorTop = $('.feedback').position().top;
-  $('body').animate({scrollTop: errorTop - 225}, 500);
+  $('html', 'body').animate({scrollTop: errorTop - 225}, 500);
   // Change border colour to red.
   $('.url').addClass('alert');
   // Show the output if there is any.
