@@ -560,7 +560,7 @@ function populateInventory() {
       .append('<b>table ID: </b>')
       .append('<code>15474835347274181123-14495543923251622067</code><br>')
       .append('<b>your API Key: </b>')
-      .append('<code>'+localStorage['APIKey']+'</code>');
+      .append($('<code>').text(localStorage['APIKey']));
 }
 
 /**
