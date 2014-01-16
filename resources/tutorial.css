@@ -305,6 +305,12 @@ img[alt=introduction-cat-image], img[alt=finish-cat-image] {
   margin-top: 20px;
 }
 
+/* Table image */
+img[alt=table] {
+  display: block;
+  width: 650px;
+}
+
 /*  of elements on focus */
 *:focus {
   outline: 0;
