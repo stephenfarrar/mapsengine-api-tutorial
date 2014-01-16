@@ -102,7 +102,7 @@ a:active {
   min-width: 80px;
 }
 
-.get-button {
+.submit-button {
   display: inline;
   float: right;
   margin-right: 0px;
@@ -127,7 +127,7 @@ a:active {
   color: black;
 }
 
-.show-button {
+#show-button {
   margin-top: 20px;
 }
 
@@ -135,7 +135,7 @@ a:active {
   opacity: 0.5;
 }
 
-.right-aligned {
+.lesson-button {
   margin-left: 568px;
 }
 
@@ -217,11 +217,11 @@ code {
   word-wrap: break-word;
 }
 
-.url.redborder {
+.url.alert {
   border-color: #DD4B39;
 }
 
-.hidden-url-div {
+.hidden-url-element {
   display: none;
   font-family: monospace;
   font-size: 13px;
@@ -230,7 +230,7 @@ code {
   min-height: 21px;
   overflow-y: hidden;
   resize: none;
-  white-space: pre;
+  white-space: pre-wrap;
   width: 555px;
   word-wrap: break-word;
 }
@@ -285,7 +285,7 @@ code {
   padding-left: 10px;
 }
 
-.response-div {
+.response-content {
   background-color: white;
   color: black;
   font-family: monospace;
