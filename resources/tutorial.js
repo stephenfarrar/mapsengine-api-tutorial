@@ -256,7 +256,7 @@ Lesson.prototype.makeMenu = function() {
   var menu = $('.lesson-menu');
   // Create lesson div.
   var newDiv = $('<div>')
-      .addClass('lesson-div menu locked');
+      .addClass('menu locked');
   // Add tick image to div and object.
   var newTick = $('<img>')
       .addClass(this.elementId + 'tick tick-image')
@@ -520,7 +520,7 @@ function loadState() {
   // Enable the introduction page and first lesson on first load.
   introduction.unlock();
   chapters[0].lessons[0].unlock();
-  // Make the active lesson the last opened page/default to introcution page.
+  // Make the active lesson the last opened page/default to introduction page.
   var activeLessonId = localStorage['currentLesson'] || 'introduction';
   // Update the inventory box.
   populateInventory();
