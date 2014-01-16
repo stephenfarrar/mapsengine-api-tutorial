@@ -79,6 +79,15 @@ a:active {
   color: #CCCCCC;
 }
 
+.locked a:hover {
+  cursor: default;
+  text-decoration: none;
+}
+
+.locked a:active {
+  color: #CCCCCC;
+}
+
 .unlocked {
   color: #000000;
 }
