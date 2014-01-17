@@ -426,7 +426,8 @@ var finish = new Lesson('finish', {
   title:'Congratulations!',
   update: function() {
     Lesson.prototype.update.call(this);
-    // The finish page will not have next button, but it will have the menu and go to documentation button.
+    // The finish page will not have next button, but it will have the menu and
+    // go to documentation button.
     $('.menu-area').show();
     $('.documentation-button').show();
     // Store the current lesson (the finish page).
