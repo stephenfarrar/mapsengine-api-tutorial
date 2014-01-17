@@ -405,6 +405,7 @@ var chapters = [
   ]})
 ];
 
+// Introduction, resume and final page lessons.
 var introduction = new Lesson('introduction', {
   title: 'Welcome!',
   buttonValue: 'Yes, I am!',
