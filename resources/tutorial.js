@@ -3,6 +3,7 @@
 var activeLesson;
 var fadeInTime = 500;
 var pendingFiles = {};
+var userAuthorization = false;
 
 //object to store lesson information
 function Lesson(divID, options) {
@@ -316,8 +317,13 @@ var chapters = [
       submitButtonValue: 'Sign In',
       update: function() {
         Lesson.prototype.update.call(this);
-        $('.submit-button').show().removeAttr('disabled');
+        $('.submit-button').show();
         $('.url').hide();
+        if (!userAuthorization) {
+          // Activate the 'Sign In' button.
+          $('.submit-button').removeAttr('disabled');
+        }
+        // Else, leave the button disabled.
       }
     }),
     new Lesson('lesson7-project', {title: 'Create a Free Project',
@@ -458,6 +464,14 @@ $(window).load(function() {
     });
   });
 });
+
+function checkIfUserIsAuthorized(authResult) {
+  if (authResult['status']['signed_in']) {
+    // The user is signed in and has authorised the application.
+    // We set a global variable with their authorization token.
+    userAuthorization = authResult['access_token'];
+  }
+}
 
 function checkNoFilesPending() {
   if (jQuery.isEmptyObject(pendingFiles)) {
