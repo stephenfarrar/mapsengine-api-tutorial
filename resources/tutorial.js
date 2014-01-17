@@ -50,7 +50,6 @@ Lesson.prototype.update = function() {
   $('#show-button').show();
   $('.next-button').attr('value', this.buttonValue);
   $('.submit-button').attr('value', this.submitButtonValue);
-<<<<<<< HEAD
   // Display the instruction blurb.
   this.displayInstructions();
   // Show a number of elements that are common to the lessons.
@@ -74,12 +73,9 @@ Lesson.prototype.update = function() {
     chapters.forEach(function(chapter) {
       chapter.lessons.forEach(function(lesson) {
         lesson.menuElement.removeClass('active');
-        if (lesson.unlocked) {
-          lesson.menuElement.addClass('unlocked');
-        }
       });
     });
-    this.menuElement.removeClass('unlocked').addClass('active');
+    this.menuElement.addClass('active');
     // Store the current lesson.
     localStorage['currentLesson'] = activeLesson.elementId;
     // Update the input (placeholder/saved URL).
