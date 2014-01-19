@@ -3,6 +3,7 @@
 var activeLesson;
 var fadeInTime = 500;
 var pendingFiles = {};
+var userAuthorization = false;
 
 /**
  * Create object to store lesson information.
@@ -375,8 +376,13 @@ var chapters = [
       submitButtonValue: 'Sign In',
       update: function() {
         Lesson.prototype.update.call(this);
-        $('.submit-button').show().removeAttr('disabled');
+        $('.submit-button').show();
         $('.url').hide();
+        if (!userAuthorization) {
+          // Activate the 'Sign In' button.
+          $('.submit-button').removeAttr('disabled');
+        }
+        // Else, leave the button disabled.
       }
     }),
     new Lesson('lesson7-project', {
@@ -527,6 +533,17 @@ $(window).load(function() {
     });
   });
 });
+
+/**
+ * Page-level callback to check if a user has an OAuth 2.0 token
+ */
+function checkIfUserIsAuthorized(authResult) {
+  if (authResult['status']['signed_in']) {
+    // The user is signed in and has authorised the application.
+    // We set a global variable with their authorization token.
+    userAuthorization = authResult['access_token'];
+  }
+}
 
 /**
  * Check if all the markdown files have been loaded.
@@ -841,23 +858,28 @@ function checkCorrectness(lesson, addressString, correctAns) {
   });
 }
 
-//*****************THE Login FUNCTIONS*******************//
+/**
+ * Login and authorization submit function.
+ */
 function authorizeUser() {
   var me = this;
   gapi.auth.signIn({
-    'immediate': true,
     'callback': function(authResult) {
       if (authResult['status']['signed_in']) {
         $('.request').hide();
         me.displaySuccessMessage();
         me.complete();
       } else {
-        me.displayErrorMessage("You need to grant this tutorial permissions if you wish to continue.")
+        me.displayErrorMessage('You need to grant this tutorial permissions ' +
+          'if you wish to continue.')
       }
     }
   });
 }
 
+/**
+ * Create a free project submit function.
+ */
 function storeProjectID() {
   var me = this;
   var projectID = $('.project-list').val();
@@ -866,6 +888,7 @@ function storeProjectID() {
     me.complete();
     me.displaySuccessMessage();
   } else {
-    me.displayErrorMessage('You need to select a project from the dropdown list. It may take a few seconds for new projects to appear.')
+    me.displayErrorMessage('You need to select a project from the dropdown ' + 
+      'list. It may take a few seconds for new projects to appear.')
   }
 } 
