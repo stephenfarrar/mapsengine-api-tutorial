@@ -1,11 +1,8 @@
 ##List Features##  
-Besides viewing a public table's attributes, you can also access the table's features using a GET request. A feature is a data entry in a table, represented by each row in the table. It is an entity in the real world that has some location, represented by geographical coordinates and other properties. For example, a feature in the 'Famous Cities' table in the previous lesson would be a city.  
+In addition to viewing a table's attributes, you can also request the table's features using a GET request. A feature is an entity in the real world that has some location, represented by geographical coordinates and other properties and stored as a row in the table. For example, a feature in the 'Famous Cities' table in the previous lesson would be a city.  
 
-The basic URL to access a features list is:                  
-https://www.googleapis.com/mapsengine/v1/tables/{tableId}/features?version=published&key={APIkey} 
+The basic URL to request a features list is:  
+`https://www.googleapis.com/mapsengine/v1/tables/{tableId}/features?version=published&key={APIkey}`  
 
-One example of the URL:  
-`https://www.googleapis.com/mapsengine/v1/tables/01512215508764088245-12798225287603138914/features?version=published&key=AIzaSyAllwffSbT4nwGqtUOvt7oshqSHowuTwN0`
-
-**EXERCISE**  
-Try to modify the URL above to list the features in the 'Famous Cities' table. Use the table ID = 15474835347274181123-14495543923251622067 and your valid API Key for the URL, then click submit.
+###Exercise###  
+Try to modify the URL above to list the features in the 'Famous Cities' table. Use the table ID `15474835347274181123-14495543923251622067` and your valid API Key for the URL, then click get.
