@@ -56,7 +56,7 @@ Lesson.prototype.update = function() {
   // Show a number of elements that are common to the lessons.
   if (this.hasSubmit) {
     $('.response-content').empty();
-    // Show the necessary element for lesson.
+    // Show the necessary elements for lesson.
     $('.menu-area').show();
     $('.request').show();
     $('.url').show();
