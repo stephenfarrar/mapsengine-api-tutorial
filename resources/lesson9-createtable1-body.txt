@@ -1,0 +1,25 @@
+{
+  "projectId": “{userProjectId}”,
+  "name": "World Famous Mountains",
+  "description": "A partial list of famous mountains in the world.",
+  "draftAccessList": "Map Editors",
+  "tags": [
+    "mountain", "high places"
+  ],
+  "schema": {
+    "columns": [
+      {
+        "name": "geometry",
+        "type": "points"
+      },
+      {
+        "name": "mountain_name",
+        "type": "string"
+      },
+      {
+        "name": "height",
+        "type": "integer"
+      }
+    ] 
+  }
+}
