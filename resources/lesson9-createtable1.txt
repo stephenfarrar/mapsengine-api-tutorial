@@ -1,0 +1,12 @@
+##Create Table I##  
+Now that you are authorized and have created a project in Google Maps Engine, you can create your own table and add it to your Google Maps Engine project.  
+
+To create or modify objects in the world wide web, you have to use the POST method as opposed to the GET method. Like GET requests, POSTing data to the GME API uses structured URLs and since this data is user specific it must also be accompanied by the header from the previous lesson.
+
+However, POST requests involve extra information in the form of the `body` of data you wish to send to the server and a declaration of the type of data you are sending which is included in the header (in this case, JSON).
+
+To create an empty table using the GME API, the request is directed to the URL: `https://www.googleapis.com/mapsengine/v1/tables`  
+The body of the request specifies some basic information and the schema of the table that you wanted to create.
+
+###Exercise###  
+Below, you can see an incomplete POST request which will create an empty table in your Google Maps Engine project. We have created the header and the body of the request for you. We will explain more about the request body in the next lesson, but please read it carefully and try to understand the format. The request below does not have the URL to which the request will be sent to. Please type in the correct URL in the box below.
