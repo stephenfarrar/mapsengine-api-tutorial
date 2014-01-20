@@ -352,7 +352,7 @@ var chapters = [
   new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
     new Lesson('lesson3-gettable', {
         title: 'Get Table',
-        submit: testGetTable,
+        submit: executeGetTable,
         showInventory: true
     }),
     new Lesson('lesson4-listfeatures', {
@@ -366,14 +366,13 @@ var chapters = [
         showInventory: true
     })
   ]}),
-  new Chapter('chapter2-authorization', {title: 'Authorization', lessons: [
+  new Chapter('chapter2-private', {title: 'Accessing Private Data', lessons: [
     new Lesson('lesson6-login', {
       title: 'Login and Authorization', 
       submit: authorizeUser,
       submitButtonValue: 'Sign In',
       update: function() {
         Lesson.prototype.update.call(this);
-        $('.submit-button').show();
         $('.url').hide();
         if (!userAuthorization) {
           // Activate the 'Sign In' button.
@@ -390,7 +389,7 @@ var chapters = [
         Lesson.prototype.update.call(this);
         $('.url').hide();
         $('.project-menu').show();
-        $('.submit-button').show().removeAttr('disabled');
+        $('.submit-button').removeAttr('disabled');
         setInterval(function() {
           gapi.client.request({
             path: '/mapsengine/v1/projects/',
@@ -406,6 +405,21 @@ var chapters = [
             }
           });
         }, 5000); //5 seconds
+      }
+    }),
+    new Lesson('lesson8-listprojects', {
+      title: 'List Projects',
+      submit: executeListProjects,
+      submitButtonValue: 'Get',
+      activeInput: '.body-input',
+      update: function() {
+        var me = this;
+        Lesson.prototype.update.call(this);
+        $.get('resources/get-request-header.txt', function(response) {
+          response = response.replace('{accessToken}', userAuthorization);
+          $('.header-input').text(response).show();
+          me.header = JSON.parse(response);
+        });
       }
     })
   ]})
@@ -698,7 +712,7 @@ function testAPIKey() {
 /**
  * Get table submit function.
  */
-function testGetTable() {
+function executeGetTable() {
   // Get user input and trim it.
   var address = $.trim($('.url').val());
   var correctAns = 'https://www.googleapis.com/mapsengine/v1/tables/' + 
@@ -901,4 +915,46 @@ function storeProjectID() {
     me.displayErrorMessage('You need to select a project from the dropdown ' +
         'list. It may take a few seconds for new projects to appear.');
   }
-} 
+}
+
+/**
+ * List projects submit function.
+ */
+function executeListProjects() {
+  var me = this;
+  var data = $('.response-content');
+  // Empty the output area.
+  data.empty();
+  var address = $.trim($('.url').val());
+  var correctAns = 'https://www.googleapis.com/mapsengine/v1/projects';
+  $.ajax({
+    url: correctAns,
+    headers: me.header,
+    dataType: 'json',
+    success: function(resource) {
+      var correctResourceString = JSON.stringify(resource, null, 2);
+      // Get the response with users's input.
+      $.ajax({
+        url: address,
+        headers: me.header,
+        dataType: 'json',
+        success: function(resource2) {
+          var resourceString = JSON.stringify(resource2, null, 2);
+          data.text(resourceString);
+          // If the response is the correct response, then the user is right.
+          if (resourceString == correctResourceString) {
+            me.displaySuccessMessage();
+            me.complete();
+          } else {
+            lesson.displayErrorMessage('Be sure to read the instructions ' +
+                'carefully and complete the exercise ' +
+                'requirements.');
+          } 
+        },
+        error: function(response) {
+          me.displayErrorMessage('The URL you entered was not correct.');
+        }
+      });
+    }
+  });
+}
