@@ -869,11 +869,7 @@ function checkCorrectness(lesson, addressString, correctAns) {
 }
 
 /**
-<<<<<<< HEAD
- * Login functions.
-=======
  * Login and authorization submit function.
->>>>>>> db135f1ca9a169d0714408de5fd38aaa5d73379e
  */
 function authorizeUser() {
   var me = this;
