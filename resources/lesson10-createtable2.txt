@@ -10,9 +10,9 @@ The body of the POST request to create a table has to be in the JSON format, and
 There are also several optional parameters that can be included in the body, which are:
 
 * `description`: The table asset description.
-* `publishedAccessList`: Defines the access list to whom view permissions of the table are granted. If you do not include this parameter, it will default your table to be private, which means that only authorized users(including you) can see the table. If you want to make it public, you can set the value of this parameter to be `Map Viewers`. To learn more, you can go to 
+* `publishedAccessList`: Defines the access list to whom view permissions of the table are granted. If you do not include this parameter, it will default your table to be private, which means that only authorized users (including you) can see the table. If you want to make it public, you can set the value of this parameter to be `Map Viewers`. To learn more, you can go to 
 [this link](https://support.google.com/mapsengine/answer/1620740?hl=en)
 * `tags`: An array of text strings, with each string representing a tag for the table.
 
 ###Exercise###  
-Try to create a POST body request to create an empty table to your project. You can create a table with any schema you want. Remember to use the project ID specified in the box below. We have provided the URL and the header of the request for you, so you don't need to change them. For reference, you can visit the previous page(Create Table I) to see how a body of the request should look like.
+Try to create a POST body request to create an empty table to your project. You can create a table with any schema you want. Remember to use the project ID specified in the box below. We have provided the URL and the header of the request for you, so you don't need to change them. For reference, you can visit the previous page (Create Table I) to see how a body of the request should look like.

@@ -1,0 +1,47 @@
+<!--HTML file for tutorial-->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Introduction</title>
+  <link href="newDesign-lesson.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div class = 'content'>
+    <div class = 'menu-area hidden-by-default'>
+      <div class = "lesson-menu"></div>
+      <!--
+      <a href = "https://developers.google.com/maps-engine" target = "_blank" class = "no-underline pointer">
+        <div class = "documentation-link menu link">GME API Documentation</div>
+      </a>
+      -->
+    </div>
+    <div class = 'lesson'>
+      <div class = 'instructions'><h2>Hello :) This is the instruction</h2><br>Blah Blah Blah <br> More blah blah blah</div>
+      <div class = "inventory butter-bar hidden-by-default"><b>Inventory</b><br>API Key = 0298301283928sd</div>
+      <div class = 'request hidden-by-default'>
+        <input type = "button" class = 'kennedy-button gray-button show-button right-aligned pointer invisible-by-default' value = 'Show Answer' onclick = 'activeLesson.showAnswer()'>
+        <div class = "answer butter-bar hidden-by-default"><b>ANSWER</b><br>https://www.hohohoho.com</div>
+
+
+       <textarea class = 'url input' placeholder="Enter the URL here."></textarea>
+        <div class = 'hidden-url-div'></div>
+        <input type="button" value="Post" class="kennedy-button blue-button get-button pointer" onclick = 'activeLesson.submit()'/>
+        <textarea class = 'header-input input' disabled="disabled">Authorization: Bearer {token}
+Content-Type: application/json</textarea>
+        <textarea class = 'body-input input' placeholder = "Please type the body of your request here."></textarea>
+      </div>
+      
+      <div class = "feedback hidden-by-default">
+        <div class = "ribbon">Great work!</div>
+        <div class = "message">This is the success message/error message. Congratulations! You did it! Huzzah!</div>
+      </div>
+
+      <input type = 'button' class = 'kennedy-button green-button next-button pointer hidden-by-default right-aligned' onclick = 'activeLesson.next.update()' value="Next Lesson">
+      <div class = 'response hidden-by-default'>
+        <div class = 'response-header'>Response</div>
+        <div class = 'response-div'>JSON JSON JSON</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
