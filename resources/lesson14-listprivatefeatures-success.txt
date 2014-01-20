@@ -1,0 +1,1 @@
+Congratulations, you are now able to list the features of a private table. The response you get is exactly the same as the response you will get from listing features of a public table. The `type` of the response will be `FeatureCollection`, followed by an array of features. Each feature will have a `type` of `Feature`, a `geometry`, and `properties`.

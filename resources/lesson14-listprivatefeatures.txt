@@ -1,0 +1,8 @@
+##List Private Features##  
+To be able to list the features of a private table, you need to send a similar GET request with ‘Get Table’ operation, where you need to specify a header with an access token contained in it, and send the request to a specific URL. The URL used for listing the features is: 
+`https://www.googleapis.com/mapsengine/v1/tables/{tableId}/features`
+The format of the header is the same as ‘List Projects’ and ‘Get Private Table’ header, which is:
+`”Authorization”: “Bearer {accessToken}”`
+
+###Exercise###  
+Try to access the features of the table ‘World Famous Mountains’ by creating the URL for the GET request. Use the table ID of the ‘World Famous Mountains’ table, which is already provided in the helpful information box. We have already created the header for you.
