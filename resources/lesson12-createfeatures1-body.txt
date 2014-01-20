@@ -1,0 +1,16 @@
+{
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [86.9253, 27.9881]
+      },
+      "properties": {
+        "gx_id": "100",
+        "mountain_name": "Mount Everest",
+        "height": "8848"
+      }
+    }
+  ]
+}

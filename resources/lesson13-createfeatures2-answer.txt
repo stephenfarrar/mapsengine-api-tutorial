@@ -1,0 +1,18 @@
+###Answer###  
+You can use this feature to add to your ‘World Famous Mountains’ table. 
+`{
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [37.3533, -3.0758]
+      },
+      "properties": {
+        "gx_id": "200",
+        "mountain_name": "Mount Kilimanjaro",
+        "height": "5895"
+      }
+    }
+  ]
+}`
