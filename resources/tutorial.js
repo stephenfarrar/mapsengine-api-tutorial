@@ -32,6 +32,8 @@ function Lesson(elementId, options) {
   } else {
     this.showInventory = false;
   }
+  // Indicate which input submission is needed.
+  this.activeInput = options.activeInput || '.url';
 }
 
 /**
@@ -84,7 +86,10 @@ Lesson.prototype.update = function() {
     $('.url').val(storedUrl || '');
     setTextAreaHeight();
     // If the input is empty, user should not be allowed to submit.
-    toggleSubmitButton($('.url'));
+    // Do this for the lessons with their own specific inputs.
+    if (this.activeInput) {
+      toggleSubmitButton($(this.activeInput));
+    }
   }
   // Set up analytics for the page visited by the user (number of times the page
   // is visited).
@@ -372,6 +377,7 @@ var chapters = [
         title: 'Login and Authorization', 
         submit: authorizeUser,
         submitButtonValue: 'Sign In',
+        activeInput: false,
         update: function() {
           Lesson.prototype.update.call(this);
           $('.url').hide();
@@ -386,6 +392,7 @@ var chapters = [
         title: 'Create a Free Project',
         submit: storeProjectID,
         submitButtonValue: 'Select',
+        activeInput: false,
         update: function() {
           Lesson.prototype.update.call(this);
           $('.url').hide();
@@ -408,15 +415,6 @@ var chapters = [
           }, 5000); //5 seconds
         }
     }),
-    new Lesson('lesson8-listprojects', {
-        title: 'List Projects',
-        submit: testAPIKey,
-        showInventory: false,
-        update: function() {
-          Lesson.prototype.update.call(this);
-          $('.header-input').show();
-        }
-    })
   ]})
 ];
 
@@ -508,25 +506,40 @@ $(window).load(function() {
       }
     }
     localStorage[activeLesson.elementId+'input'] = input.val();
-    localStorage[activeLesson.elementId+'body'] = bodyInput.val();
     setTextAreaHeight();
   });
+  bodyInput.keypress(function(){
+    toggleSubmitButton(bodyInput);
+    localStorage[activeLesson.elementId+'body'] = bodyInput.val();
+    setTextAreaHeight();
+  })
   // Input might change on keyup (handle backspace).
   input.keyup(function() {
     toggleSubmitButton(input);
     localStorage[activeLesson.elementId+'input'] = input.val();
-    localStorage[activeLesson.elementId+'body'] = bodyInput.val();
     setTextAreaHeight();
   });
+  bodyInput.keyup(function(){
+    toggleSubmitButton(bodyInput);
+    localStorage[activeLesson.elementId+'body'] = bodyInput.val();
+    setTextAreaHeight();
+  })
   // Input might change on cut/paste act.
   input.on('paste cut',function() {
     setTimeout(function() {
       toggleSubmitButton(input);
       localStorage[activeLesson.elementId+'input'] = input.val();
-      localStorage[activeLesson.elementId+'body'] = bodyInput.val();
       setTextAreaHeight();
     }, 0);
   });
+  bodyInput.on('paste cut',function() {
+    setTimeout(function() {
+      toggleSubmitButton(bodyInput);
+      localStorage[activeLesson.elementId+'input'] = bodyInput.val();
+      setTextAreaHeight();
+    }, 0);
+  });
+
 
   // Set up analytics to indicate how many times users go to the documentation 
   // page using the final page button.
@@ -591,7 +604,8 @@ function setTextAreaHeight() {
   // Always store one more character to make the height change smoother.
   $('.hidden-url-element').text(input.val() + 'a');
   input.height($('.hidden-url-element').height());
-  $('.hidden-body-element').text(bodyInput.val() + 'a');
+  $('.hidden-body-element').text(bodyInput.val() +
+      'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
   bodyInput.height($('.hidden-body-element').height());
 }
 
