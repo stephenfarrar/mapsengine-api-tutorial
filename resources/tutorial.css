@@ -247,6 +247,10 @@ code {
   min-height: 21px;
 }
 
+.url.alert {
+  border-color: #DD4B39;
+}
+
 .hidden-input {
   display: none;
   font-family: monospace;
@@ -274,10 +278,6 @@ code {
 
 .hidden-body-element {
   min-height: 100px;
-}
-
-.url.alert {
-  border-color: #DD4B39;
 }
 
 /* Project List Dropdown */
