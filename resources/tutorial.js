@@ -3,6 +3,7 @@
 var activeLesson;
 var fadeInTime = 500;
 var pendingFiles = {};
+var userAuthorization = false;
 
 /**
  * Create object to store lesson information.
@@ -367,40 +368,45 @@ var chapters = [
   ]}),
   new Chapter('chapter2-authorization', {title: 'Authorization', lessons: [
     new Lesson('lesson6-login', {
-        title: 'Login and Authorization', 
-        submit: authorizeUser,
-        submitButtonValue: 'Sign In',
-        update: function() {
-          Lesson.prototype.update.call(this);
-          $('.submit-button').show().removeAttr('disabled');
-          $('.url').hide();
+      title: 'Login and Authorization', 
+      submit: authorizeUser,
+      submitButtonValue: 'Sign In',
+      update: function() {
+        Lesson.prototype.update.call(this);
+        $('.submit-button').show();
+        $('.url').hide();
+        if (!userAuthorization) {
+          // Activate the 'Sign In' button.
+          $('.submit-button').removeAttr('disabled');
         }
+        // Else, leave the button disabled.
+      }
     }),
     new Lesson('lesson7-project', {
-        title: 'Create a Free Project',
-        submit: storeProjectID,
-        submitButtonValue: 'Select',
-        update: function() {
-          Lesson.prototype.update.call(this);
-          $('.url').hide();
-          $('.project-menu').show();
-          $('.submit-button').show().removeAttr('disabled');
-          setInterval(function() {
-            gapi.client.request({
-              path: '/mapsengine/v1/projects/',
-              method: 'GET',
-              callback: function(jsonBody) {
-                var list = $('.project-list')
-                list.empty();
-                jsonBody.projects.forEach(function(project) {
-                  var listItem = $('<option>').attr('value', project.id)
-                      .text(project.name);
-                  list.append(listItem);
-                });
-              }
-            });
-          }, 5000); //5 seconds
-        }
+      title: 'Create a Free Project',
+      submit: storeProjectID,
+      submitButtonValue: 'Select',
+      update: function() {
+        Lesson.prototype.update.call(this);
+        $('.url').hide();
+        $('.project-menu').show();
+        $('.submit-button').show().removeAttr('disabled');
+        setInterval(function() {
+          gapi.client.request({
+            path: '/mapsengine/v1/projects/',
+            method: 'GET',
+            callback: function(jsonBody) {
+              var list = $('.project-list')
+              list.empty();
+              jsonBody.projects.forEach(function(project) {
+                var listItem = $('<option>').attr('value', project.id)
+                    .text(project.name);
+                list.append(listItem);
+              });
+            }
+          });
+        }, 5000); //5 seconds
+      }
     })
   ]})
 ];
@@ -530,6 +536,17 @@ $(window).load(function() {
     });
   });
 });
+
+/**
+ * Page-level callback to check if a user has an OAuth 2.0 token
+ */
+function checkIfUserIsAuthorized(authResult) {
+  if (authResult['status']['signed_in']) {
+    // The user is signed in and has authorised the application.
+    // We set a global variable with their authorization token.
+    userAuthorization = authResult['access_token'];
+  }
+}
 
 /**
  * Check if all the markdown files have been loaded.
@@ -845,12 +862,15 @@ function checkCorrectness(lesson, addressString, correctAns) {
 }
 
 /**
+<<<<<<< HEAD
  * Login functions.
+=======
+ * Login and authorization submit function.
+>>>>>>> db135f1ca9a169d0714408de5fd38aaa5d73379e
  */
 function authorizeUser() {
   var me = this;
   gapi.auth.signIn({
-    'immediate': true,
     'callback': function(authResult) {
       if (authResult['status']['signed_in']) {
         $('.request').hide();
@@ -864,6 +884,9 @@ function authorizeUser() {
   });
 }
 
+/**
+ * Create a free project submit function.
+ */
 function storeProjectID() {
   var me = this;
   var projectID = $('.project-list').val();
