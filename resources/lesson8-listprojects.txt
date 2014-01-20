@@ -1,9 +1,0 @@
-##List Projects##  
-In the previous lesson, we used your OAuth 2.0 token to request a list of your Maps Engine projects. To do this, you have to send a GET request, and send it to a specific URL. The URL for a List Projects or Project Read request is `https://www.googleapis.com/mapsengine/v1/projects`. There are no parameters, keys or IDs required for this request. Instead, it must be accompanied by your unique OAuth 2.0 token. 
-
-In order to add this extra information, the request must have a _header_ which contains the token. Without the token, the API has no way of identifying whose projects to return. In this way, this information is kept very private as only you can decide who can see it. 
-
-If you want to verify that this information really is private, try typing the above URL into a new tab in your browser. You will see an error that this request is missing a header containing appropriate authorization information.
-
-###Exercise###  
-Enter the URL for a List Projects request into the box below. We have already completed the header for you.

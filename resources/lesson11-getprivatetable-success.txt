@@ -1,7 +1,0 @@
-Congratulations, you are now able to access a private table! The response you got is almost the same as the one you will get by accessing public table using your API Key. It will still return `id`, `projectId`, `name`, `description`, `schema`, and `bbox`, but there will be no `versions` and `role` parameter in the response. However, there might be some additional parameters, such as:
-
-* `tags`: an array of tags of the table
-* `sourceEncoding`: the encoding method used
-* `processingStatus`: the processing status of the table, which is always `complete`
-* `creationTime`: the time when the table was created
-* `lastModifiedTime`: the time when the table was last modified

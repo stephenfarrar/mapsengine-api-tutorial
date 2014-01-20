@@ -1,1 +1,0 @@
-An array of all your Maps Engine projects is listed in the response below. Each project is represented by an object that contains an `id` and a `name` value.
