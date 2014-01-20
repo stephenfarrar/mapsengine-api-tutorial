@@ -47,13 +47,13 @@ Lesson.prototype.update = function() {
   // Hide the lesson elements.
   $('.hidden-by-default').hide();
   $('.invisible-by-default').css('visibility', 'hidden');
+  // Update the buttons.
   $('#show-button').show();
-  // Update the button value.
   $('.next-button').attr('value', this.buttonValue);
   $('.submit-button').attr('value', this.submitButtonValue);
   // Display the instruction blurb.
   this.displayInstructions();
-  // A number of elements are common to the lessons.
+  // Show a number of elements that are common to the lessons.
   if (this.hasSubmit) {
     $('.response-content').empty();
     // Show the necessary elements for lesson.
@@ -74,12 +74,9 @@ Lesson.prototype.update = function() {
     chapters.forEach(function(chapter) {
       chapter.lessons.forEach(function(lesson) {
         lesson.menuElement.removeClass('active');
-        if (lesson.unlocked) {
-          lesson.menuElement.addClass('unlocked');
-        }
       });
     });
-    this.menuElement.removeClass('unlocked').addClass('active');
+    this.menuElement.addClass('active');
     // Store the current lesson.
     localStorage['currentLesson'] = activeLesson.elementId;
     // Update the input (placeholder/saved URL).
@@ -440,7 +437,13 @@ var finish = new Lesson('finish', {
     $('.menu-area').show();
     $('.documentation-button').show();
     // Store the current lesson (the finish page).
-    localStorage['currentLesson'] = activeLesson.divID;
+    localStorage['currentLesson'] = activeLesson.elementId;
+    // Make text on menu for active lesson red, and all others black.
+    chapters.forEach(function(chapter) {
+      chapter.lessons.forEach(function(lesson) {
+        lesson.menuElement.removeClass('active');
+      });
+    });
   }
 });
 
@@ -483,6 +486,7 @@ $(window).load(function() {
   });
   // Store the input everytime it changes, to the respective local storage.
   var input = $('.url');
+  var bodyInput = $('.body-input');
   // Input might change on keypress.
   input.keypress(function(event) {
     toggleSubmitButton(input);
@@ -495,12 +499,14 @@ $(window).load(function() {
       }
     }
     localStorage[activeLesson.elementId+'input'] = input.val();
+    localStorage[activeLesson.elementId+'body'] = bodyInput.val();
     setTextAreaHeight();
   });
   // Input might change on keyup (handle backspace).
   input.keyup(function() {
     toggleSubmitButton(input);
     localStorage[activeLesson.elementId+'input'] = input.val();
+    localStorage[activeLesson.elementId+'body'] = bodyInput.val();
     setTextAreaHeight();
   });
   // Input might change on cut/paste act.
@@ -508,6 +514,7 @@ $(window).load(function() {
     setTimeout(function() {
       toggleSubmitButton(input);
       localStorage[activeLesson.elementId+'input'] = input.val();
+      localStorage[activeLesson.elementId+'body'] = bodyInput.val();
       setTextAreaHeight();
     }, 0);
   });
@@ -570,10 +577,13 @@ function toggleSubmitButton(input) {
  */
 function setTextAreaHeight() {
   var input = $('.url');
+  var bodyInput = $('.body-input');
   // Store it in the hidden div, get the height and set the textarea height.
   // Always store one more character to make the height change smoother.
   $('.hidden-url-element').text(input.val() + 'a');
   input.height($('.hidden-url-element').height());
+  $('.hidden-body-element').text(bodyInput.val() + 'a');
+  bodyInput.height($('.hidden-body-element').height());
 }
 
 /**
@@ -871,7 +881,7 @@ function authorizeUser() {
         me.complete();
       } else {
         me.displayErrorMessage('You need to grant this tutorial permissions ' +
-          'if you wish to continue.')
+            'if you wish to continue.');
       }
     }
   });
@@ -888,7 +898,7 @@ function storeProjectID() {
     me.complete();
     me.displaySuccessMessage();
   } else {
-    me.displayErrorMessage('You need to select a project from the dropdown ' + 
-      'list. It may take a few seconds for new projects to appear.')
+    me.displayErrorMessage('You need to select a project from the dropdown ' +
+        'list. It may take a few seconds for new projects to appear.');
   }
 } 

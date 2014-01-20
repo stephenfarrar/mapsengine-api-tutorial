@@ -37,9 +37,12 @@
         <div class="request hidden-by-default">
           <input type="button" id="show-button" class="kennedy-button gray-button lesson-button pointer invisible-by-default" value="Show Answer" onclick="activeLesson.showAnswer()">
           <div class="answer butter-bar hidden-by-default"></div>
-          <textarea class="url" placeholder="Enter your input here, press enter or click 'Get' to submit."></textarea>
-          <div class="hidden-url-element"></div>
+          <textarea class="input url" placeholder="Enter your input here, press enter or click 'Get' to submit."></textarea>
+          <div class="hidden-input hidden-url-element"></div>
           <input type="button" class="kennedy-button blue-button submit-button pointer" onclick="activeLesson.submit()"/>
+          <textarea class="input header-input hidden-by-default" disabled="disabled"></textarea>
+          <textarea class="input body-input hidden-by-default" placeholder="Please type the body of your request here."></textarea>
+          <div class="hidden-input hidden-body-element"></div>
         </div>
         <form class="project-menu hidden-by-default">
           <select class="project-list">
@@ -52,7 +55,7 @@
         </div>
         <!--OTHER BUTTONS/LINKS-->
         <input type="button" class="kennedy-button green-button next-button pointer hidden-by-default" onclick="activeLesson.next.update()">
-        <a href="//developers.google.com/maps-engine"> 
+        <a href="//developers.google.com/maps-engine">
           <input type="button" class="kennedy-button blue-button documentation-button pointer hidden-by-default" value="Go to Documentation Page">
         </a>
         <!--RESPONSE-->
