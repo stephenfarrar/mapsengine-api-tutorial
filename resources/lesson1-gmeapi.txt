@@ -1,7 +1,7 @@
 ##GME API##  
 Google Maps Engine hosts location-based data and allows you to access it in a number of ways, including a web API for reading and writing. The GME web API allows users to manage data using simple HTTP requests.
 
-Reading data requires a GET request which returns a standard HTTP response as well as other information about the map data. This is achieved using structured URLs just the same as you would enter into your browser, but works like any other request.
+In order to read data from the Maps Engine, you send a standard HTTP GET request. This takes the form of a structured URL that uses paths and parameters, just the same as you would enter into your browser. The information requested is then returned to you in the HTTP response.
 
-**EXERCISE**  
-Enter: `alice-in-wonderland.txt` into the box below and click "Submit" and see the response!
+###Exercise###  
+Structure the correct URL to GET the file `alice-in-wonderland.txt` hosted at `mapsengine-api-tutorial.appspot.com/resources`. Click the button to send the request and GET the file.
