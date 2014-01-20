@@ -366,47 +366,56 @@ var chapters = [
         showInventory: true
     })
   ]}),
-  new Chapter('chapter2-authorization', {title: 'Authorization', lessons: [
+  new Chapter('chapter2-accessingprivatedata', {title: 'Accessing Private Data',
+      lessons: [
     new Lesson('lesson6-login', {
-      title: 'Login and Authorization', 
-      submit: authorizeUser,
-      submitButtonValue: 'Sign In',
-      update: function() {
-        Lesson.prototype.update.call(this);
-        $('.submit-button').show();
-        $('.url').hide();
-        if (!userAuthorization) {
-          // Activate the 'Sign In' button.
-          $('.submit-button').removeAttr('disabled');
+        title: 'Login and Authorization', 
+        submit: authorizeUser,
+        submitButtonValue: 'Sign In',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          $('.url').hide();
+          if (!userAuthorization) {
+            // Activate the 'Sign In' button.
+            $('.submit-button').removeAttr('disabled');
+          }
+          // Else, leave the button disabled.
         }
-        // Else, leave the button disabled.
-      }
     }),
     new Lesson('lesson7-project', {
-      title: 'Create a Free Project',
-      submit: storeProjectID,
-      submitButtonValue: 'Select',
-      update: function() {
-        Lesson.prototype.update.call(this);
-        $('.url').hide();
-        $('.project-menu').show();
-        $('.submit-button').show().removeAttr('disabled');
-        setInterval(function() {
-          gapi.client.request({
-            path: '/mapsengine/v1/projects/',
-            method: 'GET',
-            callback: function(jsonBody) {
-              var list = $('.project-list')
-              list.empty();
-              jsonBody.projects.forEach(function(project) {
-                var listItem = $('<option>').attr('value', project.id)
-                    .text(project.name);
-                list.append(listItem);
-              });
-            }
-          });
-        }, 5000); //5 seconds
-      }
+        title: 'Create a Free Project',
+        submit: storeProjectID,
+        submitButtonValue: 'Select',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          $('.url').hide();
+          $('.project-menu').show();
+          $('.submit-button').removeAttr('disabled');
+          setInterval(function() {
+            gapi.client.request({
+              path: '/mapsengine/v1/projects/',
+              method: 'GET',
+              callback: function(jsonBody) {
+                var list = $('.project-list')
+                list.empty();
+                jsonBody.projects.forEach(function(project) {
+                  var listItem = $('<option>').attr('value', project.id)
+                      .text(project.name);
+                  list.append(listItem);
+                });
+              }
+            });
+          }, 5000); //5 seconds
+        }
+    }),
+    new Lesson('lesson8-listprojects', {
+        title: 'List Projects',
+        submit: testAPIKey,
+        showInventory: false,
+        update: function() {
+          Lesson.prototype.update.call(this);
+          $('.header-input').show();
+        }
     })
   ]})
 ];
