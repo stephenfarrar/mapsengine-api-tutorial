@@ -486,6 +486,7 @@ $(window).load(function() {
   });
   // Store the input everytime it changes, to the respective local storage.
   var input = $('.url');
+  var bodyInput = $('.body-input');
   // Input might change on keypress.
   input.keypress(function(event) {
     toggleSubmitButton(input);
@@ -498,12 +499,14 @@ $(window).load(function() {
       }
     }
     localStorage[activeLesson.elementId+'input'] = input.val();
+    localStorage[activeLesson.elementId+'body'] = bodyInput.val();
     setTextAreaHeight();
   });
   // Input might change on keyup (handle backspace).
   input.keyup(function() {
     toggleSubmitButton(input);
     localStorage[activeLesson.elementId+'input'] = input.val();
+    localStorage[activeLesson.elementId+'body'] = bodyInput.val();
     setTextAreaHeight();
   });
   // Input might change on cut/paste act.
@@ -511,6 +514,7 @@ $(window).load(function() {
     setTimeout(function() {
       toggleSubmitButton(input);
       localStorage[activeLesson.elementId+'input'] = input.val();
+      localStorage[activeLesson.elementId+'body'] = bodyInput.val();
       setTextAreaHeight();
     }, 0);
   });
@@ -573,10 +577,13 @@ function toggleSubmitButton(input) {
  */
 function setTextAreaHeight() {
   var input = $('.url');
+  var bodyInput = $('.body-input');
   // Store it in the hidden div, get the height and set the textarea height.
   // Always store one more character to make the height change smoother.
   $('.hidden-url-element').text(input.val() + 'a');
   input.height($('.hidden-url-element').height());
+  $('.hidden-body-element').text(bodyInput.val() + 'a');
+  bodyInput.height($('.hidden-body-element').height());
 }
 
 /**

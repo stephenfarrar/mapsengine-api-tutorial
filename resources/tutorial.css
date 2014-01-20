@@ -222,15 +222,14 @@ code {
   margin: 0px;
 }
 
-/* URL input */
-.url {
+/* The input boxes */
+.input{
   background-color: white;
   border: 1px solid black;
   box-shadow: 4px 4px 8px #CCC;
   -moz-box-shadow: 4px 4px 8px #CCC;
   -webkit-box-shadow: 4px 4px 8px #CCC;
   color: black;
-  display: inline-block;
   font-family: monospace;
   font-size: 13px;
   height: auto;
@@ -243,22 +242,42 @@ code {
   word-wrap: break-word;
 }
 
-.url.alert {
-  border-color: #DD4B39;
+.url {
+  display: inline-block;
+  min-height: 21px;
 }
 
-.hidden-url-element {
+.hidden-input {
   display: none;
   font-family: monospace;
   font-size: 13px;
   height: auto;
   line-height: 1.5;
-  min-height: 21px;
   overflow-y: hidden;
   resize: none;
   white-space: pre-wrap;
   width: 555px;
   word-wrap: break-word;
+}
+
+.hidden-url-element {
+  min-height: 21px;
+}
+
+.header-input {
+  white-space: pre;
+}
+
+.body-input {
+  min-height: 100px;
+}
+
+.hidden-body-element {
+  min-height: 100px;
+}
+
+.url.alert {
+  border-color: #DD4B39;
 }
 
 /* Project List Dropdown */
