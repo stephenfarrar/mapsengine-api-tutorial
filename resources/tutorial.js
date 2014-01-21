@@ -4,6 +4,10 @@ var activeLesson;
 var fadeInTime = 500;
 var pendingFiles = {};
 var userAuthorization = false;
+var chapters;
+var introduction;
+var resume;
+var finish;
 
 /**
  * Create object to store textarea input information.
@@ -18,6 +22,7 @@ function InputObject(elementClass, hiddenElementClass, options) {
   this.hiddenElementClass = hiddenElementClass;
   this.elementName = options.elementName;
   this.enterSubmission = options.enterSubmission;
+  this.setup();
 }
 
 /**
@@ -25,9 +30,15 @@ function InputObject(elementClass, hiddenElementClass, options) {
  */
 InputObject.prototype.setTextAreaHeight = function() {
   // Store it in the hidden div, get the height and set the textarea height.
-  // Always store one more line to make the height change smoother.
-  $(this.hiddenElementClass).text($(this.elementClass).val() +
-      'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+  if (this.enterSubmission) {
+    // Always store one more character to make the height change smoother.
+    // This is for textarea that has enter submission property.
+    $(this.hiddenElementClass).text($(this.elementClass).val() + 'a');
+  } else {
+    // Append one more line at the end to make height change smoother.
+    // This is for textarea that has no enter submission property.
+    $(this.hiddenElementClass).text($(this.elementClass).val() + '\n\n');
+  }
   $(this.elementClass).height($(this.hiddenElementClass).height());
 }
 
@@ -87,19 +98,6 @@ InputObject.prototype.setup = function() {
   });
 };
 
-
-// Create textarea objects and events associated with the input changes.
-var urlInput = new InputObject('.url', '.hidden-url-element', {
-      elementName: 'urlInput',
-      enterSubmission: true
-    });
-var bodyInput = new InputObject('.body-input', '.hidden-body-element', {
-      elementName: 'bodyInput',
-      enterSubmission: false
-    });
-// Create an array of these inputs.
-var inputArea = [urlInput, bodyInput];
-
 /**
  * Create object to store lesson information.
  */
@@ -131,7 +129,7 @@ function Lesson(elementId, options) {
     this.showInventory = false;
   }
   // Indicate which input submission is needed.
-  this.activeInput = options.activeInput || urlInput;
+  this.activeInput = options.activeInput;
 }
 
 /**
@@ -454,156 +452,184 @@ Chapter.prototype.makeMenu = function() {
   menu.append(newHeader);
 };
 
-// Array of chapters, with the corresponding lessons.
-var chapters = [
-  new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
-    new Lesson('lesson1-gmeapi', {
-      title: 'GME API',
-      submit: getText,
-      showInventory: false
-    }),
-    new Lesson('lesson2-apikey', {
-      title: 'API Key',
-      submit: testAPIKey,
-      showInventory: false,
-      submitButtonValue: 'Submit'
-    })
-  ]}),
-  new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
-    new Lesson('lesson3-gettable', {
-      title: 'Get Table',
-      submit: executeGetTable,
-      showInventory: true
-    }),
-    new Lesson('lesson4-listfeatures', {
-      title: 'List Features',
-      submit: executeListInput,
-      showInventory: true
-    }),
-    new Lesson('lesson5-queries', {
-      title: 'Queries',
-      submit: executeQueries,
-      showInventory: true
-    })
-  ]}),
-  new Chapter('chapter2-private', {title: 'Accessing Private Data', lessons: [
-    new Lesson('lesson6-login', {
-      title: 'Login and Authorization', 
-      submit: authorizeUser,
-      submitButtonValue: 'Sign In',
-      activeInput: false,
-      update: function() {
-        Lesson.prototype.update.call(this);
-        $('.url').hide();
-        if (!userAuthorization) {
-          // Activate the 'Sign In' button.
-          $('.submit-button').removeAttr('disabled');
-        } else {
-          // Else, leave the button disabled.
-          // Make sure that the next lesson is always unlocked.
-          this.complete();
+/**
+ * Fill the chapters array with chapters and corresponding lessons.
+ * Create introduction, resume, and finish page.
+ */
+function makeChaptersAndLessons(urlInput, bodyInput) {
+  chapters = [
+    new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
+      new Lesson('lesson1-gmeapi', {
+        title: 'GME API',
+        submit: getText,
+        showInventory: false,
+        activeInput: urlInput
+      }),
+      new Lesson('lesson2-apikey', {
+        title: 'API Key',
+        submit: testAPIKey,
+        showInventory: false,
+        submitButtonValue: 'Submit',
+        activeInput: urlInput
+      })
+    ]}),
+    new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
+      new Lesson('lesson3-gettable', {
+        title: 'Get Table',
+        submit: executeGetTable,
+        showInventory: true,
+        activeInput: urlInput
+      }),
+      new Lesson('lesson4-listfeatures', {
+        title: 'List Features',
+        submit: executeListInput,
+        showInventory: true,
+        activeInput: urlInput
+      }),
+      new Lesson('lesson5-queries', {
+        title: 'Queries',
+        submit: executeQueries,
+        showInventory: true,
+        activeInput: urlInput
+      })
+    ]}),
+    new Chapter('chapter2-private', {title: 'Accessing Private Data', lessons: [
+      new Lesson('lesson6-login', {
+        title: 'Login and Authorization', 
+        submit: authorizeUser,
+        submitButtonValue: 'Sign In',
+        activeInput: false,
+        update: function() {
+          Lesson.prototype.update.call(this);
+          $('.url').hide();
+          if (!userAuthorization) {
+            // Activate the 'Sign In' button.
+            $('.submit-button').removeAttr('disabled');
+          } else {
+            // Else, leave the button disabled.
+            // Make sure that the next lesson is always unlocked.
+            this.complete();
+          }
         }
-      }
-    }),
-    new Lesson('lesson7-project', {
-      title: 'Create a Free Project',
-      submit: storeProjectID,
-      submitButtonValue: 'Select',
-      activeInput: false,
-      update: function() {
-        Lesson.prototype.update.call(this);
-        $('.url').hide();
-        $('.project-menu').show();
-        $('.submit-button').removeAttr('disabled');
-        setInterval(function() {
-          gapi.client.request({
-            path: '/mapsengine/v1/projects/',
-            method: 'GET',
-            callback: function(jsonBody) {
-              var list = $('.project-list')
-              list.empty();
-              jsonBody.projects.forEach(function(project) {
-                var listItem = $('<option>').attr('value', project.id)
-                    .text(project.name);
-                list.append(listItem);
-              });
-            }
-          });
-        }, 5000); //5 seconds
-      }
-    }),
-    new Lesson('lesson8-listprojects', {
-      title: 'List Projects',
-      submit: executeListProjects,
-      submitButtonValue: 'Get',
-      headerFile: 'get-request-header.txt',
-      update: function() {
-        Lesson.prototype.update.call(this);
-        var header = JSON.stringify(this.header);
-        header = header.replace('{accessToken}', userAuthorization);
-        this.header = JSON.parse(header);
-        $('.header-input').text(header).show();
-      }
-    })
-  ]})
-];
-
-// Introduction, resume and final page lessons.
-var introduction = new Lesson('introduction', {
-  title: 'Welcome!',
-  buttonValue: 'Yes, I am!',
-  update: function() {
-    Lesson.prototype.update.call(this);
-    $('.next-button').removeClass('right-aligned').show();
-  }
-});
-var resume = new Lesson('resume', {
-  title: 'Welcome back!',
-  buttonValue: 'Resume',
-  update: function() {
-    Lesson.prototype.update.call(this);
-    $('.next-button').removeClass('right-aligned').show();
-  }
-});
-var finish = new Lesson('finish', {
-  title:'Congratulations!',
-  update: function() {
-    Lesson.prototype.update.call(this);
-    // The finish page will not have next button, but it will have the menu and
-    // go to documentation button.
-    $('.menu-area').show();
-    $('.documentation-button').show();
-    // Store the current lesson (the finish page).
-    localStorage['currentLesson'] = activeLesson.elementId;
-    // Make text on menu for active lesson red, and all others black.
-    chapters.forEach(function(chapter) {
-      chapter.lessons.forEach(function(lesson) {
-        lesson.menuElement.removeClass('active');
-      });
-    });
-  }
-});
-
-// Determining the next, and chapter for each lesson.
-// Introduction page points to the first lesson.
-var prevLesson = chapters[0].lessons[0];
-introduction.next = prevLesson;
-// Make each lesson points to the next lesson.
-chapters.forEach(function(chapter) {
-  chapter.lessons.forEach(function(lesson) {
-    lesson.chapter = chapter;
-    prevLesson.next = lesson;
-    prevLesson = lesson;
+      }),
+      new Lesson('lesson7-project', {
+        title: 'Create a Free Project',
+        submit: storeProjectID,
+        submitButtonValue: 'Select',
+        activeInput: false,
+        update: function() {
+          Lesson.prototype.update.call(this);
+          $('.url').hide();
+          $('.project-menu').show();
+          $('.submit-button').removeAttr('disabled');
+          setInterval(function() {
+            gapi.client.request({
+              path: '/mapsengine/v1/projects/',
+              method: 'GET',
+              callback: function(jsonBody) {
+                var list = $('.project-list')
+                list.empty();
+                jsonBody.projects.forEach(function(project) {
+                  var listItem = $('<option>').attr('value', project.id)
+                      .text(project.name);
+                  list.append(listItem);
+                });
+              }
+            });
+          }, 5000); //5 seconds
+        }
+      }),
+      new Lesson('lesson8-listprojects', {
+        title: 'List Projects',
+        submit: executeListProjects,
+        submitButtonValue: 'Get',
+        activeInput: urlInput,
+        headerFile: 'get-request-header.txt',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          var header = JSON.stringify(this.header);
+          header = header.replace('{accessToken}', userAuthorization);
+          this.header = JSON.parse(header);
+          $('.header-input').text(header).show();
+        }
+      })
+    ]})
+  ];
+  // Introduction, resume and final page lessons.
+  introduction = new Lesson('introduction', {
+    title: 'Welcome!',
+    buttonValue: 'Yes, I am!',
+    update: function() {
+      Lesson.prototype.update.call(this);
+      $('.next-button').removeClass('right-aligned').show();
+    }
   });
-});
-// Last lesson points to the final page.
-prevLesson.next = finish;
-// The final page does not need to have a next.
+  resume = new Lesson('resume', {
+    title: 'Welcome back!',
+    buttonValue: 'Resume',
+    update: function() {
+      Lesson.prototype.update.call(this);
+      $('.next-button').removeClass('right-aligned').show();
+    }
+  });
+  finish = new Lesson('finish', {
+    title:'Congratulations!',
+    update: function() {
+      Lesson.prototype.update.call(this);
+      // The finish page will not have next button, but it will have the menu and
+      // go to documentation button.
+      $('.menu-area').show();
+      $('.documentation-button').show();
+      // Store the current lesson (the finish page).
+      localStorage['currentLesson'] = activeLesson.elementId;
+      // Make text on menu for active lesson red, and all others black.
+      chapters.forEach(function(chapter) {
+        chapter.lessons.forEach(function(lesson) {
+          lesson.menuElement.removeClass('active');
+        });
+      });
+    }
+  });
+  // Set the next lesson and chapter on each lesson.
+  setNextLesson();
+}
+
+/**
+ * Determining the next, and chapter for each lesson.
+ */
+function setNextLesson() {
+  // Introduction page points to the first lesson.
+  var prevLesson = chapters[0].lessons[0];
+  introduction.next = prevLesson;
+  // Make each lesson points to the next lesson.
+  chapters.forEach(function(chapter) {
+    chapter.lessons.forEach(function(lesson) {
+      lesson.chapter = chapter;
+      prevLesson.next = lesson;
+      prevLesson = lesson;
+    });
+  });
+  // Last lesson points to the final page.
+  prevLesson.next = finish;
+  // The final page does not need to have a next.
+}
+
 
 /**
  * Function executed when the window is loading.
  */
 $(window).load(function() {
+  // Create textarea objects and events associated with the input changes.
+  var urlInput = new InputObject('.url', '.hidden-url-element', {
+        elementName: 'urlInput',
+        enterSubmission: true
+      });
+  var bodyInput = new InputObject('.body-input', '.hidden-body-element', {
+        elementName: 'bodyInput',
+        enterSubmission: false
+      });
+  // Create the chapters + lesson objects
+  makeChaptersAndLessons(urlInput, bodyInput);
   // Load the markdown files for the introduction, resume, and finish page.
   introduction.loadInstruction();
   resume.loadInstruction();
@@ -620,10 +646,6 @@ $(window).load(function() {
       lesson.loadHeader();
     });
   });
-  // Create the events setup for every input area elements.
-  inputArea.forEach(function(inputObject) {
-    inputObject.setup();
-  })
   // Set up analytics to indicate how many times users go to the documentation 
   // page using the final page button.
   $('.documentation-button').on('click', function() {
