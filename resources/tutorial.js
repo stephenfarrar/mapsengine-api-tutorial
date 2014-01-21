@@ -108,14 +108,14 @@ Lesson.prototype.update = function() {
  * Handles the input the user has submitted.
  */
 Lesson.prototype.submit = function() {
-  this.address = $.trim($('.url').val());
-  this.checkCorrectness();
+  var address = $.trim($('.url').val());
+  this.checkCorrectness(address);
 }
 
 /**
  * Checking the correctness of user's input using the GME API.
  */
-Lesson.prototype.checkCorrectness = function() {
+Lesson.prototype.checkCorrectness = function(address) {
   var me = this;
   var data = $('.response-content');
   // Empty the output area.
@@ -129,7 +129,7 @@ Lesson.prototype.checkCorrectness = function() {
       var correctResourceString = JSON.stringify(resource, null, 2);
       // Get the response with users's input.
       $.ajax({
-        url: me.address,
+        url: address,
         headers: me.header,
         dataType: 'json',
         success: function(resource2) {
@@ -902,8 +902,8 @@ function executeGetTable() {
   var address = $.trim($('.url').val());
   // The Get Table is currently NOT AVAILABLE in v1.
   // It will someday be available and this 2 line codes needs to be removed
-  this.address = address.replace('v1', 'search_tt');
-  this.checkCorrectness();
+  address = address.replace('v1', 'search_tt');
+  this.checkCorrectness(address);
 }
 
 /**
