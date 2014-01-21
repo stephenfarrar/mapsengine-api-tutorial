@@ -638,7 +638,7 @@ function testGetTable() {
   var address = $.trim($('.url').val());
   var correctAns = 'https://www.googleapis.com/mapsengine/v1/tables/' + 
       '15474835347274181123-14495543923251622067?' +
-      'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38';
+      'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco';
   checkCorrectness(this, address, correctAns);
 }
 
@@ -650,7 +650,7 @@ function executeListInput() {
   var address = $.trim($('.url').val());
   var correctAns = 'https://www.googleapis.com/mapsengine/v1/tables/' +
       '15474835347274181123-14495543923251622067/features?' +
-      'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38';
+      'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco';
   checkCorrectness(this, address, correctAns);
 }
 
@@ -662,7 +662,7 @@ function executeQueries() {
   var address = $.trim($('.url').val());
   var correctAns = 'https://www.googleapis.com/mapsengine/v1/tables/' +
       '15474835347274181123-14495543923251622067/features?' +
-      'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38&' +
+      'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco&' +
       'where=Population<2000000';
   checkCorrectness(this, address, correctAns);
 }
