@@ -6,72 +6,98 @@ var pendingFiles = {};
 var userAuthorization = false;
 
 /**
+ * Create object to store textarea input information.
+ * A textarea that resizes itself to fit its contents.
+ * @elementClass {string} A selector that locates the textarea.
+ * @hiddenElementClass {string} A selector that locates a hidden div.
+ * @elementName {string} The name stored in the local storage. 
+ * @enterSubmission {boolean} Indicate the need of enter submission/not.
+ */
+function InputObject(elementClass, hiddenElementClass, options) {
+  this.elementClass = elementClass;
+  this.hiddenElementClass = hiddenElementClass;
+  this.elementName = options.elementName;
+  this.enterSubmission = options.enterSubmission;
+}
+
+/**
+ * Set the height of textarea based on the input height.
+ */
+InputObject.prototype.setTextAreaHeight = function() {
+  // Store it in the hidden div, get the height and set the textarea height.
+  // Always store one more line to make the height change smoother.
+  $(this.hiddenElementClass).text($(this.elementClass).val() +
+      'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+  $(this.elementClass).height($(this.hiddenElementClass).height());
+}
+
+/**
+ * Disable the submit button if there is empty input.
+ */
+InputObject.prototype.toggleSubmitButton = function() {
+  if ($(this.elementClass).val() == '') {
+    $('.submit-button').attr('disabled','disabled');
+  } else {
+    $('.submit-button').removeAttr('disabled');
+  }
+}
+
+/**
+ * Changes that need to happen everytime input changes.
+ */
+InputObject.prototype.onChange = function() {
+  // Enable or disable the submit button.
+  this.toggleSubmitButton();
+  // Store the input in local storage.
+  localStorage[activeLesson.elementId + this.elementName]
+      = $(this.elementClass).val();
+  // Set the height of the textarea.    
+  this.setTextAreaHeight();
+};
+
+/**
  * Create setup property of an input object.
  */
-inputObject.prototype.setup = function() {
+InputObject.prototype.setup = function() {
   var me = this;
   // Set events on keypress.
-  $(this.element).keypress(function(event) {
+  $(this.elementClass).keypress(function(event) {
     // Check if the input needs enter submission behaviour.
     if (me.enterSubmission) {
       // Enable submit by enter, not making the enter visible in the input.
       if (event.which == 13) {
         event.preventDefault();
         // Submit only if the input is not blank.
-        if ($(me.element).val() !== '') {
+        if ($(me.elementClass).val() !== '') {
           activeLesson.submit();
         }
       }
     }
-    onChange(me);
+    me.onChange();
   });
   // Set events on keyup, to handle backspaces.
-  $(this.element).keyup(function() {
-    onChange(me);
+  $(this.elementClass).keyup(function() {
+    me.onChange();
   });
   // Set events on paste and cut.
-  $(this.element).on('paste cut', function() {
+  $(this.elementClass).on('paste cut', function() {
     setTimeout(function() {
-      onChange(me);
+      me.onChange();
     }, 0);
   });
 };
 
-/**
- * Changes that need to happen everytime input changes.
- */
-function onChange(inputObject) {
-  // Enable or disable the submit button.
-  toggleSubmitButton($(inputObject.element));
-  // Store the input in local storage.
-  localStorage[activeLesson.elementId + inputObject.elementName]
-      = $(inputObject.element).val();
-  // Set the height of the textarea.    
-  setTextAreaHeight($(inputObject.element), $(inputObject.hiddenElement));
-}
 
-/**
- * Create object to store textarea input information.
- */
-function inputObject(element, hiddenElement, options) {
-  this.element = element;
-  this.hiddenElement = hiddenElement;
-  this.elementName = options.elementName;
-  this.enterSubmission = options.enterSubmission;
-}
-
-/**
- * Create textarea objects and events associated with the input changes.
- * Create an array of these inputs.
- */
-var urlInput = new inputObject('.url', '.hidden-url-element', {
+// Create textarea objects and events associated with the input changes.
+var urlInput = new InputObject('.url', '.hidden-url-element', {
       elementName: 'urlInput',
       enterSubmission: true
     });
-var bodyInput = new inputObject('.body-input', '.hidden-body-element', {
+var bodyInput = new InputObject('.body-input', '.hidden-body-element', {
       elementName: 'bodyInput',
       enterSubmission: false
     });
+// Create an array of these inputs.
 var inputArea = [urlInput, bodyInput];
 
 /**
@@ -160,10 +186,9 @@ Lesson.prototype.update = function() {
       // Update the input (placeholder/saved URL/saved body).
       var storedInput = 
           localStorage[this.elementId + this.activeInput.elementName];
-      $(this.activeInput.element).val(storedInput || '');
-      setTextAreaHeight($(this.activeInput.element), 
-          $(this.activeInput.hiddenElement));
-      toggleSubmitButton($(this.activeInput.element));
+      $(this.activeInput.elementClass).val(storedInput || '');
+      this.activeInput.setTextAreaHeight();
+      this.activeInput.toggleSubmitButton();
     }
   }
   // Set up analytics for the page visited by the user (number of times the page
@@ -641,28 +666,6 @@ function checkNoFilesPending() {
   if (jQuery.isEmptyObject(pendingFiles)) {
     loadState();
   }
-}
-
-/**
- * Disable the submit button if there is empty input.
- */
-function toggleSubmitButton(input) {
-  if (input.val() == '') {
-    $('.submit-button').attr('disabled','disabled');
-  } else {
-    $('.submit-button').removeAttr('disabled');
-  }
-}
-
-/**
- * Set the height of textarea based on the input height.
- */
-function setTextAreaHeight(input, hiddenInput) {
-  // Store it in the hidden div, get the height and set the textarea height.
-  // Always store one more line to make the height change smoother.
-  hiddenInput.text(input.val() +
-      'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
-  input.height(hiddenInput.height());
 }
 
 /**
