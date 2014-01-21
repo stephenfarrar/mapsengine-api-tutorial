@@ -65,12 +65,12 @@ function inputObject(element, hiddenElement, options) {
  * Create an array of these inputs.
  */
 var urlInput = new inputObject('.url', '.hidden-url-element', {
-        elementName: 'urlInput',
-        enterSubmission: true
+      elementName: 'urlInput',
+      enterSubmission: true
     });
 var bodyInput = new inputObject('.body-input', '.hidden-body-element', {
-        elementName: 'bodyInput',
-        enterSubmission: false
+      elementName: 'bodyInput',
+      enterSubmission: false
     });
 var inputArea = [urlInput, bodyInput];
 
@@ -166,8 +166,8 @@ Lesson.prototype.update = function() {
   // Set up analytics for the page visited by the user (number of times the page
   // is visited).
   ga('send', {
-      hitType: 'pageview',
-      page: this.elementId
+    hitType: 'pageview',
+    page: this.elementId
   });
 };
 
@@ -198,10 +198,10 @@ Lesson.prototype.showAnswer = function() {
     $('.answer').fadeIn(fadeInTime);
     // Set up analytics for show answer button (how many times users click it).
     ga('send', {
-        hitType: 'event',
-        eventCategory: 'help',
-        eventAction: 'show answer',
-        eventLabel: this.elementId
+      hitType: 'event',
+      eventCategory: 'help',
+      eventAction: 'show answer',
+      eventLabel: this.elementId
     });
   }
 };
@@ -227,10 +227,10 @@ Lesson.prototype.displaySuccessMessage = function() {
     $('.next-button').hide().fadeIn(fadeInTime);
     // Set up analytics to indicate success (how many times).
     ga('send', {
-        hitType: 'event',
-        eventCategory: 'submit',
-        eventAction: 'success',
-        eventLabel: this.elementId
+      hitType: 'event',
+      eventCategory: 'submit',
+      eventAction: 'success',
+      eventLabel: this.elementId
     });
   }
 };
@@ -266,10 +266,10 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   $('.next-button').hide();
   // Set up analytics to indicate failure (how many times).
   ga('send', {
-      hitType: 'event',
-      eventCategory: 'submit',
-      eventAction: 'failure',
-      eventLabel: this.elementId
+    hitType: 'event',
+    eventCategory: 'submit',
+    eventAction: 'failure',
+    eventLabel: this.elementId
   });
 };
 
@@ -415,77 +415,77 @@ Chapter.prototype.makeMenu = function() {
 var chapters = [
   new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
     new Lesson('lesson1-gmeapi', {
-        title: 'GME API',
-        submit: getText,
-        showInventory: false
+      title: 'GME API',
+      submit: getText,
+      showInventory: false
     }),
     new Lesson('lesson2-apikey', {
-        title: 'API Key',
-        submit: testAPIKey,
-        showInventory: false,
-        submitButtonValue: 'Submit'
+      title: 'API Key',
+      submit: testAPIKey,
+      showInventory: false,
+      submitButtonValue: 'Submit'
     })
   ]}),
   new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
     new Lesson('lesson3-gettable', {
-        title: 'Get Table',
-        submit: testGetTable,
-        showInventory: true
+      title: 'Get Table',
+      submit: testGetTable,
+      showInventory: true
     }),
     new Lesson('lesson4-listfeatures', {
-        title: 'List Features',
-        submit: executeListInput,
-        showInventory: true
+      title: 'List Features',
+      submit: executeListInput,
+      showInventory: true
     }),
     new Lesson('lesson5-queries', {
-        title: 'Queries',
-        submit: executeQueries,
-        showInventory: true
+      title: 'Queries',
+      submit: executeQueries,
+      showInventory: true
     })
   ]}),
   new Chapter('chapter2-accessingprivatedata', {title: 'Accessing Private Data',
       lessons: [
     new Lesson('lesson6-login', {
-        title: 'Login and Authorization', 
-        submit: authorizeUser,
-        submitButtonValue: 'Sign In',
-        activeInput: false,
-        update: function() {
-          Lesson.prototype.update.call(this);
-          $('.url').hide();
-          if (!userAuthorization) {
-            // Activate the 'Sign In' button.
-            $('.submit-button').removeAttr('disabled');
-          }
-          // Else, leave the button disabled.
+      title: 'Login and Authorization', 
+      submit: authorizeUser,
+      submitButtonValue: 'Sign In',
+      activeInput: false,
+      update: function() {
+        Lesson.prototype.update.call(this);
+        $('.url').hide();
+        if (!userAuthorization) {
+          // Activate the 'Sign In' button.
+          $('.submit-button').removeAttr('disabled');
         }
+        // Else, leave the button disabled.
+      }
     }),
     new Lesson('lesson7-project', {
-        title: 'Create a Free Project',
-        submit: storeProjectID,
-        submitButtonValue: 'Select',
-        activeInput: false,
-        update: function() {
-          Lesson.prototype.update.call(this);
-          $('.url').hide();
-          $('.project-menu').show();
-          $('.submit-button').removeAttr('disabled');
-          setInterval(function() {
-            gapi.client.request({
-              path: '/mapsengine/v1/projects/',
-              method: 'GET',
-              callback: function(jsonBody) {
-                var list = $('.project-list')
-                list.empty();
-                jsonBody.projects.forEach(function(project) {
-                  var listItem = $('<option>').attr('value', project.id)
-                      .text(project.name);
-                  list.append(listItem);
-                });
-              }
-            });
-          }, 5000); //5 seconds
-        }
+      title: 'Create a Free Project',
+      submit: storeProjectID,
+      submitButtonValue: 'Select',
+      activeInput: false,
+      update: function() {
+        Lesson.prototype.update.call(this);
+        $('.url').hide();
+        $('.project-menu').show();
+        $('.submit-button').removeAttr('disabled');
+        setInterval(function() {
+          gapi.client.request({
+            path: '/mapsengine/v1/projects/',
+            method: 'GET',
+            callback: function(jsonBody) {
+              var list = $('.project-list')
+              list.empty();
+              jsonBody.projects.forEach(function(project) {
+                var listItem = $('<option>').attr('value', project.id)
+                    .text(project.name);
+                list.append(listItem);
+              });
+            }
+          });
+        }, 5000); //5 seconds
+      }
     }),
   ]})
 ];
@@ -571,9 +571,9 @@ $(window).load(function() {
   // page using the final page button.
   $('.documentation-button').on('click', function() {
     ga('send', {
-        hitType: 'event',
-        eventCategory: 'readTheDocs',
-        eventAction: 'finalPageButton',
+      hitType: 'event',
+      eventCategory: 'readTheDocs',
+      eventAction: 'finalPageButton',
     });
   });
 
@@ -581,10 +581,10 @@ $(window).load(function() {
   // page while visiting a specific lesson.
   $('.documentation-link').on('click', function() {
     ga('send', {
-        hitType: 'event',
-        eventCategory: 'readTheDocs',
-        eventAction: 'navigationMenu',
-        eventLabel: activeLesson.elementId
+      hitType: 'event',
+      eventCategory: 'readTheDocs',
+      eventAction: 'navigationMenu',
+      eventLabel: activeLesson.elementId
     });
   });
 });
