@@ -24,6 +24,9 @@ function Lesson(elementId, options) {
   if (options.update) {
     this.update = options.update;
   }
+  if (options.headerFile) {
+    this.headerFile = options.headerFile;
+  }
   // Done is 'true' if the user has submitted correctly.
   this.done = false;
   this.unlocked = false;
@@ -307,6 +310,21 @@ Lesson.prototype.loadAnswer = function() {
 };
 
 /**
+ * Load the headers markdown, where applicable.
+ */
+Lesson.prototype.loadHeader = function() {
+  var me = this;
+  if (this.headerFile) {
+    pendingFiles[me.headerFile] = true;
+    $.get('resources/' + me.headerFile, function(response) {
+      me.header = JSON.parse(response);
+      delete pendingFiles[me.headerFile];
+      checkNoFilesPending();
+    });
+  }
+};
+
+/**
  * Create object to store chapter information.
  */
 function Chapter(elementId, options) {
@@ -412,14 +430,14 @@ var chapters = [
       submit: executeListProjects,
       submitButtonValue: 'Get',
       activeInput: '.body-input',
+      headerFile: 'get-request-header.txt',
       update: function() {
         var me = this;
         Lesson.prototype.update.call(this);
-        $.get('resources/get-request-header.txt', function(response) {
-          response = response.replace('{accessToken}', userAuthorization);
-          $('.header-input').text(response).show();
-          me.header = JSON.parse(response);
-        });
+        var header = JSON.stringify(me.header);
+        header = header.replace('{accessToken}', userAuthorization);
+        me.header = JSON.parse(header);
+        $('.header-input').text(header).show();
       }
     })
   ]})
@@ -496,6 +514,7 @@ $(window).load(function() {
       lesson.loadInstruction();
       lesson.loadSuccessMessage();
       lesson.loadAnswer();
+      lesson.loadHeader();
     });
   });
   // Store the input everytime it changes, to the respective local storage.
@@ -946,7 +965,7 @@ function executeListProjects() {
             me.displaySuccessMessage();
             me.complete();
           } else {
-            lesson.displayErrorMessage('Be sure to read the instructions ' +
+            me.displayErrorMessage('Be sure to read the instructions ' +
                 'carefully and complete the exercise ' +
                 'requirements.');
           } 
