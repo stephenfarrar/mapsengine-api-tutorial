@@ -511,7 +511,6 @@ var chapters = [
       title: 'List Projects',
       submit: executeListProjects,
       submitButtonValue: 'Get',
-      activeInput: '.body-input',
       headerFile: 'get-request-header.txt',
       update: function() {
         Lesson.prototype.update.call(this);
