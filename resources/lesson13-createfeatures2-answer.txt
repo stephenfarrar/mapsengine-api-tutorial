@@ -1,5 +1,5 @@
 ###Answer###  
-You can use this feature to add to your ‘World Famous Mountains’ table. 
+You can use this feature to add to your 'World Famous Mountains' table. 
 `{
   "features": [
     {
