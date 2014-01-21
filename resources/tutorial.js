@@ -486,7 +486,7 @@ var chapters = [
           });
         }, 5000); //5 seconds
       }
-    }),
+    })
   ]})
 ];
 
@@ -735,7 +735,7 @@ function testAPIKey() {
     },
     error: function(response) {
       me.displayErrorMessage('Make sure that you have created a browser key ' +
-        'and copied it correctly.');
+          'and copied it correctly.');
     }
   });
 }
