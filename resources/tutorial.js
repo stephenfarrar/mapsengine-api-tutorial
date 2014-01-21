@@ -588,9 +588,7 @@ var finish = new Lesson('finish', {
 // Introduction page points to the first lesson.
 var prevLesson = chapters[0].lessons[0];
 introduction.next = prevLesson;
-/**
- * Make each lesson points to the next lesson.
- */
+// Make each lesson points to the next lesson.
 chapters.forEach(function(chapter) {
   chapter.lessons.forEach(function(lesson) {
     lesson.chapter = chapter;
