@@ -19,13 +19,20 @@ function Lesson(elementId, options) {
     this.hasSubmit = true;
   } else {
     // It is an intro/final page.
-    this.hasSubmit = false;
+    if (options.hasSubmit) {
+      this.hasSubmit = true;
+    } else {
+      this.hasSubmit = false;
+    }
   }
   if (options.update) {
     this.update = options.update;
   }
   if (options.headerFile) {
     this.headerFile = options.headerFile;
+  }
+  if (options.correctAns) {
+    this.correctAns = options.correctAns;
   }
   // Done is 'true' if the user has submitted correctly.
   this.done = false;
@@ -96,6 +103,149 @@ Lesson.prototype.update = function() {
       page: this.elementId
   });
 };
+
+/**
+ * Handles the input the user has submitted.
+ */
+Lesson.prototype.submit = function() {
+  this.address = $.trim($('.url').val());
+  this.checkCorrectness();
+}
+
+/**
+ * Checking the correctness of user's input using the GME API.
+ */
+Lesson.prototype.checkCorrectness = function() {
+  var me = this;
+  var data = $('.response-content');
+  // Empty the output area.
+  data.empty();
+  // Get the response with the correct URL.
+  $.ajax({
+    url: me.correctAns,
+    headers: me.header,
+    dataType: 'json',
+    success: function(resource) {
+      var correctResourceString = JSON.stringify(resource, null, 2);
+      // Get the response with users's input.
+      $.ajax({
+        url: me.address,
+        headers: me.header,
+        dataType: 'json',
+        success: function(resource2) {
+          var resourceString = JSON.stringify(resource2, null, 2);
+          data.text(resourceString);
+          // If the response is the correct response, then the user is right.
+          if (resourceString == correctResourceString) {
+            me.displaySuccessMessage();
+            me.complete();
+          } else {
+            me.displayErrorMessage('Be sure to read the instructions ' +
+                'carefully and complete the exercise ' +
+                'requirements.');
+          } 
+        },
+        error: function(response) {
+          // Try parsing the response.
+          var errorMess;
+          try {
+            response = JSON.parse(response.responseText);
+            errorMess = response.error.errors[0];
+            // Append the response to the output area.
+            var responseString = JSON.stringify(errorMess, null, 2);
+            data.text(responseString); 
+          } catch (e) {
+            errorMess = 'notJSONObject';
+          }
+          // Giving messages for different error reasons.
+          if (errorMess == 'notJSONObject') {
+            me.displayErrorMessage('The URL is not a valid Google Maps ' +
+                'Engine API URL.');
+          } else if (errorMess.reason == 'authError') {
+            me.displayErrorMessage('It appears that your authorization ' +
+                'token is invalid. Make sure that you entered the correct ' +
+                'header for this request.');
+          } else if (errorMess.reason == 'keyInvalid') {
+            // If it contains curly braces, ask user to remove them.
+            if (addressString.indexOf('{') != -1 || 
+                addressString.indexOf('}') != -1) {
+              me.displayErrorMessage('Check that you have removed the ' +
+                  'curly braces({ }) surrounding the API Key in your URL.');
+            } else {
+              me.displayErrorMessage('The API Key used in the URL is ' +
+                  'invalid. Make sure that you entered your API Key ' +
+                  'correctly.');
+            }
+          } else if (errorMess.reason == 'dailyLimitExceededUnreg') {
+            me.displayErrorMessage('There might be something wrong with ' +
+                'your \'key\' parameter. Make sure that you entered it ' +
+                'correctly.');
+          } else if (errorMess.reason == 'invalid') {
+            var field = errorMess.location;
+            // If the error is not in table ID, tell the error location.
+            if (field!=='id') {
+              me.displayErrorMessage('Check whether you have given the ' +
+                  'right values for the parameters, in particular, ' +
+                  'the \''+field+'\' field.');
+            } else {
+              // If it contains curly braces, ask user to remove them.
+              if (addressString.indexOf('{') != -1 || 
+                  addressString.indexOf('}') != -1) {
+                me.displayErrorMessage('Check that you have removed the ' +
+                    'curly braces({ }) surrounding the table ID in your URL.');
+              } else {
+                me.displayErrorMessage('The table ID used in the URL is ' +
+                    'invalid. Check whether you have given the right table ' +
+                    'ID and make sure that the table has been made public. ' +
+                    'To make your table public, you can follow the ' +
+                    'instructions in <a href=' +
+                    '"//support.google.com/mapsengine/answer/3164737?hl=en"' +
+                    '>this link</a>.');
+              }
+            }
+          } else if (errorMess.reason == 'required') {
+            me.displayErrorMessage('A required parameter has been left ' +
+                'out of the request. Make sure that you entered all ' +
+                'parameters needed.');
+          } else if (errorMess.reason == 'notFound') {
+            me.displayErrorMessage('No results were found for your ' +
+                'request. The asset might not exist, not a public asset, ' +
+                'or it has been deleted from the Google Maps Engine.');
+          } else if (errorMess.reason == 'insufficientPermissions') {
+            me.displayErrorMessage('You do not have sufficient ' +
+                'permissions for this request. Make sure you have specified ' +
+                'version=published in the request.');
+          } else if (errorMess.reason == 'limitExceeded') {
+            me.displayErrorMessage('The resource is too large to be ' +
+                'accessed through the API.');
+          } else if (errorMess.reason == 'duplicate') {
+            me.displayErrorMessage('The new feature you are trying to ' +
+                'insert has an ID that already exists in the table.');
+          } else if (errorMess.reason == 'rateLimitExceeded' || 
+                     errorMess.reason == 'quotaExceeded') {
+            me.displayErrorMessage('You have exhausted the ' +
+                'application\'s daily quota or its per-second rate limit. ' +
+                'Please contact the Enterprise Support for higher limits.');
+          } else if (errorMess.reason == 'unauthorized') {
+            me.displayErrorMessage('Make sure you have included the ' +
+                'required authorization header with the request.');
+          } else if (errorMess.reason == 'requestTooLarge') {
+            me.displayErrorMessage('This request contains too many ' +
+                'features and/or vertices.');
+          } else if (errorMess.reason == 'accessNotConfigured') {
+            me.displayErrorMessage('There is a per-IP or per-Referer ' +
+                'restriction configured on the API Key and the request does ' +
+                'not match these restrictions, or the Maps Engine API is not ' +
+                'activated on the project ID.');
+          } else {
+            me.displayErrorMessage('The data you requested cannot be ' +
+                'processed. Check your request to ensure that it is correct.');
+          }
+        }
+      });
+    }
+  });
+}
 
 /**
  * Display instruction if there is any.
@@ -321,6 +471,9 @@ Lesson.prototype.loadHeader = function() {
       delete pendingFiles[me.headerFile];
       checkNoFilesPending();
     });
+  } else {
+    // If the lesson has no header, give it an empty object.
+    this.header = {};
   }
 };
 
@@ -371,17 +524,27 @@ var chapters = [
     new Lesson('lesson3-gettable', {
         title: 'Get Table',
         submit: executeGetTable,
-        showInventory: true
+        showInventory: true,
+        correctAns: 'https://www.googleapis.com/mapsengine/search_tt/tables/' + 
+                '15474835347274181123-14495543923251622067?' +
+                'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38'
     }),
     new Lesson('lesson4-listfeatures', {
         title: 'List Features',
-        submit: executeListInput,
-        showInventory: true
+        showInventory: true,
+        correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
+                '15474835347274181123-14495543923251622067/features?' +
+                'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38',
+        hasSubmit: true
     }),
     new Lesson('lesson5-queries', {
         title: 'Queries',
-        submit: executeQueries,
-        showInventory: true
+        showInventory: true,
+        correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
+                '15474835347274181123-14495543923251622067/features?' +
+                'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v3' +
+                '8&where=Population<2000000',
+        hasSubmit: true
     })
   ]}),
   new Chapter('chapter2-private', {title: 'Accessing Private Data', lessons: [
@@ -430,10 +593,11 @@ var chapters = [
     }),
     new Lesson('lesson8-listprojects', {
       title: 'List Projects',
-      submit: executeListProjects,
+      hasSubmit: true,
       submitButtonValue: 'Get',
       activeInput: '.body-input',
       headerFile: 'get-request-header.txt',
+      correctAns: 'https://www.googleapis.com/mapsengine/v1/projects',
       update: function() {
         Lesson.prototype.update.call(this);
         var header = JSON.stringify(this.header);
@@ -727,8 +891,8 @@ function testAPIKey() {
       me.displayErrorMessage('Make sure that you have created a browser key ' +
         'and copied it correctly.');
     }
-  });
-}
+  })
+;}
 
 /**
  * Get table submit function.
@@ -736,171 +900,10 @@ function testAPIKey() {
 function executeGetTable() {
   // Get user input and trim it.
   var address = $.trim($('.url').val());
-  var correctAns = 'https://www.googleapis.com/mapsengine/v1/tables/' + 
-      '15474835347274181123-14495543923251622067?' +
-      'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38';
   // The Get Table is currently NOT AVAILABLE in v1.
   // It will someday be available and this 2 line codes needs to be removed
-  address = address.replace('v1', 'search_tt');
-  correctAns = correctAns.replace('v1', 'search_tt');
-  checkCorrectness(this, address, correctAns);
-}
-
-/**
- * List Feature submit function.
- */
-function executeListInput() {
-  // Get user input and trim it.
-  var address = $.trim($('.url').val());
-  var correctAns = 'https://www.googleapis.com/mapsengine/v1/tables/' +
-      '15474835347274181123-14495543923251622067/features?' +
-      'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38';
-  checkCorrectness(this, address, correctAns);
-}
-
-/**
- * Queries submit function.
- */
-function executeQueries() {
-  // Get user input and trim it.
-  var address = $.trim($('.url').val());
-  var correctAns = 'https://www.googleapis.com/mapsengine/v1/tables/' +
-      '15474835347274181123-14495543923251622067/features?' +
-      'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38&' +
-      'where=Population<2000000';
-  checkCorrectness(this, address, correctAns);
-}
-
-/**
- * Checking the correctness of user's input using the GME API.
- */
-function checkCorrectness(lesson, addressString, correctAns) {
-  var data = $('.response-content');
-  // Empty the output area.
-  data.empty();
-  // Get the response with the correct URL.
-  $.ajax({
-    url: correctAns,
-    dataType: 'json',
-    success: function(resource) {
-      var correctResourceString = JSON.stringify(resource, null, 2);
-      // Get the response with users's input.
-      $.ajax({
-        url: addressString,
-        dataType: 'json',
-        success: function(resource2) {
-          var resourceString = JSON.stringify(resource2, null, 2);
-          data.text(resourceString);
-          // If the response is the correct response, then the user is right.
-          if (resourceString == correctResourceString) {
-            lesson.displaySuccessMessage();
-            lesson.complete();
-          } else {
-            lesson.displayErrorMessage('Be sure to read the instructions ' +
-                'carefully and complete the exercise ' +
-                'requirements.');
-          } 
-        },
-        error: function(response) {
-          // Try parsing the response.
-          var errorMess;
-          try {
-            response = JSON.parse(response.responseText);
-            errorMess = response.error.errors[0];
-            // Append the response to the output area.
-            var responseString = JSON.stringify(errorMess, null, 2);
-            data.text(responseString); 
-          } catch (e) {
-            errorMess = 'notJSONObject';
-          }
-          // Giving messages for different error reasons.
-          if (errorMess == 'notJSONObject') {
-            lesson.displayErrorMessage('The URL is not a valid Google Maps ' +
-                'Engine API URL.');
-          } else if (errorMess.reason == 'authError') {
-            lesson.displayErrorMessage('It appears that your authorization ' +
-                'token is invalid. Make sure that you entered the correct ' +
-                'header for this request.');
-          } else if (errorMess.reason == 'keyInvalid') {
-            // If it contains curly braces, ask user to remove them.
-            if (addressString.indexOf('{') != -1 || 
-                addressString.indexOf('}') != -1) {
-              lesson.displayErrorMessage('Check that you have removed the ' +
-                  'curly braces({ }) surrounding the API Key in your URL.');
-            } else {
-              lesson.displayErrorMessage('The API Key used in the URL is ' +
-                  'invalid. Make sure that you entered your API Key ' +
-                  'correctly.');
-            }
-          } else if (errorMess.reason == 'dailyLimitExceededUnreg') {
-            lesson.displayErrorMessage('There might be something wrong with ' +
-                'your \'key\' parameter. Make sure that you entered it ' +
-                'correctly.');
-          } else if (errorMess.reason == 'invalid') {
-            var field = errorMess.location;
-            // If the error is not in table ID, tell the error location.
-            if (field!=='id') {
-              lesson.displayErrorMessage('Check whether you have given the ' +
-                  'right values for the parameters, in particular, ' +
-                  'the \''+field+'\' field.');
-            } else {
-              // If it contains curly braces, ask user to remove them.
-              if (addressString.indexOf('{') != -1 || 
-                  addressString.indexOf('}') != -1) {
-                lesson.displayErrorMessage('Check that you have removed the ' +
-                    'curly braces({ }) surrounding the table ID in your URL.');
-              } else {
-                lesson.displayErrorMessage('The table ID used in the URL is ' +
-                    'invalid. Check whether you have given the right table ' +
-                    'ID and make sure that the table has been made public. ' +
-                    'To make your table public, you can follow the ' +
-                    'instructions in <a href=' +
-                    '"//support.google.com/mapsengine/answer/3164737?hl=en"' +
-                    '>this link</a>.');
-              }
-            }
-          } else if (errorMess.reason == 'required') {
-            lesson.displayErrorMessage('A required parameter has been left ' +
-                'out of the request. Make sure that you entered all ' +
-                'parameters needed.');
-          } else if (errorMess.reason == 'notFound') {
-            lesson.displayErrorMessage('No results were found for your ' +
-                'request. The asset might not exist, not a public asset, ' +
-                'or it has been deleted from the Google Maps Engine.');
-          } else if (errorMess.reason == 'insufficientPermissions') {
-            lesson.displayErrorMessage('You do not have sufficient ' +
-                'permissions for this request. Make sure you have specified ' +
-                'version=published in the request.');
-          } else if (errorMess.reason == 'limitExceeded') {
-            lesson.displayErrorMessage('The resource is too large to be ' +
-                'accessed through the API.');
-          } else if (errorMess.reason == 'duplicate') {
-            lesson.displayErrorMessage('The new feature you are trying to ' +
-                'insert has an ID that already exists in the table.');
-          } else if (errorMess.reason == 'rateLimitExceeded' || 
-                     errorMess.reason == 'quotaExceeded') {
-            lesson.displayErrorMessage('You have exhausted the ' +
-                'application\'s daily quota or its per-second rate limit. ' +
-                'Please contact the Enterprise Support for higher limits.');
-          } else if (errorMess.reason == 'unauthorized') {
-            lesson.displayErrorMessage('Make sure you have included the ' +
-                'required authorization header with the request.');
-          } else if (errorMess.reason == 'requestTooLarge') {
-            lesson.displayErrorMessage('This request contains too many ' +
-                'features and/or vertices.');
-          } else if (errorMess.reason == 'accessNotConfigured') {
-            lesson.displayErrorMessage('There is a per-IP or per-Referer ' +
-                'restriction configured on the API Key and the request does ' +
-                'not match these restrictions, or the Maps Engine API is not ' +
-                'activated on the project ID.');
-          } else {
-            lesson.displayErrorMessage('The data you requested cannot be ' +
-                'processed. Check your request to ensure that it is correct.');
-          }
-        }
-      });
-    }
-  });
+  this.address = address.replace('v1', 'search_tt');
+  this.checkCorrectness();
 }
 
 /**
@@ -926,56 +929,13 @@ function authorizeUser() {
  * Create a free project submit function.
  */
 function storeProjectID() {
-  var me = this;
   var projectID = $('.project-list').val();
   if (projectID) {
     localStorage['projectID'] = projectID;
-    me.complete();
-    me.displaySuccessMessage();
+    this.complete();
+    this.displaySuccessMessage();
   } else {
-    me.displayErrorMessage('You need to select a project from the dropdown ' +
+    this.displayErrorMessage('You need to select a project from the dropdown ' +
         'list. It may take a few seconds for new projects to appear.');
   }
-}
-
-/**
- * List projects submit function.
- */
-function executeListProjects() {
-  var me = this;
-  var data = $('.response-content');
-  // Empty the output area.
-  data.empty();
-  var address = $.trim($('.url').val());
-  var correctAns = 'https://www.googleapis.com/mapsengine/v1/projects';
-  $.ajax({
-    url: correctAns,
-    headers: me.header,
-    dataType: 'json',
-    success: function(resource) {
-      var correctResourceString = JSON.stringify(resource, null, 2);
-      // Get the response with users's input.
-      $.ajax({
-        url: address,
-        headers: me.header,
-        dataType: 'json',
-        success: function(resource2) {
-          var resourceString = JSON.stringify(resource2, null, 2);
-          data.text(resourceString);
-          // If the response is the correct response, then the user is right.
-          if (resourceString == correctResourceString) {
-            me.displaySuccessMessage();
-            me.complete();
-          } else {
-            me.displayErrorMessage('Be sure to read the instructions ' +
-                'carefully and complete the exercise ' +
-                'requirements.');
-          } 
-        },
-        error: function(response) {
-          me.displayErrorMessage('The URL you entered was not correct.');
-        }
-      });
-    }
-  });
 }
