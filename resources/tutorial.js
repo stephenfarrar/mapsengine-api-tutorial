@@ -436,7 +436,7 @@ var chapters = [
       headerFile: 'get-request-header.txt',
       update: function() {
         Lesson.prototype.update.call(this);
-        var header = JSON.stringify(me.header);
+        var header = JSON.stringify(this.header);
         header = header.replace('{accessToken}', userAuthorization);
         this.header = JSON.parse(header);
         $('.header-input').text(header).show();
