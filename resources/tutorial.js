@@ -639,10 +639,6 @@ function testGetTable() {
   var correctAns = 'https://www.googleapis.com/mapsengine/v1/tables/' + 
       '15474835347274181123-14495543923251622067?' +
       'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38';
-  // The Get Table is currently NOT AVAILABLE in v1.
-  // It will someday be available and this 2 line codes needs to be removed
-  address = address.replace('v1', 'search_tt');
-  correctAns = correctAns.replace('v1', 'search_tt');
   checkCorrectness(this, address, correctAns);
 }
 
