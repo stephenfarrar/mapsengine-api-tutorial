@@ -178,7 +178,7 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   }
   this.attempt++;
   // If there have been 3 attempts or more, show the answer button.
-  if ((this.attempt >= 3) && ($('.answer').is(':hidden'))) {
+  if ((this.attempt >= 3) && ($('.answer').is(':hidden')) && (this.answer)) {
     $('#show-button').css('visibility', 'visible');
   }
   // Automatically scroll to the error message.
