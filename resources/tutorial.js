@@ -535,8 +535,8 @@ var chapters = [
         title: 'Queries',
         showInventory: true,
         correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
-                '15474835347274181123-14495543923251622067/features?' +
-                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco' +
+                '15474835347274181123-14495543923251622067/features?version' +
+                '=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco' +
                 '&where=Population<2000000',
         hasSubmit: true
     })
