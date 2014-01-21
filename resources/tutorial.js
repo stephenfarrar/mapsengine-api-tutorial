@@ -15,15 +15,9 @@ function Lesson(elementId, options) {
   this.submitButtonValue = options.submitButtonValue || 'Get';
   if (options.submit) {
     this.submit = options.submit;
-    // If it has a submission, then it must be a lesson.
     this.hasSubmit = true;
   } else {
-    // It is an intro/final page.
-    if (options.hasSubmit) {
-      this.hasSubmit = true;
-    } else {
-      this.hasSubmit = false;
-    }
+    this.hasSubmit = !!options.hasSubmit;
   }
   if (options.update) {
     this.update = options.update;
