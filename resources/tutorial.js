@@ -6,6 +6,75 @@ var pendingFiles = {};
 var userAuthorization = false;
 
 /**
+ * Create setup property of an input object.
+ */
+inputObject.prototype.setup = function() {
+  var me = this;
+  // Set events on keypress.
+  $(this.element).keypress(function(event) {
+    // Check if the input needs enter submission behaviour.
+    if (me.enterSubmission) {
+      // Enable submit by enter, not making the enter visible in the input.
+      if (event.which == 13) {
+        event.preventDefault();
+        // Submit only if the input is not blank.
+        if ($(me.element).val() !== '') {
+          activeLesson.submit();
+        }
+      }
+    }
+    onChange(me);
+  });
+  // Set events on keyup, to handle backspaces.
+  $(this.element).keyup(function() {
+    onChange(me);
+  });
+  // Set events on paste and cut.
+  $(this.element).on('paste cut', function() {
+    setTimeout(function() {
+      onChange(me);
+    }, 0);
+  });
+};
+
+/**
+ * Changes that need to happen everytime input changes.
+ */
+function onChange(inputObject) {
+  // Enable or disable the submit button.
+  toggleSubmitButton($(inputObject.element));
+  // Store the input in local storage.
+  localStorage[activeLesson.elementId + inputObject.elementName]
+      = $(inputObject.element).val();
+  // Set the height of the textarea.    
+  setTextAreaHeight($(inputObject.element), $(inputObject.hiddenElement));
+}
+
+/**
+ * Create object to store textarea input information.
+ */
+function inputObject(element, hiddenElement, options) {
+  this.element = element;
+  this.hiddenElement = hiddenElement;
+  this.elementName = options.elementName;
+  this.enterSubmission = options.enterSubmission;
+}
+
+/**
+ * Create textarea objects and events associated with the input changes.
+ * Create an array of these inputs.
+ */
+var urlInput = new inputObject('.url', '.hidden-url-element', {
+        elementName: 'urlInput',
+        enterSubmission: true
+    });
+var bodyInput = new inputObject('.body-input', '.hidden-body-element', {
+        elementName: 'bodyInput',
+        enterSubmission: false
+    });
+var inputArea = [urlInput, bodyInput];
+
+/**
  * Create object to store lesson information.
  */
 function Lesson(elementId, options) {
@@ -33,7 +102,7 @@ function Lesson(elementId, options) {
     this.showInventory = false;
   }
   // Indicate which input submission is needed.
-  this.activeInput = options.activeInput || '.url';
+  this.activeInput = options.activeInput || urlInput;
 }
 
 /**
@@ -81,14 +150,17 @@ Lesson.prototype.update = function() {
     this.menuElement.addClass('active');
     // Store the current lesson.
     localStorage['currentLesson'] = activeLesson.elementId;
-    // Update the input (placeholder/saved URL).
-    var storedUrl = localStorage[this.elementId + 'input'];
-    $('.url').val(storedUrl || '');
-    setTextAreaHeight();
+    // The previous input stored should be loaded and shown in the input area.
     // If the input is empty, user should not be allowed to submit.
     // Do this for the lessons with their own specific inputs.
     if (this.activeInput) {
-      toggleSubmitButton($(this.activeInput));
+      // Update the input (placeholder/saved URL/saved body).
+      var storedInput = 
+          localStorage[this.elementId + this.activeInput.elementName];
+      $(this.activeInput.element).val(storedInput || '');
+      setTextAreaHeight($(this.activeInput.element), 
+          $(this.activeInput.hiddenElement));
+      toggleSubmitButton($(this.activeInput.element));
     }
   }
   // Set up analytics for the page visited by the user (number of times the page
@@ -491,56 +563,10 @@ $(window).load(function() {
       lesson.loadAnswer();
     });
   });
-  // Store the input everytime it changes, to the respective local storage.
-  var input = $('.url');
-  var bodyInput = $('.body-input');
-  // Input might change on keypress.
-  input.keypress(function(event) {
-    toggleSubmitButton(input);
-    // Enable submit by enter, not making the enter visible in the input.
-    if (event.which == 13) {
-      event.preventDefault();
-      // Submit only if the input is not blank.
-      if (input.val() !== '') {
-        activeLesson.submit();
-      }
-    }
-    localStorage[activeLesson.elementId+'input'] = input.val();
-    setTextAreaHeight();
-  });
-  bodyInput.keypress(function(){
-    toggleSubmitButton(bodyInput);
-    localStorage[activeLesson.elementId+'body'] = bodyInput.val();
-    setTextAreaHeight();
+  // Create the events setup for every input area elements.
+  inputArea.forEach(function(inputObject) {
+    inputObject.setup();
   })
-  // Input might change on keyup (handle backspace).
-  input.keyup(function() {
-    toggleSubmitButton(input);
-    localStorage[activeLesson.elementId+'input'] = input.val();
-    setTextAreaHeight();
-  });
-  bodyInput.keyup(function(){
-    toggleSubmitButton(bodyInput);
-    localStorage[activeLesson.elementId+'body'] = bodyInput.val();
-    setTextAreaHeight();
-  })
-  // Input might change on cut/paste act.
-  input.on('paste cut',function() {
-    setTimeout(function() {
-      toggleSubmitButton(input);
-      localStorage[activeLesson.elementId+'input'] = input.val();
-      setTextAreaHeight();
-    }, 0);
-  });
-  bodyInput.on('paste cut',function() {
-    setTimeout(function() {
-      toggleSubmitButton(bodyInput);
-      localStorage[activeLesson.elementId+'input'] = bodyInput.val();
-      setTextAreaHeight();
-    }, 0);
-  });
-
-
   // Set up analytics to indicate how many times users go to the documentation 
   // page using the final page button.
   $('.documentation-button').on('click', function() {
@@ -597,16 +623,12 @@ function toggleSubmitButton(input) {
 /**
  * Set the height of textarea based on the input height.
  */
-function setTextAreaHeight() {
-  var input = $('.url');
-  var bodyInput = $('.body-input');
+function setTextAreaHeight(input, hiddenInput) {
   // Store it in the hidden div, get the height and set the textarea height.
-  // Always store one more character to make the height change smoother.
-  $('.hidden-url-element').text(input.val() + 'a');
-  input.height($('.hidden-url-element').height());
-  $('.hidden-body-element').text(bodyInput.val() +
+  // Always store one more line to make the height change smoother.
+  hiddenInput.text(input.val() +
       'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
-  bodyInput.height($('.hidden-body-element').height());
+  input.height(hiddenInput.height());
 }
 
 /**
