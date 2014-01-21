@@ -390,7 +390,6 @@ var chapters = [
       submit: authorizeUser,
       submitButtonValue: 'Sign In',
       update: function() {
-        var me = this;
         Lesson.prototype.update.call(this);
         $('.url').hide();
         if (!userAuthorization) {
@@ -399,7 +398,7 @@ var chapters = [
         } else {
           // Else, leave the button disabled.
           // Make sure that the next lesson is always unlocked.
-          me.complete();
+          this.complete();
         }
       }
     }),
@@ -436,11 +435,10 @@ var chapters = [
       activeInput: '.body-input',
       headerFile: 'get-request-header.txt',
       update: function() {
-        var me = this;
         Lesson.prototype.update.call(this);
         var header = JSON.stringify(me.header);
         header = header.replace('{accessToken}', userAuthorization);
-        me.header = JSON.parse(header);
+        this.header = JSON.parse(header);
         $('.header-input').text(header).show();
       }
     })
