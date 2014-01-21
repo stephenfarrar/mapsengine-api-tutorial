@@ -521,23 +521,23 @@ var chapters = [
         showInventory: true,
         correctAns: 'https://www.googleapis.com/mapsengine/search_tt/tables/' + 
                 '15474835347274181123-14495543923251622067?' +
-                'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38'
+                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco'
     }),
     new Lesson('lesson4-listfeatures', {
         title: 'List Features',
         showInventory: true,
         correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
                 '15474835347274181123-14495543923251622067/features?' +
-                'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v38',
+                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco',
         hasSubmit: true
     }),
     new Lesson('lesson5-queries', {
         title: 'Queries',
         showInventory: true,
         correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
-                '15474835347274181123-14495543923251622067/features?' +
-                'version=published&key=AIzaSyDa6xKBtlB7i6FTG58RxDAQc125sjk5v3' +
-                '8&where=Population<2000000',
+                '15474835347274181123-14495543923251622067/features?version' +
+                '=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco' +
+                '&where=Population<2000000',
         hasSubmit: true
     })
   ]}),
