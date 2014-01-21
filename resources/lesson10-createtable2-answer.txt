@@ -1,7 +1,7 @@
 ###Answer###  
-Below is one example of the body of the request, which will create an empty table of train stations in Sydney, Australia. The name of the table is `Sydney Train Stations`. The table can only be edited by `Map Editors`, but it can be view publically by everyone ('Map Viewers'). The table schema contains `geometry` and `station_name`. Each feature in the table will represent a Sydney train station, which includes the point(longitude and latitude) and the name of the station. You can use the body below or you can create your own table based on the example we give you.
+Below is one example of the body of the request, which will create an empty table of train stations in Sydney, Australia. The name of the table is `Sydney Train Stations`. The table can only be edited by `Map Editors`, but it can be view publically by everyone ('Map Viewers'). The table schema contains `geometry` and `station_name`. Each feature in the table will represent a Sydney train station, which includes the point (longitude and latitude) and the name of the station. You can use the body below or you can create your own table based on the example we give you.
 `{
-  "projectId": “{userProjectId}”,
+  "projectId": "{userProjectId}",
   "name": "Sydney Train Stations",
   "description": "A partial list of Sydney train stations.",
   "draftAccessList": "Map Editors",
