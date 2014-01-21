@@ -8,7 +8,7 @@ Each feature within the array must contain:
 	* `coordinates`, containing one or more positions. A `position` is an array containing a single longitude, a single latitude, and optionally a single altitude value, in that order. 
 * `properties`, with one or more entries which conform to the target table's schema. It must contain:
 	* `gx_id`, whose value is unique within the table. You can create your own `gx_id` but make sure that no other feature in the table has the same ID.
-	* other properties in table's schema. String and integer values must be enclosed in double quotes (“), while float values must not be enclosed in quotes.
+	* other properties in table's schema. String and integer values must be enclosed in double quotes ("), while float values must not be enclosed in quotes.
 
 ###Exercise###  
 Try to create a POST body request to insert *one* feature to your 'World Famous Mountains' table. We have created the URL and the header of the request for you so you do not need to modify them. The details of the feature is up to your liking, but remember that you have to follow the schema of the table. The body has to be a `features` array, with each feature contains:
