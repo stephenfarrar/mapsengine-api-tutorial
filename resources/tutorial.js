@@ -93,6 +93,9 @@ function Lesson(elementId, options) {
   if (options.update) {
     this.update = options.update;
   }
+  if (options.headerFile) {
+    this.headerFile = options.headerFile;
+  }
   // Done is 'true' if the user has submitted correctly.
   this.done = false;
   this.unlocked = false;
@@ -384,6 +387,21 @@ Lesson.prototype.loadAnswer = function() {
 };
 
 /**
+ * Load the headers markdown, where applicable.
+ */
+Lesson.prototype.loadHeader = function() {
+  var me = this;
+  if (this.headerFile) {
+    pendingFiles[me.headerFile] = true;
+    $.get('resources/' + me.headerFile, function(response) {
+      me.header = JSON.parse(response);
+      delete pendingFiles[me.headerFile];
+      checkNoFilesPending();
+    });
+  }
+};
+
+/**
  * Create object to store chapter information.
  */
 function Chapter(elementId, options) {
@@ -429,7 +447,7 @@ var chapters = [
   new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
     new Lesson('lesson3-gettable', {
       title: 'Get Table',
-      submit: testGetTable,
+      submit: executeGetTable,
       showInventory: true
     }),
     new Lesson('lesson4-listfeatures', {
@@ -443,8 +461,7 @@ var chapters = [
       showInventory: true
     })
   ]}),
-  new Chapter('chapter2-accessingprivatedata', {title: 'Accessing Private Data',
-      lessons: [
+  new Chapter('chapter2-private', {title: 'Accessing Private Data', lessons: [
     new Lesson('lesson6-login', {
       title: 'Login and Authorization', 
       submit: authorizeUser,
@@ -456,8 +473,11 @@ var chapters = [
         if (!userAuthorization) {
           // Activate the 'Sign In' button.
           $('.submit-button').removeAttr('disabled');
+        } else {
+          // Else, leave the button disabled.
+          // Make sure that the next lesson is always unlocked.
+          this.complete();
         }
-        // Else, leave the button disabled.
       }
     }),
     new Lesson('lesson7-project', {
@@ -485,6 +505,20 @@ var chapters = [
             }
           });
         }, 5000); //5 seconds
+      }
+    }),
+    new Lesson('lesson8-listprojects', {
+      title: 'List Projects',
+      submit: executeListProjects,
+      submitButtonValue: 'Get',
+      activeInput: '.body-input',
+      headerFile: 'get-request-header.txt',
+      update: function() {
+        Lesson.prototype.update.call(this);
+        var header = JSON.stringify(this.header);
+        header = header.replace('{accessToken}', userAuthorization);
+        this.header = JSON.parse(header);
+        $('.header-input').text(header).show();
       }
     })
   ]})
@@ -561,6 +595,7 @@ $(window).load(function() {
       lesson.loadInstruction();
       lesson.loadSuccessMessage();
       lesson.loadAnswer();
+      lesson.loadHeader();
     });
   });
   // Create the events setup for every input area elements.
@@ -743,7 +778,7 @@ function testAPIKey() {
 /**
  * Get table submit function.
  */
-function testGetTable() {
+function executeGetTable() {
   // Get user input and trim it.
   var address = $.trim($('.url').val());
   var correctAns = 'https://www.googleapis.com/mapsengine/v1/tables/' + 
@@ -946,4 +981,46 @@ function storeProjectID() {
     me.displayErrorMessage('You need to select a project from the dropdown ' +
         'list. It may take a few seconds for new projects to appear.');
   }
-} 
+}
+
+/**
+ * List projects submit function.
+ */
+function executeListProjects() {
+  var me = this;
+  var data = $('.response-content');
+  // Empty the output area.
+  data.empty();
+  var address = $.trim($('.url').val());
+  var correctAns = 'https://www.googleapis.com/mapsengine/v1/projects';
+  $.ajax({
+    url: correctAns,
+    headers: me.header,
+    dataType: 'json',
+    success: function(resource) {
+      var correctResourceString = JSON.stringify(resource, null, 2);
+      // Get the response with users's input.
+      $.ajax({
+        url: address,
+        headers: me.header,
+        dataType: 'json',
+        success: function(resource2) {
+          var resourceString = JSON.stringify(resource2, null, 2);
+          data.text(resourceString);
+          // If the response is the correct response, then the user is right.
+          if (resourceString == correctResourceString) {
+            me.displaySuccessMessage();
+            me.complete();
+          } else {
+            me.displayErrorMessage('Be sure to read the instructions ' +
+                'carefully and complete the exercise ' +
+                'requirements.');
+          } 
+        },
+        error: function(response) {
+          me.displayErrorMessage('The URL you entered was not correct.');
+        }
+      });
+    }
+  });
+}
