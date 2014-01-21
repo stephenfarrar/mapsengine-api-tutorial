@@ -390,13 +390,17 @@ var chapters = [
       submit: authorizeUser,
       submitButtonValue: 'Sign In',
       update: function() {
+        var me = this;
         Lesson.prototype.update.call(this);
         $('.url').hide();
         if (!userAuthorization) {
           // Activate the 'Sign In' button.
           $('.submit-button').removeAttr('disabled');
+        } else {
+          // Else, leave the button disabled.
+          // Make sure that the next lesson is always unlocked.
+          me.complete();
         }
-        // Else, leave the button disabled.
       }
     }),
     new Lesson('lesson7-project', {
