@@ -24,7 +24,7 @@ var finish;
  * @hiddenElement {string} A jQuery object of hidden div. 
  * @enterSubmission {boolean} Indicate the need of enter submission/not.
  */
-function InputObject(element, hiddenElement, options) {
+function ResizingTextarea(element, hiddenElement, options) {
   this.element = element;
   this.hiddenElement = hiddenElement;
   this.enterSubmission = options.enterSubmission;
@@ -35,7 +35,7 @@ function InputObject(element, hiddenElement, options) {
 /**
  * Set the height of textarea based on the input height.
  */
-InputObject.prototype.updateTextAreaHeight = function() {
+ResizingTextarea.prototype.updateTextAreaHeight = function() {
   // Store it in the hidden div, get the height and set the textarea height.
   if (this.enterSubmission) {
     // Always store one more character to make the height change smoother.
@@ -52,7 +52,7 @@ InputObject.prototype.updateTextAreaHeight = function() {
 /**
  * Disable the submit button if there is empty input.
  */
-InputObject.prototype.updateSubmitButton = function() {
+ResizingTextarea.prototype.updateSubmitButton = function() {
   if (this.element.val() == '') {
     $('.submit-button').attr('disabled','disabled');
   } else {
@@ -63,7 +63,7 @@ InputObject.prototype.updateSubmitButton = function() {
 /**
  * Changes that need to happen everytime input changes.
  */
-InputObject.prototype.update = function() {
+ResizingTextarea.prototype.update = function() {
   // Enable or disable the submit button.
   this.updateSubmitButton();
   // Set the height of the textarea.    
@@ -74,7 +74,7 @@ InputObject.prototype.update = function() {
 /**
  * Create setup property of an input object.
  */
-InputObject.prototype.setup = function() {
+ResizingTextarea.prototype.setup = function() {
   var me = this;
   // Set events on keypress.
   this.element.keypress(function(event) {
@@ -795,11 +795,12 @@ function setNextLesson() {
  */
 $(window).load(function() {
   // Create textarea objects and events associated with the input changes.
-  var urlInput = new InputObject($('.url'), $('.hidden-url-element'), {
+  var urlInput = new ResizingTextarea($('.url'), $('.hidden-url-element'), {
         enterSubmission: true,
         onChange: storeInput
       });
-  var bodyInput = new InputObject($('.body-input'), $('.hidden-body-element'), {
+  var bodyInput = new ResizingTextarea($('.body-input'), 
+      $('.hidden-body-element'), {
         enterSubmission: false,
         onChange: storeInput
       });
