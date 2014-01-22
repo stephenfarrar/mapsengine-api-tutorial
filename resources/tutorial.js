@@ -687,8 +687,6 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           if (userAuthorization) {
             // Dectivate the 'Sign In' button.
             $('.submit-button').attr('disabled', 'disabled');
-          } else {
-            // Else, leave the button disabled.
             // Make sure that the next lesson is always unlocked.
             this.complete();
           }
