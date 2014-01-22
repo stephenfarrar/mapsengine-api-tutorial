@@ -122,6 +122,7 @@ function Lesson(elementId, options) {
   this.title = options.title;
   this.buttonValue = options.buttonValue || 'Next Lesson';
   this.submitButtonValue = options.submitButtonValue || 'Get';
+  this.hasAnswer = options.hasAnswer || true;
   if (options.submit) {
     this.submit = options.submit;
     this.hasSubmit = true;
@@ -147,6 +148,17 @@ function Lesson(elementId, options) {
   }
   // Indicate which input submission is needed.
   this.activeInput = options.activeInput;
+  // Load the instructions file for each lesson.
+  this.loadInstruction();
+  // Only lessons with a submission require success, answer and header content.
+  if (this.hasSubmit) {
+    this.loadSuccessMessage();
+    this.loadHeader();
+    // Only lessons with an activeInput field have an answer.
+    if (this.activeInput) {
+      this.loadAnswer();
+    }
+  }
 }
 
 /**
@@ -361,6 +373,7 @@ Lesson.prototype.checkCorrectness = function(address) {
  */
 Lesson.prototype.displayInstructions = function() {
   if (this.instructions) {
+    console.log(this);
     $('.instructions').html(markdown.toHTML(this.instructions));
   }
 };
@@ -671,9 +684,9 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         update: function() {
           Lesson.prototype.update.call(this);
           $('.url').hide();
-          if (!userAuthorization) {
-            // Activate the 'Sign In' button.
-            $('.submit-button').removeAttr('disabled');
+          if (userAuthorization) {
+            // Dectivate the 'Sign In' button.
+            $('.submit-button').attr('disabled', 'disabled');
           } else {
             // Else, leave the button disabled.
             // Make sure that the next lesson is always unlocked.
@@ -795,9 +808,12 @@ function newTasksList(firstTask, onFinished) {
     tasks[task] = true;
   };
   me.remove = function(task) {
-    delete tasks[task];
-    if (jQuery.isEmptyObject(tasks)) {
-      onFinished();
+    // Only remove an object if the list has an object to remove.
+    if (!jQuery.isEmptyObject(tasks)) {
+      delete tasks[task];
+      if (jQuery.isEmptyObject(tasks)) {
+        onFinished();
+      }
     }
   };
   me.add(firstTask);
@@ -831,11 +847,6 @@ $(window).load(function() {
     chapter.makeMenu();
     chapter.lessons.forEach(function(lesson) {
       lesson.makeMenu();
-      // Load the markdown files for each lesson.
-      lesson.loadInstruction();
-      lesson.loadSuccessMessage();
-      lesson.loadAnswer();
-      lesson.loadHeader();
     });
   });
   // Set up analytics to indicate how many times users go to the documentation 
