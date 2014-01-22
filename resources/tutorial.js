@@ -2,7 +2,6 @@
 // The global variables.
 var activeLesson;
 var fadeInTime = 500;
-var pendingFiles = {};
 var userAuthorization = false;
 /**
  * @type array of {Chapter}. Each {Chapter} contains an array of {Lesson}.
@@ -539,11 +538,10 @@ Lesson.prototype.makeMenu = function() {
 Lesson.prototype.loadInstruction = function() {
   var me = this;
   var filename = this.elementId + '.txt';
-  pendingFiles[filename] = true;
+  tasksList.add(filename);
   $.get('resources/' + filename, function(response) {
     me.instructions = response;
-    delete pendingFiles[filename];
-    checkNoFilesPending();
+    tasksList.remove(filename);
   });
 };
 
@@ -553,11 +551,10 @@ Lesson.prototype.loadInstruction = function() {
 Lesson.prototype.loadSuccessMessage = function() {
   var me = this;
   var filename = this.elementId + '-success.txt';
-  pendingFiles[filename] = true;
+  tasksList.add(filename);
   $.get('resources/' + filename, function(response) {
     me.successMessage = response;
-    delete pendingFiles[filename];
-    checkNoFilesPending();
+    tasksList.remove(filename);
   });
 };
 
@@ -567,11 +564,10 @@ Lesson.prototype.loadSuccessMessage = function() {
 Lesson.prototype.loadAnswer = function() {
   var me = this;
   var filename = this.elementId + '-answer.txt';
-  pendingFiles[filename] = true;
+  tasksList.add(filename);
   $.get('resources/' + filename, function(response) {
     me.answer = response;
-    delete pendingFiles[filename];
-    checkNoFilesPending();
+    tasksList.remove(filename);
   });
 };
 
@@ -581,11 +577,10 @@ Lesson.prototype.loadAnswer = function() {
 Lesson.prototype.loadHeader = function() {
   var me = this;
   if (this.headerFile) {
-    pendingFiles[me.headerFile] = true;
+    tasksList.add(me.headerFile);
     $.get('resources/' + me.headerFile, function(response) {
       me.header = JSON.parse(response);
-      delete pendingFiles[me.headerFile];
-      checkNoFilesPending();
+      tasksList.remove(me.headerFile);
     });
   } else {
     // If the lesson has no header, give it an empty object.
@@ -815,6 +810,27 @@ function displayHeader() {
 }
 
 /**
+ * Object to manage tasks that need completing before the page is displayed.
+ */
+function newTasksList(firstTask, onFinished) {
+  var me = {};
+  var tasks = {};
+  me.add = function(task) {
+    tasks[task] = true;
+  };
+  me.remove = function(task) {
+    delete tasks[task];
+    if (jQuery.isEmptyObject(tasks)) {
+      onFinished();
+    }
+  };
+  me.add(firstTask);
+  return me;
+}
+
+var tasksList = newTasksList('callback', loadState);
+
+/**
  * Function executed when the window is loading.
  */
 $(window).load(function() {
@@ -877,15 +893,7 @@ function checkIfUserIsAuthorized(authResult) {
     // We set a global variable with their authorization token.
     userAuthorization = authResult['access_token'];
   }
-}
-
-/**
- * Check if all the markdown files have been loaded.
- */
-function checkNoFilesPending() {
-  if (jQuery.isEmptyObject(pendingFiles)) {
-    loadState();
-  }
+  tasksList.remove('callback');
 }
 
 /**
