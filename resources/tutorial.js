@@ -198,7 +198,13 @@ Lesson.prototype.update = function() {
     // The previous input stored should be loaded and shown in the input area.
     // If the input is empty, user should not be allowed to submit.
     // Do this for the lessons with their own specific inputs.
+    // Enabled/disabled the input based on the activeInput.
     if (this.activeInput) {
+      // Disabled both input area first.
+      $('.url').attr('disabled', 'disabled');
+      $('.body-input').attr('disabled', 'disabled');
+      // Enabled the specific input area for each lesson.
+      this.activeInput.element.removeAttr('disabled'); 
       // Update the input (placeholder/saved URL/saved body).
       var storedInput = retrieveInput();
       this.activeInput.element.val(storedInput || '');
@@ -625,13 +631,11 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       new Lesson('lesson1-gmeapi', {
         title: 'GME API',
         submit: getText,
-        showInventory: false,
         activeInput: urlInput
       }),
       new Lesson('lesson2-apikey', {
         title: 'API Key',
         submit: testAPIKey,
-        showInventory: false,
         submitButtonValue: 'Submit',
         activeInput: urlInput
       })
@@ -722,10 +726,21 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         correctAns: 'https://www.googleapis.com/mapsengine/v1/projects',
         update: function() {
           Lesson.prototype.update.call(this);
-          var header = JSON.stringify(this.header);
-          header = header.replace('{accessToken}', userAuthorization);
-          this.header = JSON.parse(header);
-          $('.header-input').text(header).show();
+          displayHeader();
+        }
+      })
+    ]}),
+    new Chapter('chapter2-table', {title: 'Making a Table', lessons: [
+      new Lesson('lesson9-createtable1', {
+        title: 'Create Table I',
+        submit: checkCreateTable,
+        submitButtonValue: 'Post',
+        activeInput: urlInput,
+        headerFile: 'post-request-header.txt',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          displayHeader();
+          $('.body-input').show();
         }
       })
     ]})
@@ -789,6 +804,15 @@ function setNextLesson() {
   // The final page does not need to have a next.
 }
 
+/**
+ * Update and display header of each lesson.
+ */
+function displayHeader() {
+  var header = JSON.stringify(this.header);
+  header = header.replace('{accessToken}', userAuthorization);
+  this.header = JSON.parse(header);
+  $('.header-input').text(header).show();
+}
 
 /**
  * Function executed when the window is loading.
