@@ -122,6 +122,7 @@ function Lesson(elementId, options) {
   this.title = options.title;
   this.buttonValue = options.buttonValue || 'Next Lesson';
   this.submitButtonValue = options.submitButtonValue || 'Get';
+  this.inventoryContents = options.inventoryContents;
   if (options.submit) {
     this.submit = options.submit;
     this.hasSubmit = true;
@@ -140,11 +141,6 @@ function Lesson(elementId, options) {
   // Done is 'true' if the user has submitted correctly.
   this.done = false;
   this.unlocked = false;
-  if (options.showInventory) {
-    this.showInventory = options.showInventory;
-  } else {
-    this.showInventory = false;
-  }
   // Indicate which input submission is needed.
   this.activeInput = options.activeInput;
 }
@@ -176,7 +172,9 @@ Lesson.prototype.update = function() {
     $('.request').show();
     $('.url').show();
     // Show inventory if needed.
-    if (this.showInventory) {
+    if (this.inventoryContents) {
+      // Update the inventory box.
+      populateInventory(this.inventoryContents);
       $('.inventory').show();
     } else {
       $('.inventory').hide();
@@ -620,13 +618,11 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       new Lesson('lesson1-gmeapi', {
         title: 'GME API',
         submit: getText,
-        showInventory: false,
         activeInput: urlInput
       }),
       new Lesson('lesson2-apikey', {
         title: 'API Key',
         submit: testAPIKey,
-        showInventory: false,
         submitButtonValue: 'Submit',
         activeInput: urlInput
       })
@@ -634,7 +630,14 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
     new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
       new Lesson('lesson3-gettable', {
         title: 'Get Table',
-        showInventory: true,
+        inventoryContents: [{
+          label: 'table ID: ', 
+          information: '15474835347274181123-14495543923251622067'
+        },
+        {
+          label: 'Your API Key: ',
+          information: localStorage['APIKey']
+        }],
         activeInput: urlInput,
         correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' + 
                 '15474835347274181123-14495543923251622067?' +
@@ -643,7 +646,14 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       }),
       new Lesson('lesson4-listfeatures', {
         title: 'List Features',
-        showInventory: true,
+        inventoryContents: [{
+          label: 'table ID: ', 
+          information: '15474835347274181123-14495543923251622067'
+        },
+        {
+          label: 'Your API Key: ',
+          information: localStorage['APIKey']
+        }],
         activeInput: urlInput,
         correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
                 '15474835347274181123-14495543923251622067/features?' +
@@ -653,7 +663,14 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       }),
       new Lesson('lesson5-queries', {
         title: 'Queries',
-        showInventory: true,
+        inventoryContents: [{
+          label: 'table ID: ', 
+          information: '15474835347274181123-14495543923251622067'
+        },
+        {
+          label: 'Your API Key: ',
+          information: localStorage['APIKey']
+        }],
         activeInput: urlInput,
         correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
                 '15474835347274181123-14495543923251622067/features?'+ 
@@ -882,8 +899,6 @@ function loadState() {
   chapters[0].lessons[0].unlock();
   // Make the active lesson the last opened page/default to introduction page.
   var activeLessonId = localStorage['currentLesson'] || 'introduction';
-  // Update the inventory box.
-  populateInventory();
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
       // Restore user completion information.
@@ -911,16 +926,17 @@ function loadState() {
 }
 
 /**
- * Updating the inventory box.
+ * Updating the inventory box according to the object values in the contents
+ * array.
  */
-function populateInventory() {
+function populateInventory(contents) {
   var inventory = $('.inventory');
   inventory.empty()
       .append('<h3>Helpful information</h3>')
-      .append('<b>table ID: </b>')
-      .append('<code>15474835347274181123-14495543923251622067</code><br>')
-      .append('<b>your API Key: </b>')
-      .append($('<code>').text(localStorage['APIKey']));
+  contents.forEach(function(item) {
+    inventory.append('<b>' + item.label + '</b>')
+        .append('<code>' + item.information + '</code><br>')
+  });
 }
 
 /**
