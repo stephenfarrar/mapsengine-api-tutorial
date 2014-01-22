@@ -134,6 +134,9 @@ function Lesson(elementId, options) {
   if (options.headerFile) {
     this.headerFile = options.headerFile;
   }
+  if (options.hasBodyFile) {
+    this.hasBodyFile = options.hasBodyFile;
+  }
   if (options.correctAns) {
     this.correctAns = options.correctAns;
   }
@@ -376,11 +379,17 @@ Lesson.prototype.displayInstructions = function() {
  */
 Lesson.prototype.showAnswer = function() {
   if (this.answer) {
-    // Replace userAPIKey with the API Key stored in local storage.
     // Change the markdown files to HTML and combined with the API Key.
     var htmlAnswer = markdown.toHTML(this.answer);
+    // Replace userAPIKey with the API Key stored in local storage.
     var htmlKey =  $('<span>').text(localStorage['APIKey']).html();
     htmlAnswer = htmlAnswer.replace('{userAPIKey}', htmlKey);
+    // Replace userTableId with World Famous Mountain table ID.
+    var htmlTableId =  $('<span>').text(localStorage['tableID']).html();
+    htmlAnswer = htmlAnswer.replace('{userTableId}', htmlTableId);
+    // Replace userProjectId with the project ID they chose.
+    var htmlProjectId =  $('<span>').text(localStorage['projectID']).html();
+    htmlAnswer = htmlAnswer.replace('{userProjectId}', htmlProjectId);
     // Change the html of answer area.
     $('.answer').html(htmlAnswer);
     // Hide button once clicked.
@@ -577,16 +586,31 @@ Lesson.prototype.loadAnswer = function() {
 Lesson.prototype.loadHeader = function() {
   var me = this;
   if (this.headerFile) {
-    tasksList.add(me.headerFile);
+    tasksList.add(this.elementId + this.headerFile);
     $.get('resources/' + me.headerFile, function(response) {
       me.header = JSON.parse(response);
-      tasksList.remove(me.headerFile);
+      tasksList.remove(me.elementId + me.headerFile);
     });
   } else {
     // If the lesson has no header, give it an empty object.
     this.header = {};
   }
 };
+
+/**
+ * Load the body markdown, where applicable.
+ */
+Lesson.prototype.loadBody = function() {
+  var me = this;
+  if (this.hasBodyFile) {
+    var filename = this.elementId + '-body.txt';
+    tasksList.add(filename);
+    $.get('resources/' + filename, function(response) {
+      me.body = JSON.parse(response);
+      tasksList.remove(filename);
+    });
+  }
+}
 
 /**
  * Create object to store chapter information.
@@ -731,10 +755,12 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         submit: checkCreateTable,
         submitButtonValue: 'Post',
         activeInput: urlInput,
+        hasBodyFile: true,
         headerFile: 'post-request-header.txt',
         update: function() {
           Lesson.prototype.update.call(this);
           displayHeader();
+          displayBody();
           $('.body-input').show();
         }
       })
@@ -803,10 +829,21 @@ function setNextLesson() {
  * Update and display header of each lesson.
  */
 function displayHeader() {
-  var header = JSON.stringify(this.header);
-  header = header.replace('{accessToken}', userAuthorization);
-  this.header = JSON.parse(header);
+  activeLesson.header.Authorization = "Bearer " + userAuthorization;
+  var header = JSON.stringify(activeLesson.header, null, 2);
   $('.header-input').text(header).show();
+}
+
+/**
+ * Update and display body of each lesson.
+ */
+function displayBody() {
+  activeLesson.body.projectId = localStorage['projectID'];
+  var body = JSON.stringify(activeLesson.body, null, 2);
+  $('.body-input').text(body).show();
+  $('.hidden-body-element').text(body + '\n');
+  $('.body-input').height($('.hidden-body-element').height());
+
 }
 
 /**
@@ -860,6 +897,7 @@ $(window).load(function() {
       lesson.loadSuccessMessage();
       lesson.loadAnswer();
       lesson.loadHeader();
+      lesson.loadBody();
     });
   });
   // Set up analytics to indicate how many times users go to the documentation 
@@ -1037,4 +1075,76 @@ function storeProjectID() {
     this.displayErrorMessage('You need to select a project from the dropdown ' +
         'list. It may take a few seconds for new projects to appear.');
   }
+}
+
+/**
+ * Check whether a new table has been created or not.
+ */
+function checkCreateTable() {
+  var me = this;
+  var data = $('.response-content');
+  // Empty the output area.
+  data.empty();
+  // Save the input from the user.
+  var address = $.trim($('.url').val());
+  // Find out the number of tables the user has in the project.
+  $.ajax({
+    headers: {"Authorization": "Bearer " + userAuthorization},
+    type: "GET",
+    url: "https://www.googleapis.com/mapsengine/v1/tables?projectId=" +
+        localStorage['projectID'],
+    // This request should always be successful.
+    success: function(response) {
+      // Store the number of tables the user has.
+      var initialTableCount = response.tables.length;
+      // Attempt to create a table with user's input.
+      $.ajax({
+        headers: me.header,
+        type: "POST",
+        url: address,
+        data: JSON.stringify(me.body),
+        dataType: 'json',
+        success: function(resource){
+          var finalTableCount;
+          // If the request returns a valid object, show the output.
+          if (typeof resource == 'object') {
+            var responseString = JSON.stringify(resource, null, 2);
+            data.text(responseString); 
+          }
+          // Find out the number of tables in the project after success request.
+          $.ajax({
+            headers: {"Authorization": "Bearer " + userAuthorization},
+            type: "GET",
+            url: "https://www.googleapis.com/mapsengine/v1/tables?projectId=" +
+                localStorage['projectID'],
+            success: function(response) {
+              finalTableCount = response.tables.length;
+              // If the number of table increase, then the user is right.
+              if (finalTableCount > initialTableCount){
+                me.displaySuccessMessage();
+                me.complete();
+              } else {
+                me.displayErrorMessage("Make sure you enter the URL for " +
+                    "create table correctly.")
+              }
+            }
+          });
+        },
+        error: function(response){
+          var errorMess;
+          console.log(response);
+          try {
+            response = JSON.parse(response.responseText);
+            errorMess = response.error.errors[0];
+            // Append the response to the output area.
+            var responseString = JSON.stringify(errorMess, null, 2);
+            data.text(responseString); 
+          } catch (e) {
+            errorMess = 'notJSONObject';
+          }
+          me.displayErrorMessage("Make sure you type the URL correctly.");
+        }
+      });
+    }
+  });
 }
