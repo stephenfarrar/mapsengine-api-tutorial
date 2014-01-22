@@ -244,6 +244,9 @@ Lesson.prototype.update = function() {
  * Handles the input the user has submitted.
  */
 Lesson.prototype.submit = function() {
+  // Make the user not able to submit again for a while.
+  // This is to avoid double posting.
+  $('.submit-button').attr('disabled', 'disabled');
   var input = $.trim(this.activeInput.element.val());
   // Empty the output area.
   var data = $('.response-content');
@@ -301,6 +304,8 @@ Lesson.prototype.displaySuccessMessage = function() {
     // The lesson is completed. Display the success message.
     this.complete();
     $('.message').html(markdown.toHTML(this.successMessage));
+    // Enable the submit button again.
+    $('.submit-button').removeAttr('disabled');
     // Display the success ribbon and message.
     $('.feedback').hide().fadeIn(fadeInTime)
         .removeClass('failure').addClass('success');
@@ -330,6 +335,8 @@ Lesson.prototype.displaySuccessMessage = function() {
 Lesson.prototype.displayErrorMessage = function(errorMessage) {
   $('.message').html('Sorry, that input is incorrect. ')
       .append(errorMessage).append(' Please try again.');
+  // Enable the submit button again.
+  $('.submit-button').removeAttr('disabled');
   // Display the message, hide the success ribbon.
   $('.feedback').hide().fadeIn(fadeInTime)
       .removeClass('success').addClass('failure');
