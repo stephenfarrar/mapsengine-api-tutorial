@@ -671,7 +671,7 @@ function newTasksList(firstTask, onFinished) {
   return me;
 }
 
-var tasksList = newTasksList('callback', function() {loadState();});
+var tasksList = newTasksList('callback', loadState);
 
 /**
  * Function executed when the window is loading.
