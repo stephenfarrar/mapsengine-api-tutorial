@@ -4,7 +4,15 @@ var activeLesson;
 var fadeInTime = 500;
 var pendingFiles = {};
 var userAuthorization = false;
+/**
+ * @type array of {Chapter}. Each {Chapter} contains an array of {Lesson}.
+ * Need to be a global variable, since used in other functions.
+ */
 var chapters;
+/**
+ * @type {Lesson}
+ * Need to be a global variable, since used in other functions.
+ */
 var introduction;
 var resume;
 var finish;
@@ -12,41 +20,40 @@ var finish;
 /**
  * Create object to store textarea input information.
  * A textarea that resizes itself to fit its contents.
- * @elementClass {string} A selector that locates the textarea.
- * @hiddenElementClass {string} A selector that locates a hidden div.
- * @elementName {string} The name stored in the local storage. 
+ * @element {string} A jQuery object of textarea.
+ * @hiddenElement {string} A jQuery object of hidden div. 
  * @enterSubmission {boolean} Indicate the need of enter submission/not.
  */
-function InputObject(elementClass, hiddenElementClass, options) {
-  this.elementClass = elementClass;
-  this.hiddenElementClass = hiddenElementClass;
-  this.elementName = options.elementName;
+function InputObject(element, hiddenElement, options) {
+  this.element = element;
+  this.hiddenElement = hiddenElement;
   this.enterSubmission = options.enterSubmission;
+  this.onChange = options.onChange;
   this.setup();
 }
 
 /**
  * Set the height of textarea based on the input height.
  */
-InputObject.prototype.setTextAreaHeight = function() {
+InputObject.prototype.updateTextAreaHeight = function() {
   // Store it in the hidden div, get the height and set the textarea height.
   if (this.enterSubmission) {
     // Always store one more character to make the height change smoother.
     // This is for textarea that has enter submission property.
-    $(this.hiddenElementClass).text($(this.elementClass).val() + 'a');
+    this.hiddenElement.text(this.element.val() + 'a');
   } else {
     // Append one more line at the end to make height change smoother.
     // This is for textarea that has no enter submission property.
-    $(this.hiddenElementClass).text($(this.elementClass).val() + '\n\n');
+    this.hiddenElement.text(this.element.val() + '\n\n');
   }
-  $(this.elementClass).height($(this.hiddenElementClass).height());
+  this.element.height(this.hiddenElement.height());
 }
 
 /**
  * Disable the submit button if there is empty input.
  */
-InputObject.prototype.toggleSubmitButton = function() {
-  if ($(this.elementClass).val() == '') {
+InputObject.prototype.updateSubmitButton = function() {
+  if (this.element.val() == '') {
     $('.submit-button').attr('disabled','disabled');
   } else {
     $('.submit-button').removeAttr('disabled');
@@ -56,14 +63,12 @@ InputObject.prototype.toggleSubmitButton = function() {
 /**
  * Changes that need to happen everytime input changes.
  */
-InputObject.prototype.onChange = function() {
+InputObject.prototype.update = function() {
   // Enable or disable the submit button.
-  this.toggleSubmitButton();
-  // Store the input in local storage.
-  localStorage[activeLesson.elementId + this.elementName]
-      = $(this.elementClass).val();
+  this.updateSubmitButton();
   // Set the height of the textarea.    
-  this.setTextAreaHeight();
+  this.updateTextAreaHeight();
+  this.onChange(this.element.val());
 };
 
 /**
@@ -72,31 +77,43 @@ InputObject.prototype.onChange = function() {
 InputObject.prototype.setup = function() {
   var me = this;
   // Set events on keypress.
-  $(this.elementClass).keypress(function(event) {
+  this.element.keypress(function(event) {
     // Check if the input needs enter submission behaviour.
     if (me.enterSubmission) {
       // Enable submit by enter, not making the enter visible in the input.
       if (event.which == 13) {
         event.preventDefault();
         // Submit only if the input is not blank.
-        if ($(me.elementClass).val() !== '') {
+        if (me.element.val() !== '') {
           activeLesson.submit();
         }
       }
     }
-    me.onChange();
+    me.update();
   });
   // Set events on keyup, to handle backspaces.
-  $(this.elementClass).keyup(function() {
-    me.onChange();
+  this.element.keyup(function() {
+    me.update();
   });
   // Set events on paste and cut.
-  $(this.elementClass).on('paste cut', function() {
+  this.element.on('paste cut', function() {
     setTimeout(function() {
-      me.onChange();
+      me.update();
     }, 0);
   });
 };
+
+/**
+ * Function to store input in local storage.
+ */
+function storeInput(inputValue) {
+  // Store the input in local storage.
+  localStorage[activeLesson.elementId + 'input'] = inputValue;
+}
+
+function retrieveInput() {
+  return localStorage[activeLesson.elementId + 'input'];
+}
 
 /**
  * Create object to store lesson information.
@@ -183,11 +200,10 @@ Lesson.prototype.update = function() {
     // Do this for the lessons with their own specific inputs.
     if (this.activeInput) {
       // Update the input (placeholder/saved URL/saved body).
-      var storedInput = 
-          localStorage[this.elementId + this.activeInput.elementName];
-      $(this.activeInput.elementClass).val(storedInput || '');
-      this.activeInput.setTextAreaHeight();
-      this.activeInput.toggleSubmitButton();
+      var storedInput = retrieveInput();
+      this.activeInput.element.val(storedInput || '');
+      this.activeInput.updateTextAreaHeight();
+      this.activeInput.updateSubmitButton();
     }
   }
   // Set up analytics for the page visited by the user (number of times the page
@@ -625,31 +641,32 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         title: 'Get Table',
         showInventory: true,
         activeInput: urlInput,
-        correctAns: 'https://www.googleapis.com/mapsengine/search_tt/tables/' + 
+        correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' + 
                 '15474835347274181123-14495543923251622067?' +
-                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco'
-        }),
-        new Lesson('lesson4-listfeatures', {
-            title: 'List Features',
-            showInventory: true,
-            activeInput: urlInput,
-            correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
-                    '15474835347274181123-14495543923251622067/features?' +
-                    'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1v' +
-                    'pHQdco',
-            hasSubmit: true
-        }),
-        new Lesson('lesson5-queries', {
-            title: 'Queries',
-            showInventory: true,
-            activeInput: urlInput,
-            correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
-                    '15474835347274181123-14495543923251622067/features?'+ 
-                    'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1v' +
-                    'pHQdco&where=Population<2000000',
-            hasSubmit: true
-        })
-      ]}),
+                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco',
+        hasSubmit: true        
+      }),
+      new Lesson('lesson4-listfeatures', {
+        title: 'List Features',
+        showInventory: true,
+        activeInput: urlInput,
+        correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
+                '15474835347274181123-14495543923251622067/features?' +
+                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1v' +
+                'pHQdco',
+        hasSubmit: true
+      }),
+      new Lesson('lesson5-queries', {
+        title: 'Queries',
+        showInventory: true,
+        activeInput: urlInput,
+        correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
+                '15474835347274181123-14495543923251622067/features?'+ 
+                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1v' +
+                'pHQdco&where=Population<2000000',
+        hasSubmit: true
+      })
+    ]}),
     new Chapter('chapter2-private', {title: 'Accessing Private Data', lessons: [
       new Lesson('lesson6-login', {
         title: 'Login and Authorization', 
@@ -778,13 +795,13 @@ function setNextLesson() {
  */
 $(window).load(function() {
   // Create textarea objects and events associated with the input changes.
-  var urlInput = new InputObject('.url', '.hidden-url-element', {
-        elementName: 'urlInput',
-        enterSubmission: true
+  var urlInput = new InputObject($('.url'), $('.hidden-url-element'), {
+        enterSubmission: true,
+        onChange: storeInput
       });
-  var bodyInput = new InputObject('.body-input', '.hidden-body-element', {
-        elementName: 'bodyInput',
-        enterSubmission: false
+  var bodyInput = new InputObject($('.body-input'), $('.hidden-body-element'), {
+        enterSubmission: false,
+        onChange: storeInput
       });
   // Create the chapters + lesson objects
   makeChaptersAndLessons(urlInput, bodyInput);
