@@ -4,6 +4,116 @@ var activeLesson;
 var fadeInTime = 500;
 var pendingFiles = {};
 var userAuthorization = false;
+/**
+ * @type array of {Chapter}. Each {Chapter} contains an array of {Lesson}.
+ * Need to be a global variable, since used in other functions.
+ */
+var chapters;
+/**
+ * @type {Lesson}
+ * Need to be a global variable, since used in other functions.
+ */
+var introduction;
+var resume;
+var finish;
+
+/**
+ * Create object to store textarea input information.
+ * A textarea that resizes itself to fit its contents.
+ * @element {string} A jQuery object of textarea.
+ * @hiddenElement {string} A jQuery object of hidden div. 
+ * @enterSubmission {boolean} Indicate the need of enter submission/not.
+ */
+function ResizingTextarea(element, hiddenElement, options) {
+  this.element = element;
+  this.hiddenElement = hiddenElement;
+  this.enterSubmission = options.enterSubmission;
+  this.onChange = options.onChange;
+  this.setup();
+}
+
+/**
+ * Set the height of textarea based on the input height.
+ */
+ResizingTextarea.prototype.updateTextAreaHeight = function() {
+  // Store it in the hidden div, get the height and set the textarea height.
+  if (this.enterSubmission) {
+    // Always store one more character to make the height change smoother.
+    // This is for textarea that has enter submission property.
+    this.hiddenElement.text(this.element.val() + 'a');
+  } else {
+    // Append one more line at the end to make height change smoother.
+    // This is for textarea that has no enter submission property.
+    this.hiddenElement.text(this.element.val() + '\n\n');
+  }
+  this.element.height(this.hiddenElement.height());
+}
+
+/**
+ * Disable the submit button if there is empty input.
+ */
+ResizingTextarea.prototype.updateSubmitButton = function() {
+  if (this.element.val() == '') {
+    $('.submit-button').attr('disabled','disabled');
+  } else {
+    $('.submit-button').removeAttr('disabled');
+  }
+}
+
+/**
+ * Changes that need to happen everytime input changes.
+ */
+ResizingTextarea.prototype.update = function() {
+  // Enable or disable the submit button.
+  this.updateSubmitButton();
+  // Set the height of the textarea.    
+  this.updateTextAreaHeight();
+  this.onChange(this.element.val());
+};
+
+/**
+ * Create setup property of an input object.
+ */
+ResizingTextarea.prototype.setup = function() {
+  var me = this;
+  // Set events on keypress.
+  this.element.keypress(function(event) {
+    // Check if the input needs enter submission behaviour.
+    if (me.enterSubmission) {
+      // Enable submit by enter, not making the enter visible in the input.
+      if (event.which == 13) {
+        event.preventDefault();
+        // Submit only if the input is not blank.
+        if (me.element.val() !== '') {
+          activeLesson.submit();
+        }
+      }
+    }
+    me.update();
+  });
+  // Set events on keyup, to handle backspaces.
+  this.element.keyup(function() {
+    me.update();
+  });
+  // Set events on paste and cut.
+  this.element.on('paste cut', function() {
+    setTimeout(function() {
+      me.update();
+    }, 0);
+  });
+};
+
+/**
+ * Function to store input in local storage.
+ */
+function storeInput(inputValue) {
+  // Store the input in local storage.
+  localStorage[activeLesson.elementId + 'input'] = inputValue;
+}
+
+function retrieveInput() {
+  return localStorage[activeLesson.elementId + 'input'];
+}
 
 /**
  * Create object to store lesson information.
@@ -36,6 +146,8 @@ function Lesson(elementId, options) {
   } else {
     this.showInventory = false;
   }
+  // Indicate which input submission is needed.
+  this.activeInput = options.activeInput;
 }
 
 /**
@@ -83,18 +195,22 @@ Lesson.prototype.update = function() {
     this.menuElement.addClass('active');
     // Store the current lesson.
     localStorage['currentLesson'] = activeLesson.elementId;
-    // Update the input (placeholder/saved URL).
-    var storedUrl = localStorage[this.elementId + 'input'];
-    $('.url').val(storedUrl || '');
-    setTextAreaHeight();
+    // The previous input stored should be loaded and shown in the input area.
     // If the input is empty, user should not be allowed to submit.
-    toggleSubmitButton($('.url'));
+    // Do this for the lessons with their own specific inputs.
+    if (this.activeInput) {
+      // Update the input (placeholder/saved URL/saved body).
+      var storedInput = retrieveInput();
+      this.activeInput.element.val(storedInput || '');
+      this.activeInput.updateTextAreaHeight();
+      this.activeInput.updateSubmitButton();
+    }
   }
   // Set up analytics for the page visited by the user (number of times the page
   // is visited).
   ga('send', {
-      hitType: 'pageview',
-      page: this.elementId
+    hitType: 'pageview',
+    page: this.elementId
   });
 };
 
@@ -268,10 +384,10 @@ Lesson.prototype.showAnswer = function() {
     $('.answer').fadeIn(fadeInTime);
     // Set up analytics for show answer button (how many times users click it).
     ga('send', {
-        hitType: 'event',
-        eventCategory: 'help',
-        eventAction: 'show answer',
-        eventLabel: this.elementId
+      hitType: 'event',
+      eventCategory: 'help',
+      eventAction: 'show answer',
+      eventLabel: this.elementId
     });
   }
 };
@@ -297,10 +413,10 @@ Lesson.prototype.displaySuccessMessage = function() {
     $('.next-button').hide().fadeIn(fadeInTime);
     // Set up analytics to indicate success (how many times).
     ga('send', {
-        hitType: 'event',
-        eventCategory: 'submit',
-        eventAction: 'success',
-        eventLabel: this.elementId
+      hitType: 'event',
+      eventCategory: 'submit',
+      eventAction: 'success',
+      eventLabel: this.elementId
     });
   }
 };
@@ -336,10 +452,10 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   $('.next-button').hide();
   // Set up analytics to indicate failure (how many times).
   ga('send', {
-      hitType: 'event',
-      eventCategory: 'submit',
-      eventAction: 'failure',
-      eventLabel: this.elementId
+    hitType: 'event',
+    eventCategory: 'submit',
+    eventAction: 'failure',
+    eventLabel: this.elementId
   });
 };
 
@@ -499,168 +615,197 @@ Chapter.prototype.makeMenu = function() {
   menu.append(newHeader);
 };
 
-// Array of chapters, with the corresponding lessons.
-var chapters = [
-  new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
-    new Lesson('lesson1-gmeapi', {
+/**
+ * Fill the chapters array with chapters and corresponding lessons.
+ * Create introduction, resume, and finish page.
+ */
+function makeChaptersAndLessons(urlInput, bodyInput) {
+  chapters = [
+    new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
+      new Lesson('lesson1-gmeapi', {
         title: 'GME API',
         submit: getText,
-        showInventory: false
-    }),
-    new Lesson('lesson2-apikey', {
+        showInventory: false,
+        activeInput: urlInput
+      }),
+      new Lesson('lesson2-apikey', {
         title: 'API Key',
         submit: testAPIKey,
         showInventory: false,
-        submitButtonValue: 'Submit'
-    })
-  ]}),
-  new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
-    new Lesson('lesson3-gettable', {
+        submitButtonValue: 'Submit',
+        activeInput: urlInput
+      })
+    ]}),
+    new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
+      new Lesson('lesson3-gettable', {
         title: 'Get Table',
-        submit: executeGetTable,
         showInventory: true,
-        correctAns: 'https://www.googleapis.com/mapsengine/search_tt/tables/' + 
+        activeInput: urlInput,
+        correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' + 
                 '15474835347274181123-14495543923251622067?' +
-                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco'
-    }),
-    new Lesson('lesson4-listfeatures', {
+                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco',
+        hasSubmit: true        
+      }),
+      new Lesson('lesson4-listfeatures', {
         title: 'List Features',
         showInventory: true,
+        activeInput: urlInput,
         correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
                 '15474835347274181123-14495543923251622067/features?' +
-                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco',
+                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1v' +
+                'pHQdco',
         hasSubmit: true
-    }),
-    new Lesson('lesson5-queries', {
+      }),
+      new Lesson('lesson5-queries', {
         title: 'Queries',
         showInventory: true,
+        activeInput: urlInput,
         correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
-                '15474835347274181123-14495543923251622067/features?version' +
-                '=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco' +
-                '&where=Population<2000000',
+                '15474835347274181123-14495543923251622067/features?'+ 
+                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1v' +
+                'pHQdco&where=Population<2000000',
         hasSubmit: true
-    })
-  ]}),
-  new Chapter('chapter2-private', {title: 'Accessing Private Data', lessons: [
-    new Lesson('lesson6-login', {
-      title: 'Login and Authorization', 
-      submit: authorizeUser,
-      submitButtonValue: 'Sign In',
-      update: function() {
-        Lesson.prototype.update.call(this);
-        $('.url').hide();
-        if (!userAuthorization) {
-          // Activate the 'Sign In' button.
-          $('.submit-button').removeAttr('disabled');
-        } else {
-          // Else, leave the button disabled.
-          // Make sure that the next lesson is always unlocked.
-          this.complete();
+      })
+    ]}),
+    new Chapter('chapter2-private', {title: 'Accessing Private Data', lessons: [
+      new Lesson('lesson6-login', {
+        title: 'Login and Authorization', 
+        submit: authorizeUser,
+        submitButtonValue: 'Sign In',
+        activeInput: false,
+        update: function() {
+          Lesson.prototype.update.call(this);
+          $('.url').hide();
+          if (!userAuthorization) {
+            // Activate the 'Sign In' button.
+            $('.submit-button').removeAttr('disabled');
+          } else {
+            // Else, leave the button disabled.
+            // Make sure that the next lesson is always unlocked.
+            this.complete();
+          }
         }
-      }
-    }),
-    new Lesson('lesson7-project', {
-      title: 'Create a Free Project',
-      submit: storeProjectID,
-      submitButtonValue: 'Select',
-      update: function() {
-        Lesson.prototype.update.call(this);
-        $('.url').hide();
-        $('.project-menu').show();
-        $('.submit-button').removeAttr('disabled');
-        setInterval(function() {
-          gapi.client.request({
-            path: '/mapsengine/v1/projects/',
-            method: 'GET',
-            callback: function(jsonBody) {
-              var list = $('.project-list')
-              list.empty();
-              jsonBody.projects.forEach(function(project) {
-                var listItem = $('<option>').attr('value', project.id)
-                    .text(project.name);
-                list.append(listItem);
-              });
-            }
-          });
-        }, 5000); //5 seconds
-      }
-    }),
-    new Lesson('lesson8-listprojects', {
-      title: 'List Projects',
-      hasSubmit: true,
-      submitButtonValue: 'Get',
-      activeInput: '.body-input',
-      headerFile: 'get-request-header.txt',
-      correctAns: 'https://www.googleapis.com/mapsengine/v1/projects',
-      update: function() {
-        Lesson.prototype.update.call(this);
-        var header = JSON.stringify(this.header);
-        header = header.replace('{accessToken}', userAuthorization);
-        this.header = JSON.parse(header);
-        $('.header-input').text(header).show();
-      }
-    })
-  ]})
-];
-
-// Introduction, resume and final page lessons.
-var introduction = new Lesson('introduction', {
-  title: 'Welcome!',
-  buttonValue: 'Yes, I am!',
-  update: function() {
-    Lesson.prototype.update.call(this);
-    $('.next-button').removeClass('right-aligned').show();
-  }
-});
-var resume = new Lesson('resume', {
-  title: 'Welcome back!',
-  buttonValue: 'Resume',
-  update: function() {
-    Lesson.prototype.update.call(this);
-    $('.next-button').removeClass('right-aligned').show();
-  }
-});
-var finish = new Lesson('finish', {
-  title:'Congratulations!',
-  update: function() {
-    Lesson.prototype.update.call(this);
-    // The finish page will not have next button, but it will have the menu and
-    // go to documentation button.
-    $('.menu-area').show();
-    $('.documentation-button').show();
-    // Store the current lesson (the finish page).
-    localStorage['currentLesson'] = activeLesson.elementId;
-    // Make text on menu for active lesson red, and all others black.
-    chapters.forEach(function(chapter) {
-      chapter.lessons.forEach(function(lesson) {
-        lesson.menuElement.removeClass('active');
-      });
-    });
-  }
-});
-
-// Determining the next, and chapter for each lesson.
-// Introduction page points to the first lesson.
-var prevLesson = chapters[0].lessons[0];
-introduction.next = prevLesson;
-/**
- * Make each lesson points to the next lesson.
- */
-chapters.forEach(function(chapter) {
-  chapter.lessons.forEach(function(lesson) {
-    lesson.chapter = chapter;
-    prevLesson.next = lesson;
-    prevLesson = lesson;
+      }),
+      new Lesson('lesson7-project', {
+        title: 'Create a Free Project',
+        submit: storeProjectID,
+        submitButtonValue: 'Select',
+        activeInput: false,
+        update: function() {
+          Lesson.prototype.update.call(this);
+          $('.url').hide();
+          $('.project-menu').show();
+          $('.submit-button').removeAttr('disabled');
+          setInterval(function() {
+            gapi.client.request({
+              path: '/mapsengine/v1/projects/',
+              method: 'GET',
+              callback: function(jsonBody) {
+                var list = $('.project-list')
+                list.empty();
+                jsonBody.projects.forEach(function(project) {
+                  var listItem = $('<option>').attr('value', project.id)
+                      .text(project.name);
+                  list.append(listItem);
+                });
+              }
+            });
+          }, 5000); //5 seconds
+        }
+      }), 
+      new Lesson('lesson8-listprojects', {
+        title: 'List Projects',
+        hasSubmit: true,
+        submitButtonValue: 'Get',
+        activeInput: urlInput,
+        headerFile: 'get-request-header.txt',
+        correctAns: 'https://www.googleapis.com/mapsengine/v1/projects',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          var header = JSON.stringify(this.header);
+          header = header.replace('{accessToken}', userAuthorization);
+          this.header = JSON.parse(header);
+          $('.header-input').text(header).show();
+        }
+      })
+    ]})
+  ];
+  // Introduction, resume and final page lessons.
+  introduction = new Lesson('introduction', {
+    title: 'Welcome!',
+    buttonValue: 'Yes, I am!',
+    update: function() {
+      Lesson.prototype.update.call(this);
+      $('.next-button').removeClass('right-aligned').show();
+    }
   });
-});
-// Last lesson points to the final page.
-prevLesson.next = finish;
-// The final page does not need to have a next.
+  resume = new Lesson('resume', {
+    title: 'Welcome back!',
+    buttonValue: 'Resume',
+    update: function() {
+      Lesson.prototype.update.call(this);
+      $('.next-button').removeClass('right-aligned').show();
+    }
+  });
+  finish = new Lesson('finish', {
+    title:'Congratulations!',
+    update: function() {
+      Lesson.prototype.update.call(this);
+      // The finish page will not have next button, but it will have the menu &
+      // go to documentation button.
+      $('.menu-area').show();
+      $('.documentation-button').show();
+      // Store the current lesson (the finish page).
+      localStorage['currentLesson'] = activeLesson.elementId;
+      // Make text on menu for active lesson red, and all others black.
+      chapters.forEach(function(chapter) {
+        chapter.lessons.forEach(function(lesson) {
+          lesson.menuElement.removeClass('active');
+        });
+      });
+    }
+  });
+  // Set the next lesson and chapter on each lesson.
+  setNextLesson();
+}
+
+/**
+ * Determining the next, and chapter for each lesson.
+ */
+function setNextLesson() {
+  // Introduction page points to the first lesson.
+  var prevLesson = chapters[0].lessons[0];
+  introduction.next = prevLesson;
+  // Make each lesson points to the next lesson.
+  chapters.forEach(function(chapter) {
+    chapter.lessons.forEach(function(lesson) {
+      lesson.chapter = chapter;
+      prevLesson.next = lesson;
+      prevLesson = lesson;
+    });
+  });
+  // Last lesson points to the final page.
+  prevLesson.next = finish;
+  // The final page does not need to have a next.
+}
+
 
 /**
  * Function executed when the window is loading.
  */
 $(window).load(function() {
+  // Create textarea objects and events associated with the input changes.
+  var urlInput = new ResizingTextarea($('.url'), $('.hidden-url-element'), {
+        enterSubmission: true,
+        onChange: storeInput
+      });
+  var bodyInput = new ResizingTextarea($('.body-input'), 
+      $('.hidden-body-element'), {
+        enterSubmission: false,
+        onChange: storeInput
+      });
+  // Create the chapters + lesson objects
+  makeChaptersAndLessons(urlInput, bodyInput);
   // Load the markdown files for the introduction, resume, and finish page.
   introduction.loadInstruction();
   resume.loadInstruction();
@@ -677,48 +822,13 @@ $(window).load(function() {
       lesson.loadHeader();
     });
   });
-  // Store the input everytime it changes, to the respective local storage.
-  var input = $('.url');
-  var bodyInput = $('.body-input');
-  // Input might change on keypress.
-  input.keypress(function(event) {
-    toggleSubmitButton(input);
-    // Enable submit by enter, not making the enter visible in the input.
-    if (event.which == 13) {
-      event.preventDefault();
-      // Submit only if the input is not blank.
-      if (input.val() !== '') {
-        activeLesson.submit();
-      }
-    }
-    localStorage[activeLesson.elementId+'input'] = input.val();
-    localStorage[activeLesson.elementId+'body'] = bodyInput.val();
-    setTextAreaHeight();
-  });
-  // Input might change on keyup (handle backspace).
-  input.keyup(function() {
-    toggleSubmitButton(input);
-    localStorage[activeLesson.elementId+'input'] = input.val();
-    localStorage[activeLesson.elementId+'body'] = bodyInput.val();
-    setTextAreaHeight();
-  });
-  // Input might change on cut/paste act.
-  input.on('paste cut',function() {
-    setTimeout(function() {
-      toggleSubmitButton(input);
-      localStorage[activeLesson.elementId+'input'] = input.val();
-      localStorage[activeLesson.elementId+'body'] = bodyInput.val();
-      setTextAreaHeight();
-    }, 0);
-  });
-
   // Set up analytics to indicate how many times users go to the documentation 
   // page using the final page button.
   $('.documentation-button').on('click', function() {
     ga('send', {
-        hitType: 'event',
-        eventCategory: 'readTheDocs',
-        eventAction: 'finalPageButton',
+      hitType: 'event',
+      eventCategory: 'readTheDocs',
+      eventAction: 'finalPageButton',
     });
   });
 
@@ -726,10 +836,10 @@ $(window).load(function() {
   // page while visiting a specific lesson.
   $('.documentation-link').on('click', function() {
     ga('send', {
-        hitType: 'event',
-        eventCategory: 'readTheDocs',
-        eventAction: 'navigationMenu',
-        eventLabel: activeLesson.elementId
+      hitType: 'event',
+      eventCategory: 'readTheDocs',
+      eventAction: 'navigationMenu',
+      eventLabel: activeLesson.elementId
     });
   });
 });
@@ -752,31 +862,6 @@ function checkNoFilesPending() {
   if (jQuery.isEmptyObject(pendingFiles)) {
     loadState();
   }
-}
-
-/**
- * Disable the submit button if there is empty input.
- */
-function toggleSubmitButton(input) {
-  if (input.val() == '') {
-    $('.submit-button').attr('disabled','disabled');
-  } else {
-    $('.submit-button').removeAttr('disabled');
-  }
-}
-
-/**
- * Set the height of textarea based on the input height.
- */
-function setTextAreaHeight() {
-  var input = $('.url');
-  var bodyInput = $('.body-input');
-  // Store it in the hidden div, get the height and set the textarea height.
-  // Always store one more character to make the height change smoother.
-  $('.hidden-url-element').text(input.val() + 'a');
-  input.height($('.hidden-url-element').height());
-  $('.hidden-body-element').text(bodyInput.val() + 'a');
-  bodyInput.height($('.hidden-body-element').height());
 }
 
 /**
@@ -883,22 +968,10 @@ function testAPIKey() {
     },
     error: function(response) {
       me.displayErrorMessage('Make sure that you have created a browser key ' +
-        'and copied it correctly.');
+          'and copied it correctly.');
     }
   })
 ;}
-
-/**
- * Get table submit function.
- */
-function executeGetTable() {
-  // Get user input and trim it.
-  var address = $.trim($('.url').val());
-  // The Get Table is currently NOT AVAILABLE in v1.
-  // It will someday be available and this 2 line codes needs to be removed
-  address = address.replace('v1', 'search_tt');
-  this.checkCorrectness(address);
-}
 
 /**
  * Login and authorization submit function.
