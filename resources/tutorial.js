@@ -919,7 +919,7 @@ function decideErrorMessage(errorMess, input) {
   } else if (errorMess.reason == 'invalid') {
     var field = errorMess.location;
     // If the error is not in table ID, tell the error location.
-    if (field!=='id') {
+    if (field!='id') {
       message = 'Check whether you have given the right values for the ' +
           'parameters, in particular, the \''+field+'\' field.';
     } else {
