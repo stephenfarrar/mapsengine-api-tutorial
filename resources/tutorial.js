@@ -2,10 +2,10 @@
 // The global variables.
 var activeLesson;
 var fadeInTime = 500;
-var userAuthorization;
+var userAuthorization = false;
 /**
  * @type array of {Chapter}. Each {Chapter} contains an array of {Lesson}.
- * Need to be a global variable, since used in other functions tions.
+ * Need to be a global variable, since used in other functions.
  */
 var chapters;
 /**
