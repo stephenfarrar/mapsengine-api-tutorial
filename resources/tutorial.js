@@ -72,7 +72,7 @@ ResizingTextarea.prototype.updateTextAreaHeight = function() {
  * Disable the submit button if there is empty input.
  */
 ResizingTextarea.prototype.updateSubmitButton = function() {
-  if (this.element.val() == '') {
+  if (this.element.val() == '' || hasEntered) {
     $('.submit-button').attr('disabled','disabled');
   } else {
     $('.submit-button').removeAttr('disabled');
@@ -107,8 +107,6 @@ ResizingTextarea.prototype.setup = function() {
         if (me.element.val() != '' && !hasEntered) {
           hasEntered = true;
           activeLesson.submit();
-        } else if (hasEntered) {
-          $('.submit-button').attr('disabled', 'disabled');
         }
       }
     }    
@@ -979,7 +977,7 @@ function decideErrorMessage(errorMess, input) {
 function getText(address) {
   var me = this;
   if (address == 'mapsengine-api-tutorial.appspot.com/resources/' +
-         'alice-in-wondreland.txt') {
+         'alice-in-wonderland.txt') {
     // The user entered the correct input.  
     $.ajax({
       url: 'resources/alice-in-wonderland.txt',
