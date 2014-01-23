@@ -8,7 +8,7 @@ var userAuthorization = false;
  *   still processing.
  * This is to disable double submission when the code is still processing.
  */
-var hasEntered = false;
+var hasSubmitted = false;
 /**
  * @type array of {Chapter}. Each {Chapter} contains an array of {Lesson}.
  * Need to be a global variable, since used in other functions.
@@ -73,7 +73,7 @@ ResizingTextarea.prototype.updateTextAreaHeight = function() {
  * Disable the submit button if there is empty input.
  */
 ResizingTextarea.prototype.updateSubmitButton = function() {
-  if (this.element.val() == '' || hasEntered) {
+  if (this.element.val() == '' || hasSubmitted) {
     $('.submit-button').attr('disabled','disabled');
   } else {
     $('.submit-button').removeAttr('disabled');
@@ -105,7 +105,7 @@ ResizingTextarea.prototype.setup = function() {
       if (event.which == 13) {
         event.preventDefault();
         // Submit only if the button is not disabled and has not submit.
-        if (me.element.val() != '' && !hasEntered) {
+        if (me.element.val() != '' && !hasSubmitted) {
           activeLesson.submit();
         }
       }
@@ -255,7 +255,7 @@ Lesson.prototype.update = function() {
 Lesson.prototype.submit = function() {
   // Make the user not able to submit again for a while.
   // This is to avoid double posting.
-  hasEntered = true;
+  hasSubmitted = true;
   $('.submit-button').attr('disabled', 'disabled');
   var input = $.trim(this.activeInput.element.val());
   // Empty the output area.
@@ -315,7 +315,7 @@ Lesson.prototype.displaySuccessMessage = function() {
     this.complete();
     $('.message').html(markdown.toHTML(this.successMessage));
     // Enable the submit button again, and enabled submission.
-    hasEntered = false;
+    hasSubmitted = false;
     $('.submit-button').removeAttr('disabled');
     // Display the success ribbon and message.
     $('.feedback').hide().fadeIn(fadeInTime)
@@ -347,7 +347,7 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   $('.message').html('Sorry, that input is incorrect. ')
       .append(errorMessage).append(' Please try again.');
   // Enable the submit button again, and enabled submission.
-  hasEntered = false;
+  hasSubmitted = false;
   $('.submit-button').removeAttr('disabled');
   // Display the message, hide the success ribbon.
   $('.feedback').hide().fadeIn(fadeInTime)
