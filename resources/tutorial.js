@@ -2,10 +2,10 @@
 // The global variables.
 var activeLesson;
 var fadeInTime = 500;
-var userAuthorization = false;
+var userAuthorization;
 /**
  * @type array of {Chapter}. Each {Chapter} contains an array of {Lesson}.
- * Need to be a global variable, since used in other functions.
+ * Need to be a global variable, since used in other functions tions.
  */
 var chapters;
 /**
@@ -164,6 +164,17 @@ function Lesson(elementId, options) {
   this.unlocked = false;
   // Indicate which input submission is needed.
   this.activeInput = options.activeInput;
+  // Load the instructions file for each lesson.
+  this.loadInstruction();
+  // Only lessons with a submission require success, answer and header content.
+  if (this.hasSubmit) {
+    this.loadSuccessMessage();
+    this.loadBody();
+    // Only lessons with an activeInput field have an answer.
+    if (this.activeInput) {
+      this.loadAnswer();
+    }
+  }
 }
 
 /**
@@ -194,7 +205,7 @@ Lesson.prototype.update = function() {
     $('.url').show();
     // Show inventory if needed.
     if (this.inventoryContents) {
-      // Update the inventory box.
+      // Update the inventory contents.
       populateInventory(this.inventoryContents);
       $('.inventory').show();
     } else {
@@ -560,7 +571,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       new Lesson('lesson3-gettable', {
         title: 'Get Table',
         inventoryContents: [{
-          label: 'table ID: ', 
+          label: 'Table ID: ',
           information: '15474835347274181123-14495543923251622067'
         }, {
           label: 'Your API Key: '
@@ -574,7 +585,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       new Lesson('lesson4-listfeatures', {
         title: 'List Features',
         inventoryContents: [{
-          label: 'table ID: ', 
+          label: 'Table ID: ',
           information: '15474835347274181123-14495543923251622067'
         }, {
           label: 'Your API Key: '
@@ -589,7 +600,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       new Lesson('lesson5-queries', {
         title: 'Queries',
         inventoryContents: [{
-          label: 'table ID: ', 
+          label: 'Table ID: ',
           information: '15474835347274181123-14495543923251622067'
         }, {
           label: 'Your API Key: '
@@ -610,11 +621,9 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         update: function() {
           Lesson.prototype.update.call(this);
           $('.url').hide();
-          if (!userAuthorization) {
-            // Activate the 'Sign In' button.
-            $('.submit-button').removeAttr('disabled');
-          } else {
-            // Else, leave the button disabled.
+          if (userAuthorization) {
+            // Dectivate the 'Sign In' button.
+            $('.submit-button').attr('disabled', 'disabled');
             // Make sure that the next lesson is always unlocked.
             this.complete();
           }
@@ -746,10 +755,13 @@ function newTasksList(firstTask, onFinished) {
   };
   me.remove = function(task) {
     delete tasks[task];
-    if (jQuery.isEmptyObject(tasks)) {
+    if ($.isEmptyObject(tasks)) {
       onFinished();
     }
   };
+  me.isEmpty = function() {
+    return ($.isEmptyObject(tasks));
+  }
   me.add(firstTask);
   return me;
 }
@@ -781,11 +793,6 @@ $(window).load(function() {
     chapter.makeMenu();
     chapter.lessons.forEach(function(lesson) {
       lesson.makeMenu();
-      // Load the markdown files for each lesson.
-      lesson.loadInstruction();
-      lesson.loadSuccessMessage();
-      lesson.loadAnswer();
-      lesson.loadBody();
     });
   });
   // Set up analytics to indicate how many times users go to the documentation 
@@ -819,7 +826,10 @@ function checkIfUserIsAuthorized(authResult) {
     // We set a global variable with their authorization token.
     userAuthorization = authResult['access_token'];
   }
-  tasksList.remove('callback');
+  // The task should only be removed once, when the page is loaded.
+  if (!tasksList.isEmpty()) {
+    tasksList.remove('callback');
+  }
 }
 
 /**
@@ -859,19 +869,20 @@ function loadState() {
 }
 
 /**
- * Updating the inventory box according to the object values in the contents
- * array.
+ * Updating the inventory box.
  */
 function populateInventory(contents) {
   var inventory = $('.inventory');
   inventory.empty()
-      .append('<h3>Helpful information</h3>')
+      .append('<h3>Helpful information</h3>');
   contents.forEach(function(item) {
+    // Load the API key.
     if (item.label == 'Your API Key: ') {
       item.information = localStorage['APIKey'];
     }
+    // Add the item to the inventory element.
     inventory.append('<b>' + item.label + '</b>')
-        .append('<code>' + item.information + '</code><br>')
+        .append('<code>' + item.information + '</code><br>');
   });
 }
 
