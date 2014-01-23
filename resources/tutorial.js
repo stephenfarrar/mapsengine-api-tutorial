@@ -1132,9 +1132,9 @@ function checkCreateTable(input) {
     url: 'https://www.googleapis.com/mapsengine/v1/tables?projectId=' +
         localStorage['projectID'],
     // This request should always be successful.
-    success: function(response) {
+    success: function(resource) {
       // Store the number of tables the user has.
-      var initialTableCount = response.tables.length;
+      var initialTableCount = resource.tables.length;
       // Attempt to create a table with user's input.
       $.ajax({
         headers: me.header,
@@ -1142,11 +1142,11 @@ function checkCreateTable(input) {
         url: me.url || input,
         data: JSON.stringify(me.body) || input,
         dataType: 'json',
-        success: function(resource){
+        success: function(resource2){
           var finalTableCount;
           // If the request returns a valid object, show the output.
-          if (typeof resource == 'object') {
-            var responseString = JSON.stringify(resource, null, 2);
+          if (typeof resource2 == 'object') {
+            var responseString = JSON.stringify(resource2, null, 2);
             $('.response-content').text(responseString); 
           }
           // Find out the number of tables in the project after success request.
@@ -1155,11 +1155,16 @@ function checkCreateTable(input) {
             type: 'GET',
             url: 'https://www.googleapis.com/mapsengine/v1/tables?projectId=' +
                 localStorage['projectID'],
-            success: function(response) {
-              finalTableCount = response.tables.length;
+            success: function(resource3) {
+              finalTableCount = resource3.tables.length;
               // If the number of table increase, then the user is right.
-              if (finalTableCount > initialTableCount){
+              if (finalTableCount > initialTableCount) {
                 me.displaySuccessMessage();
+                // Store the table ID in local storage if it is the World
+                // Famous Mountains table (lesson9-createtable1).
+                if (me.elementId == "lesson9-createtable1") {
+                  localStorage['tableID'] = resource2.id;
+                }
               } else {
                 me.displayErrorMessage('Make sure you enter the URL for ' +
                     'create table correctly.')
