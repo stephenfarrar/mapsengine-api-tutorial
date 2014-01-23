@@ -149,6 +149,9 @@ function Lesson(elementId, options) {
   if (options.update) {
     this.update = options.update;
   }
+  if (options.hasUrlFile) {
+    this.hasUrlFile = options.hasUrlFile;
+  }
   if (options.header) {
     this.header = options.header;
   }
@@ -477,6 +480,21 @@ Lesson.prototype.loadAnswer = function() {
 };
 
 /**
+ * Load the url markdown, where applicable.
+ */
+Lesson.prototype.loadUrl = function() {
+  var me = this;
+  if (this.hasUrlFile) {
+    var filename = this.elementId + '-url.txt';
+    tasksList.add(filename);
+    $.get('resources/' + filename, function(response) {
+      me.url = response;
+      tasksList.remove(filename);
+    });
+  }
+}
+
+/**
  * Load the body markdown, where applicable.
  */
 Lesson.prototype.loadBody = function() {
@@ -489,6 +507,16 @@ Lesson.prototype.loadBody = function() {
       tasksList.remove(filename);
     });
   }
+}
+
+/**
+ * Update and display the url of lesson.
+ */
+Lesson.prototype.displayUrl = function() {
+  this.url = this.url.replace('{userTableId}', localStorage['tableID']);
+  $('.url').val(this.url).show();
+  $('.hidden-url-element').text(this.url);
+  $('.url').height($('.hidden-url-element').height());
 }
 
 /**
@@ -506,8 +534,8 @@ Lesson.prototype.displayHeader = function() {
 Lesson.prototype.displayBody = function() {
   this.body.projectId = localStorage['projectID'];
   var body = JSON.stringify(this.body, null, 2);
-  $('.body-input').text(body).show();
-  $('.hidden-body-element').text(body + '\n');
+  $('.body-input').val(body).show();
+  $('.hidden-body-element').text(body);
   $('.body-input').height($('.hidden-body-element').height());
 }
 
@@ -660,6 +688,20 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           this.displayBody();
           $('.body-input').show();
         }
+      }),
+      new Lesson('lesson10-createtable2', {
+        title: 'Create Table II',
+        checkAnswer: checkCreateTable,
+        submitButtonValue: 'Post',
+        activeInput: bodyInput,
+        hasUrlFile: true,
+        header: HEADER_FOR_POST,
+        update: function() {
+          Lesson.prototype.update.call(this);
+          this.displayUrl();
+          this.displayHeader();
+          $('.body-input').show();
+        }
       })
     ]})
   ];
@@ -772,6 +814,7 @@ $(window).load(function() {
       lesson.loadInstruction();
       lesson.loadSuccessMessage();
       lesson.loadAnswer();
+      lesson.loadUrl();
       lesson.loadBody();
     });
   });
@@ -871,7 +914,7 @@ function handleErrorResponse(response, input) {
     errorMess = response.error.errors[0];
     // Append the response to the output area.
     var responseString = JSON.stringify(errorMess, null, 2);
-    $('response-content').text(responseString); 
+    $('.response-content').text(responseString); 
   } catch (e) {
     errorMess = 'notJSONObject';
   }
@@ -972,7 +1015,7 @@ function getText(address) {
       url: 'resources/alice-in-wonderland.txt',
       dataType: 'text',
       success: function(resource) {
-        $('response-content').text(resource);
+        $('r.esponse-content').text(resource);
         me.displaySuccessMessage();
       }
     });
@@ -1028,7 +1071,7 @@ function checkCorrectness(address) {
         dataType: 'json',
         success: function(resource2) {
           var resourceString = JSON.stringify(resource2, null, 2);
-          $('response-content').text(resourceString);
+          $('.response-content').text(resourceString);
           // If the response is the correct response, then the user is right.
           if (resourceString == correctResourceString) {
             me.displaySuccessMessage();
@@ -1096,15 +1139,15 @@ function checkCreateTable(input) {
       $.ajax({
         headers: me.header,
         type: 'POST',
-        url: input,
-        data: JSON.stringify(me.body),
+        url: me.url || input,
+        data: JSON.stringify(me.body) || input,
         dataType: 'json',
         success: function(resource){
           var finalTableCount;
           // If the request returns a valid object, show the output.
           if (typeof resource == 'object') {
             var responseString = JSON.stringify(resource, null, 2);
-            $('response-content').text(responseString); 
+            $('.response-content').text(responseString); 
           }
           // Find out the number of tables in the project after success request.
           $.ajax({
