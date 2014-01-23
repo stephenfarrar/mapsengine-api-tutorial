@@ -2,7 +2,7 @@
 // The global variables.
 var activeLesson;
 var fadeInTime = 500;
-var userAuthorization = false;
+var userAuthorization;
 /**
  * @type array of {Chapter}. Each {Chapter} contains an array of {Lesson}.
  * Need to be a global variable, since used in other functions.
@@ -742,14 +742,14 @@ function newTasksList(firstTask, onFinished) {
     tasks[task] = true;
   };
   me.remove = function(task) {
-    // Only remove an object if the list has an object to remove.
-    if (!jQuery.isEmptyObject(tasks)) {
-      delete tasks[task];
-      if (jQuery.isEmptyObject(tasks)) {
-        onFinished();
-      }
+    delete tasks[task];
+    if ($.isEmptyObject(tasks)) {
+      onFinished();
     }
   };
+  me.isEmpty = function() {
+    return ($.isEmptyObject(tasks));
+  }
   me.add(firstTask);
   return me;
 }
@@ -814,7 +814,10 @@ function checkIfUserIsAuthorized(authResult) {
     // We set a global variable with their authorization token.
     userAuthorization = authResult['access_token'];
   }
-  tasksList.remove('callback');
+  // The task should only be removed once, when the page is loaded.
+  if (!tasksList.isEmpty()) {
+    tasksList.remove('callback');
+  }
 }
 
 /**
@@ -1061,6 +1064,7 @@ function authorizeUser() {
   gapi.auth.signIn({
     'callback': function(authResult) {
       if (authResult['status']['signed_in']) {
+        userAuthorization = authResult['access_token'];
         $('.request').hide();
         me.displaySuccessMessage();
       } else {
