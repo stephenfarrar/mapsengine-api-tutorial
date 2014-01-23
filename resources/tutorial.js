@@ -4,6 +4,11 @@ var activeLesson;
 var fadeInTime = 500;
 var userAuthorization = false;
 /**
+ * This variable is to indicate whether user has submit by clicking enter.
+ * This is to disable double submission when the code is still processing.
+ */
+var hasEntered = false;
+/**
  * @type array of {Chapter}. Each {Chapter} contains an array of {Lesson}.
  * Need to be a global variable, since used in other functions.
  */
@@ -92,22 +97,28 @@ ResizingTextarea.prototype.setup = function() {
   var me = this;
   // Set events on keypress.
   this.element.keypress(function(event) {
+    me.update(); 
     // Check if the input needs enter submission behaviour.
     if (me.enterSubmission) {
       // Enable submit by enter, not making the enter visible in the input.
       if (event.which == 13) {
         event.preventDefault();
-        // Submit only if the input is not blank.
-        if (me.element.val() !== '') {
+        // Submit only if the button is not disabled.
+        if (me.element.val() != '' && !hasEntered) {
+          hasEntered = true;
           activeLesson.submit();
+        } else if (hasEntered) {
+          $('.submit-button').attr('disabled', 'disabled');
         }
       }
-    }
-    me.update();
+    }    
   });
   // Set events on keyup, to handle backspaces.
-  this.element.keyup(function() {
-    me.update();
+  this.element.keyup(function(event) {
+    // Don't update for enter submission characters.
+    if (event.which != 13) {
+      me.update();
+    }
   });
   // Set events on paste and cut.
   this.element.on('paste cut', function() {
@@ -304,7 +315,8 @@ Lesson.prototype.displaySuccessMessage = function() {
     // The lesson is completed. Display the success message.
     this.complete();
     $('.message').html(markdown.toHTML(this.successMessage));
-    // Enable the submit button again.
+    // Enable the submit button again, and enabled enter.
+    hasEntered = false;
     $('.submit-button').removeAttr('disabled');
     // Display the success ribbon and message.
     $('.feedback').hide().fadeIn(fadeInTime)
@@ -335,7 +347,8 @@ Lesson.prototype.displaySuccessMessage = function() {
 Lesson.prototype.displayErrorMessage = function(errorMessage) {
   $('.message').html('Sorry, that input is incorrect. ')
       .append(errorMessage).append(' Please try again.');
-  // Enable the submit button again.
+  // Enable the submit button again, and enabled enter.
+  hasEntered = false;
   $('.submit-button').removeAttr('disabled');
   // Display the message, hide the success ribbon.
   $('.feedback').hide().fadeIn(fadeInTime)
@@ -871,7 +884,7 @@ function handleErrorResponse(response, input) {
     errorMess = response.error.errors[0];
     // Append the response to the output area.
     var responseString = JSON.stringify(errorMess, null, 2);
-    $('response-content').text(responseString); 
+    $('.response-content').text(responseString); 
   } catch (e) {
     errorMess = 'notJSONObject';
   }
@@ -972,7 +985,7 @@ function getText(address) {
       url: 'resources/alice-in-wonderland.txt',
       dataType: 'text',
       success: function(resource) {
-        $('response-content').text(resource);
+        $('.response-content').text(resource);
         me.displaySuccessMessage();
       }
     });
@@ -1028,7 +1041,7 @@ function checkCorrectness(address) {
         dataType: 'json',
         success: function(resource2) {
           var resourceString = JSON.stringify(resource2, null, 2);
-          $('response-content').text(resourceString);
+          $('.response-content').text(resourceString);
           // If the response is the correct response, then the user is right.
           if (resourceString == correctResourceString) {
             me.displaySuccessMessage();
@@ -1104,7 +1117,7 @@ function checkCreateTable(input) {
           // If the request returns a valid object, show the output.
           if (typeof resource == 'object') {
             var responseString = JSON.stringify(resource, null, 2);
-            $('response-content').text(responseString); 
+            $('.response-content').text(responseString); 
           }
           // Find out the number of tables in the project after success request.
           $.ajax({
