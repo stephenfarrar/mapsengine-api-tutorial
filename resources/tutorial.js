@@ -2,7 +2,7 @@
 // The global variables.
 var activeLesson;
 var fadeInTime = 500;
-var userAuthorization = false;
+var userAuthorization;
 /**
  * @type array of {Chapter}. Each {Chapter} contains an array of {Lesson}.
  * Need to be a global variable, since used in other functions.
@@ -784,10 +784,6 @@ $(window).load(function() {
       });
   // Create the chapters + lesson objects
   makeChaptersAndLessons(urlInput, bodyInput);
-  // Load the markdown files for the introduction, resume, and finish page.
-  introduction.loadInstruction();
-  resume.loadInstruction();
-  finish.loadInstruction();
   // Create the chapter + lesson buttons + load markdown files for lessons.
   chapters.forEach(function(chapter) {
     chapter.makeMenu();
@@ -821,14 +817,17 @@ $(window).load(function() {
  * Page-level callback to check if a user has an OAuth 2.0 token
  */
 function checkIfUserIsAuthorized(authResult) {
+  // The first time the callback is called, on page load, userAuthorization
+  // has no value.
+  if (userAuthorization == null) {
+    tasksList.remove('callback');
+  }
   if (authResult['status']['signed_in']) {
     // The user is signed in and has authorised the application.
     // We set a global variable with their authorization token.
     userAuthorization = authResult['access_token'];
-  }
-  // The task should only be removed once, when the page is loaded.
-  if (!tasksList.isEmpty()) {
-    tasksList.remove('callback');
+  } else {
+    userAuthorization = false;
   }
 }
 
