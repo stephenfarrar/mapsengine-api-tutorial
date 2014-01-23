@@ -4,12 +4,6 @@ var activeLesson;
 var fadeInTime = 500;
 var userAuthorization = false;
 /**
- * This variable is to indicate whether user has submit the input & the code is
- *   still processing.
- * This is to disable double submission when the code is still processing.
- */
-var hasSubmitted = false;
-/**
  * @type array of {Chapter}. Each {Chapter} contains an array of {Lesson}.
  * Need to be a global variable, since used in other functions.
  */
@@ -21,6 +15,10 @@ var chapters;
 var introduction;
 var resume;
 var finish;
+/**
+ * @type {SubmitButtonCoordinator}
+ */
+var submitButton = new SubmitButtonCoordinator();
 /**
  * Header for GET request.
  * @const {Object}
@@ -36,6 +34,45 @@ var HEADER_FOR_POST = {
   'Authorization': null,
   'Content-type': 'application/json'
 };
+
+/**
+ * Create object to store information needed by submit button.
+ * @isSubmitting {boolean} Indicate whether the submission code is executing.
+ * @isEmpty {boolean} Indicate whether textarea input is empty. 
+ */
+function SubmitButtonCoordinator() {
+  this.isSubmitting = false;
+  this.isEmpty = false;
+}
+
+/**
+ * Enable/disable the submit button.
+*/
+SubmitButtonCoordinator.prototype.update = function() {
+  // Disable submit button if input is empty/currently submitting.
+  // Enable it otherwise.
+  if (this.isEmpty || this.isSubmitting) {
+    $('.submit-button').attr('disabled', 'disabled');
+  } else {
+    $('.submit-button').removeAttr('disabled');
+  }
+}
+
+/**
+ * Updatting the isEmpty property to true/false, according to textarea input.
+ */
+SubmitButtonCoordinator.prototype.updateIsEmpty = function(isEmpty) {
+  this.isEmpty = isEmpty;
+  this.update();
+}
+
+/**
+ * Updatting the isSubmitting property to true/false.
+ */
+SubmitButtonCoordinator.prototype.updateIsSubmitting = function(isSubmitting) {
+  this.isSubmitting = isSubmitting;
+  this.update();
+}
 
 /**
  * Create object to store textarea input information.
@@ -70,13 +107,13 @@ ResizingTextarea.prototype.updateTextAreaHeight = function() {
 }
 
 /**
- * Disable the submit button if there is empty input.
+ * Update the submit button isEmpty status according to input area.
  */
 ResizingTextarea.prototype.updateSubmitButton = function() {
-  if (this.element.val() == '' || hasSubmitted) {
-    $('.submit-button').attr('disabled','disabled');
+  if (this.element.val() == '') {
+    submitButton.updateIsEmpty(true);
   } else {
-    $('.submit-button').removeAttr('disabled');
+    submitButton.updateIsEmpty(false);
   }
 }
 
@@ -84,7 +121,7 @@ ResizingTextarea.prototype.updateSubmitButton = function() {
  * Changes that need to happen everytime input changes.
  */
 ResizingTextarea.prototype.update = function() {
-  // Enable or disable the submit button.
+  // Enable or disable the submit button according to input.
   this.updateSubmitButton();
   // Set the height of the textarea.    
   this.updateTextAreaHeight();
@@ -104,8 +141,8 @@ ResizingTextarea.prototype.setup = function() {
       // Enable submit by enter, not making the enter visible in the input.
       if (event.which == 13) {
         event.preventDefault();
-        // Submit only if the button is not disabled and has not submit.
-        if (me.element.val() != '' && !hasSubmitted) {
+        // Try to submit if the input is not empty.
+        if (me.element.val() != '') {
           activeLesson.submit();
         }
       }
@@ -113,10 +150,7 @@ ResizingTextarea.prototype.setup = function() {
   });
   // Set events on keyup, to handle backspaces.
   this.element.keyup(function(event) {
-    // Don't update for enter submission characters.
-    if (event.which != 13) {
-      me.update();
-    }
+    me.update();
   });
   // Set events on paste and cut.
   this.element.on('paste cut', function() {
@@ -177,6 +211,8 @@ function Lesson(elementId, options) {
   }
   // Indicate which input submission is needed.
   this.activeInput = options.activeInput;
+  // Set the submission status to be false.
+  this.isSubmitting = false;
 }
 
 /**
@@ -253,10 +289,11 @@ Lesson.prototype.update = function() {
  * Handles the input the user has submitted.
  */
 Lesson.prototype.submit = function() {
-  // Make the user not able to submit again for a while.
-  // This is to avoid double posting.
-  hasSubmitted = true;
-  $('.submit-button').attr('disabled', 'disabled');
+  // If the lesson is currently submitting, do not proceed.
+  if (this.isSubmitting) return;
+  // Else, update the submission status and check the answer.
+  this.isSubmitting = true;
+  submitButton.updateIsSubmitting(this.isSubmitting);
   var input = $.trim(this.activeInput.element.val());
   // Empty the output area.
   var data = $('.response-content');
@@ -314,9 +351,9 @@ Lesson.prototype.displaySuccessMessage = function() {
     // The lesson is completed. Display the success message.
     this.complete();
     $('.message').html(markdown.toHTML(this.successMessage));
-    // Enable the submit button again, and enabled submission.
-    hasSubmitted = false;
-    $('.submit-button').removeAttr('disabled');
+    // The submission has finished, update the submission status.
+    this.isSubmitting = false;
+    submitButton.updateIsSubmitting(this.isSubmitting);
     // Display the success ribbon and message.
     $('.feedback').hide().fadeIn(fadeInTime)
         .removeClass('failure').addClass('success');
@@ -346,9 +383,9 @@ Lesson.prototype.displaySuccessMessage = function() {
 Lesson.prototype.displayErrorMessage = function(errorMessage) {
   $('.message').html('Sorry, that input is incorrect. ')
       .append(errorMessage).append(' Please try again.');
-  // Enable the submit button again, and enabled submission.
-  hasSubmitted = false;
-  $('.submit-button').removeAttr('disabled');
+  // The submission has finished, update the submission status.
+  this.isSubmitting = false;
+  submitButton.updateIsSubmitting(this.isSubmitting);
   // Display the message, hide the success ribbon.
   $('.feedback').hide().fadeIn(fadeInTime)
       .removeClass('success').addClass('failure');
