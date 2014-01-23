@@ -747,9 +747,6 @@ function newTasksList(firstTask, onFinished) {
       onFinished();
     }
   };
-  me.isEmpty = function() {
-    return ($.isEmptyObject(tasks));
-  }
   me.add(firstTask);
   return me;
 }
@@ -809,14 +806,17 @@ $(window).load(function() {
  * Page-level callback to check if a user has an OAuth 2.0 token
  */
 function checkIfUserIsAuthorized(authResult) {
+  // The first time the callback is called, on page load, userAuthorization
+  // has no value.
+  if (userAuthorization == null) {
+    tasksList.remove('callback');
+  }
   if (authResult['status']['signed_in']) {
     // The user is signed in and has authorised the application.
     // We set a global variable with their authorization token.
     userAuthorization = authResult['access_token'];
-  }
-  // The task should only be removed once, when the page is loaded.
-  if (!tasksList.isEmpty()) {
-    tasksList.remove('callback');
+  } else {
+    userAuthorization = false;
   }
 }
 
