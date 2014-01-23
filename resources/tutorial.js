@@ -1024,7 +1024,6 @@ function testAPIKey(userKey) {
     dataType: 'json',
     success: function(resource) {
       localStorage['APIKey'] = userKey;
-      populateInventory();
       me.displaySuccessMessage();
     },
     error: function(response) {
