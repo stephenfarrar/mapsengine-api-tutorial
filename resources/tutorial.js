@@ -1064,7 +1064,6 @@ function authorizeUser() {
   gapi.auth.signIn({
     'callback': function(authResult) {
       if (authResult['status']['signed_in']) {
-        userAuthorization = authResult['access_token'];
         $('.request').hide();
         me.displaySuccessMessage();
       } else {
