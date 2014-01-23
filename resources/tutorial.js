@@ -61,7 +61,7 @@ SubmitButtonCoordinator.prototype.update = function() {
 /**
  * Updatting the isEmpty property to true/false, according to textarea input.
  */
-SubmitButtonCoordinator.prototype.updateIsEmpty = function(isEmpty) {
+SubmitButtonCoordinator.prototype.setIsEmpty = function(isEmpty) {
   this.isEmpty = isEmpty;
   this.update();
 }
@@ -69,7 +69,7 @@ SubmitButtonCoordinator.prototype.updateIsEmpty = function(isEmpty) {
 /**
  * Updatting the isSubmitting property to true/false.
  */
-SubmitButtonCoordinator.prototype.updateIsSubmitting = function(isSubmitting) {
+SubmitButtonCoordinator.prototype.setIsSubmitting = function(isSubmitting) {
   this.isSubmitting = isSubmitting;
   this.update();
 }
@@ -107,22 +107,11 @@ ResizingTextarea.prototype.updateTextAreaHeight = function() {
 }
 
 /**
- * Update the submit button isEmpty status according to input area.
- */
-ResizingTextarea.prototype.updateSubmitButton = function() {
-  if (this.element.val() == '') {
-    submitButton.updateIsEmpty(true);
-  } else {
-    submitButton.updateIsEmpty(false);
-  }
-}
-
-/**
  * Changes that need to happen everytime input changes.
  */
 ResizingTextarea.prototype.update = function() {
   // Enable or disable the submit button according to input.
-  this.updateSubmitButton();
+  submitButton.setIsEmpty(this.element.val() == '')
   // Set the height of the textarea.    
   this.updateTextAreaHeight();
   this.onChange(this.element.val());
@@ -149,7 +138,7 @@ ResizingTextarea.prototype.setup = function() {
     }    
   });
   // Set events on keyup, to handle backspaces.
-  this.element.keyup(function(event) {
+  this.element.keyup(function() {
     me.update();
   });
   // Set events on paste and cut.
@@ -159,6 +148,21 @@ ResizingTextarea.prototype.setup = function() {
     }, 0);
   });
 };
+
+/**
+ * Set the input of the textarea and update the height/submit button.
+ */
+ResizingTextarea.prototype.setInput = function(input) {
+  this.element.val(input);
+  this.update();
+}
+
+/**
+ * Get the input from the textarea.
+ */
+ResizingTextarea.prototype.getInput = function() {
+  return this.element.val();
+}
 
 /**
  * Function to store input in local storage.
@@ -272,9 +276,7 @@ Lesson.prototype.update = function() {
       this.activeInput.element.removeAttr('disabled'); 
       // Update the input (placeholder/saved URL/saved body).
       var storedInput = retrieveInput();
-      this.activeInput.element.val(storedInput || '');
-      this.activeInput.updateTextAreaHeight();
-      this.activeInput.updateSubmitButton();
+      this.activeInput.setInput(storedInput || '');
     }
   }
   // Set up analytics for the page visited by the user (number of times the page
@@ -293,8 +295,8 @@ Lesson.prototype.submit = function() {
   if (this.isSubmitting) return;
   // Else, update the submission status and check the answer.
   this.isSubmitting = true;
-  submitButton.updateIsSubmitting(this.isSubmitting);
-  var input = $.trim(this.activeInput.element.val());
+  submitButton.setIsSubmitting(this.isSubmitting);
+  var input = $.trim(this.activeInput.getInput());
   // Empty the output area.
   var data = $('.response-content');
   data.empty();
@@ -353,7 +355,7 @@ Lesson.prototype.displaySuccessMessage = function() {
     $('.message').html(markdown.toHTML(this.successMessage));
     // The submission has finished, update the submission status.
     this.isSubmitting = false;
-    submitButton.updateIsSubmitting(this.isSubmitting);
+    submitButton.setIsSubmitting(this.isSubmitting);
     // Display the success ribbon and message.
     $('.feedback').hide().fadeIn(fadeInTime)
         .removeClass('failure').addClass('success');
@@ -385,7 +387,7 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
       .append(errorMessage).append(' Please try again.');
   // The submission has finished, update the submission status.
   this.isSubmitting = false;
-  submitButton.updateIsSubmitting(this.isSubmitting);
+  submitButton.setIsSubmitting(this.isSubmitting);
   // Display the message, hide the success ribbon.
   $('.feedback').hide().fadeIn(fadeInTime)
       .removeClass('success').addClass('failure');
