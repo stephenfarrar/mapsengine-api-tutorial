@@ -759,9 +759,6 @@ function newTasksList(firstTask, onFinished) {
       onFinished();
     }
   };
-  me.isEmpty = function() {
-    return ($.isEmptyObject(tasks));
-  }
   me.add(firstTask);
   return me;
 }
