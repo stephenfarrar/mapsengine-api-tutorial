@@ -15,6 +15,21 @@ var chapters;
 var introduction;
 var resume;
 var finish;
+/**
+ * Header for GET request.
+ * @const {Object}
+ */
+var HEADER_FOR_GET = {
+  'Authorization': null
+};
+/**
+ * Header for POST request.
+ * @const {Object}
+ */
+var HEADER_FOR_POST = {
+  'Authorization': null,
+  'Content-type': 'application/json'
+};
 
 /**
  * Create object to store textarea input information.
@@ -123,16 +138,22 @@ function Lesson(elementId, options) {
   this.buttonValue = options.buttonValue || 'Next Lesson';
   this.submitButtonValue = options.submitButtonValue || 'Get';
   if (options.submit) {
+    // For lessons that does not take url/body input.
     this.submit = options.submit;
     this.hasSubmit = true;
-  } else {
-    this.hasSubmit = !!options.hasSubmit;
+  } else if (options.checkAnswer) {
+    // For lessons that needs to take url/body input.
+    this.checkAnswer = options.checkAnswer;
+    this.hasSubmit = true;
   }
   if (options.update) {
     this.update = options.update;
   }
-  if (options.headerFile) {
-    this.headerFile = options.headerFile;
+  if (options.header) {
+    this.header = options.header;
+  }
+  if (options.hasBodyFile) {
+    this.hasBodyFile = options.hasBodyFile;
   }
   if (options.correctAns) {
     this.correctAns = options.correctAns;
@@ -197,7 +218,13 @@ Lesson.prototype.update = function() {
     // The previous input stored should be loaded and shown in the input area.
     // If the input is empty, user should not be allowed to submit.
     // Do this for the lessons with their own specific inputs.
+    // Enabled/disabled the input based on the activeInput.
     if (this.activeInput) {
+      // Disabled both input area first.
+      $('.url').attr('disabled', 'disabled');
+      $('.body-input').attr('disabled', 'disabled');
+      // Enabled the specific input area for each lesson.
+      this.activeInput.element.removeAttr('disabled'); 
       // Update the input (placeholder/saved URL/saved body).
       var storedInput = retrieveInput();
       this.activeInput.element.val(storedInput || '');
@@ -217,143 +244,15 @@ Lesson.prototype.update = function() {
  * Handles the input the user has submitted.
  */
 Lesson.prototype.submit = function() {
-  var address = $.trim($('.url').val());
-  this.checkCorrectness(address);
-}
-
-/**
- * Checking the correctness of user's input using the GME API.
- */
-Lesson.prototype.checkCorrectness = function(address) {
-  var me = this;
-  var data = $('.response-content');
+  // Make the user not able to submit again for a while.
+  // This is to avoid double posting.
+  $('.submit-button').attr('disabled', 'disabled');
+  var input = $.trim(this.activeInput.element.val());
   // Empty the output area.
+  var data = $('.response-content');
   data.empty();
-  // Get the response with the correct URL.
-  $.ajax({
-    url: me.correctAns,
-    headers: me.header,
-    dataType: 'json',
-    success: function(resource) {
-      var correctResourceString = JSON.stringify(resource, null, 2);
-      // Get the response with users's input.
-      $.ajax({
-        url: address,
-        headers: me.header,
-        dataType: 'json',
-        success: function(resource2) {
-          var resourceString = JSON.stringify(resource2, null, 2);
-          data.text(resourceString);
-          // If the response is the correct response, then the user is right.
-          if (resourceString == correctResourceString) {
-            me.displaySuccessMessage();
-            me.complete();
-          } else {
-            me.displayErrorMessage('Be sure to read the instructions ' +
-                'carefully and complete the exercise ' +
-                'requirements.');
-          } 
-        },
-        error: function(response) {
-          // Try parsing the response.
-          var errorMess;
-          try {
-            response = JSON.parse(response.responseText);
-            errorMess = response.error.errors[0];
-            // Append the response to the output area.
-            var responseString = JSON.stringify(errorMess, null, 2);
-            data.text(responseString); 
-          } catch (e) {
-            errorMess = 'notJSONObject';
-          }
-          // Giving messages for different error reasons.
-          if (errorMess == 'notJSONObject') {
-            me.displayErrorMessage('The URL is not a valid Google Maps ' +
-                'Engine API URL.');
-          } else if (errorMess.reason == 'authError') {
-            me.displayErrorMessage('It appears that your authorization ' +
-                'token is invalid. Make sure that you entered the correct ' +
-                'header for this request.');
-          } else if (errorMess.reason == 'keyInvalid') {
-            // If it contains curly braces, ask user to remove them.
-            if (addressString.indexOf('{') != -1 || 
-                addressString.indexOf('}') != -1) {
-              me.displayErrorMessage('Check that you have removed the ' +
-                  'curly braces({ }) surrounding the API Key in your URL.');
-            } else {
-              me.displayErrorMessage('The API Key used in the URL is ' +
-                  'invalid. Make sure that you entered your API Key ' +
-                  'correctly.');
-            }
-          } else if (errorMess.reason == 'dailyLimitExceededUnreg') {
-            me.displayErrorMessage('There might be something wrong with ' +
-                'your \'key\' parameter. Make sure that you entered it ' +
-                'correctly.');
-          } else if (errorMess.reason == 'invalid') {
-            var field = errorMess.location;
-            // If the error is not in table ID, tell the error location.
-            if (field!=='id') {
-              me.displayErrorMessage('Check whether you have given the ' +
-                  'right values for the parameters, in particular, ' +
-                  'the \''+field+'\' field.');
-            } else {
-              // If it contains curly braces, ask user to remove them.
-              if (addressString.indexOf('{') != -1 || 
-                  addressString.indexOf('}') != -1) {
-                me.displayErrorMessage('Check that you have removed the ' +
-                    'curly braces({ }) surrounding the table ID in your URL.');
-              } else {
-                me.displayErrorMessage('The table ID used in the URL is ' +
-                    'invalid. Check whether you have given the right table ' +
-                    'ID and make sure that the table has been made public. ' +
-                    'To make your table public, you can follow the ' +
-                    'instructions in <a href=' +
-                    '"//support.google.com/mapsengine/answer/3164737?hl=en"' +
-                    '>this link</a>.');
-              }
-            }
-          } else if (errorMess.reason == 'required') {
-            me.displayErrorMessage('A required parameter has been left ' +
-                'out of the request. Make sure that you entered all ' +
-                'parameters needed.');
-          } else if (errorMess.reason == 'notFound') {
-            me.displayErrorMessage('No results were found for your ' +
-                'request. The asset might not exist, not a public asset, ' +
-                'or it has been deleted from the Google Maps Engine.');
-          } else if (errorMess.reason == 'insufficientPermissions') {
-            me.displayErrorMessage('You do not have sufficient ' +
-                'permissions for this request. Make sure you have specified ' +
-                'version=published in the request.');
-          } else if (errorMess.reason == 'limitExceeded') {
-            me.displayErrorMessage('The resource is too large to be ' +
-                'accessed through the API.');
-          } else if (errorMess.reason == 'duplicate') {
-            me.displayErrorMessage('The new feature you are trying to ' +
-                'insert has an ID that already exists in the table.');
-          } else if (errorMess.reason == 'rateLimitExceeded' || 
-                     errorMess.reason == 'quotaExceeded') {
-            me.displayErrorMessage('You have exhausted the ' +
-                'application\'s daily quota or its per-second rate limit. ' +
-                'Please contact the Enterprise Support for higher limits.');
-          } else if (errorMess.reason == 'unauthorized') {
-            me.displayErrorMessage('Make sure you have included the ' +
-                'required authorization header with the request.');
-          } else if (errorMess.reason == 'requestTooLarge') {
-            me.displayErrorMessage('This request contains too many ' +
-                'features and/or vertices.');
-          } else if (errorMess.reason == 'accessNotConfigured') {
-            me.displayErrorMessage('There is a per-IP or per-Referer ' +
-                'restriction configured on the API Key and the request does ' +
-                'not match these restrictions, or the Maps Engine API is not ' +
-                'activated on the project ID.');
-          } else {
-            me.displayErrorMessage('The data you requested cannot be ' +
-                'processed. Check your request to ensure that it is correct.');
-          }
-        }
-      });
-    }
-  });
+  // Check the correctness of user input.
+  this.checkAnswer(input);
 }
 
 /**
@@ -370,11 +269,17 @@ Lesson.prototype.displayInstructions = function() {
  */
 Lesson.prototype.showAnswer = function() {
   if (this.answer) {
-    // Replace userAPIKey with the API Key stored in local storage.
     // Change the markdown files to HTML and combined with the API Key.
     var htmlAnswer = markdown.toHTML(this.answer);
+    // Replace userAPIKey with the API Key stored in local storage.
     var htmlKey =  $('<span>').text(localStorage['APIKey']).html();
     htmlAnswer = htmlAnswer.replace('{userAPIKey}', htmlKey);
+    // Replace userTableId with World Famous Mountain table ID.
+    var htmlTableId =  $('<span>').text(localStorage['tableID']).html();
+    htmlAnswer = htmlAnswer.replace('{userTableId}', htmlTableId);
+    // Replace userProjectId with the project ID they chose.
+    var htmlProjectId =  $('<span>').text(localStorage['projectID']).html();
+    htmlAnswer = htmlAnswer.replace('{userProjectId}', htmlProjectId);
     // Change the html of answer area.
     $('.answer').html(htmlAnswer);
     // Hide button once clicked.
@@ -396,7 +301,11 @@ Lesson.prototype.showAnswer = function() {
  */
 Lesson.prototype.displaySuccessMessage = function() {
   if (this.successMessage) {
+    // The lesson is completed. Display the success message.
+    this.complete();
     $('.message').html(markdown.toHTML(this.successMessage));
+    // Enable the submit button again.
+    $('.submit-button').removeAttr('disabled');
     // Display the success ribbon and message.
     $('.feedback').hide().fadeIn(fadeInTime)
         .removeClass('failure').addClass('success');
@@ -426,6 +335,8 @@ Lesson.prototype.displaySuccessMessage = function() {
 Lesson.prototype.displayErrorMessage = function(errorMessage) {
   $('.message').html('Sorry, that input is incorrect. ')
       .append(errorMessage).append(' Please try again.');
+  // Enable the submit button again.
+  $('.submit-button').removeAttr('disabled');
   // Display the message, hide the success ribbon.
   $('.feedback').hide().fadeIn(fadeInTime)
       .removeClass('success').addClass('failure');
@@ -566,21 +477,39 @@ Lesson.prototype.loadAnswer = function() {
 };
 
 /**
- * Load the headers markdown, where applicable.
+ * Load the body markdown, where applicable.
  */
-Lesson.prototype.loadHeader = function() {
+Lesson.prototype.loadBody = function() {
   var me = this;
-  if (this.headerFile) {
-    tasksList.add(me.headerFile);
-    $.get('resources/' + me.headerFile, function(response) {
-      me.header = JSON.parse(response);
-      tasksList.remove(me.headerFile);
+  if (this.hasBodyFile) {
+    var filename = this.elementId + '-body.txt';
+    tasksList.add(filename);
+    $.get('resources/' + filename, function(response) {
+      me.body = JSON.parse(response);
+      tasksList.remove(filename);
     });
-  } else {
-    // If the lesson has no header, give it an empty object.
-    this.header = {};
   }
-};
+}
+
+/**
+ * Update and display the header of lesson.
+ */
+Lesson.prototype.displayHeader = function() {
+  this.header.Authorization = 'Bearer ' + userAuthorization;
+  var header = JSON.stringify(this.header, null, 2);
+  $('.header-input').text(header).show();
+}
+
+/**
+ * Update and display the body of lesson.
+ */
+Lesson.prototype.displayBody = function() {
+  this.body.projectId = localStorage['projectID'];
+  var body = JSON.stringify(this.body, null, 2);
+  $('.body-input').text(body).show();
+  $('.hidden-body-element').text(body + '\n');
+  $('.body-input').height($('.hidden-body-element').height());
+}
 
 /**
  * Create object to store chapter information.
@@ -619,14 +548,12 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
     new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
       new Lesson('lesson1-gmeapi', {
         title: 'GME API',
-        submit: getText,
-        showInventory: false,
+        checkAnswer: getText,
         activeInput: urlInput
       }),
       new Lesson('lesson2-apikey', {
         title: 'API Key',
-        submit: testAPIKey,
-        showInventory: false,
+        checkAnswer: testAPIKey,
         submitButtonValue: 'Submit',
         activeInput: urlInput
       })
@@ -635,31 +562,31 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       new Lesson('lesson3-gettable', {
         title: 'Get Table',
         showInventory: true,
+        checkAnswer: checkCorrectness,
         activeInput: urlInput,
         correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' + 
                 '15474835347274181123-14495543923251622067?' +
-                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco',
-        hasSubmit: true        
+                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco'       
       }),
       new Lesson('lesson4-listfeatures', {
         title: 'List Features',
         showInventory: true,
+        checkAnswer: checkCorrectness,
         activeInput: urlInput,
         correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
                 '15474835347274181123-14495543923251622067/features?' +
                 'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1v' +
-                'pHQdco',
-        hasSubmit: true
+                'pHQdco'
       }),
       new Lesson('lesson5-queries', {
         title: 'Queries',
         showInventory: true,
+        checkAnswer: checkCorrectness,
         activeInput: urlInput,
         correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
                 '15474835347274181123-14495543923251622067/features?'+ 
                 'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1v' +
-                'pHQdco&where=Population<2000000',
-        hasSubmit: true
+                'pHQdco&where=Population<2000000'
       })
     ]}),
     new Chapter('chapter2-private', {title: 'Accessing Private Data', lessons: [
@@ -667,7 +594,6 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         title: 'Login and Authorization', 
         submit: authorizeUser,
         submitButtonValue: 'Sign In',
-        activeInput: false,
         update: function() {
           Lesson.prototype.update.call(this);
           $('.url').hide();
@@ -685,7 +611,6 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         title: 'Create a Free Project',
         submit: storeProjectID,
         submitButtonValue: 'Select',
-        activeInput: false,
         update: function() {
           Lesson.prototype.update.call(this);
           $('.url').hide();
@@ -710,17 +635,30 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       }), 
       new Lesson('lesson8-listprojects', {
         title: 'List Projects',
-        hasSubmit: true,
+        checkAnswer: checkCorrectness,
         submitButtonValue: 'Get',
         activeInput: urlInput,
-        headerFile: 'get-request-header.txt',
+        header: HEADER_FOR_GET,
         correctAns: 'https://www.googleapis.com/mapsengine/v1/projects',
         update: function() {
           Lesson.prototype.update.call(this);
-          var header = JSON.stringify(this.header);
-          header = header.replace('{accessToken}', userAuthorization);
-          this.header = JSON.parse(header);
-          $('.header-input').text(header).show();
+          this.displayHeader();
+        }
+      })
+    ]}),
+    new Chapter('chapter2-table', {title: 'Making a Table', lessons: [
+      new Lesson('lesson9-createtable1', {
+        title: 'Create Table I',
+        checkAnswer: checkCreateTable,
+        submitButtonValue: 'Post',
+        activeInput: urlInput,
+        hasBodyFile: true,
+        header: HEADER_FOR_POST,
+        update: function() {
+          Lesson.prototype.update.call(this);
+          this.displayHeader();
+          this.displayBody();
+          $('.body-input').show();
         }
       })
     ]})
@@ -784,7 +722,6 @@ function setNextLesson() {
   // The final page does not need to have a next.
 }
 
-
 /**
  * Object to manage tasks that need completing before the page is displayed.
  */
@@ -835,7 +772,7 @@ $(window).load(function() {
       lesson.loadInstruction();
       lesson.loadSuccessMessage();
       lesson.loadAnswer();
-      lesson.loadHeader();
+      lesson.loadBody();
     });
   });
   // Set up analytics to indicate how many times users go to the documentation 
@@ -924,43 +861,134 @@ function populateInventory() {
 }
 
 /**
+ * Function to handle error response from Google Maps Engine server.
+ */
+function handleErrorResponse(response, input) {
+  var errorMess;
+  // Try parsing the error response.
+  try {
+    response = JSON.parse(response.responseText);
+    errorMess = response.error.errors[0];
+    // Append the response to the output area.
+    var responseString = JSON.stringify(errorMess, null, 2);
+    $('response-content').text(responseString); 
+  } catch (e) {
+    errorMess = 'notJSONObject';
+  }
+  // Display the error with the message.
+  activeLesson.displayErrorMessage(decideErrorMessage(errorMess, input));
+}
+
+/**
+ * Function to choose error message to display.
+ */
+function decideErrorMessage(errorMess, input) {
+  // Giving messages for different error reasons.
+  var message;
+  if (errorMess == 'notJSONObject') {
+    message = 'The URL is not a valid Google Maps Engine API URL.';
+  } else if (errorMess.reason == 'authError') {
+    message = 'It appears that your authorization token is invalid. Make ' +
+        'sure that you entered the correct header for this request.';
+  } else if (errorMess.reason == 'keyInvalid') {
+    // If it contains curly braces, ask user to remove them.
+    if (input.indexOf('{') != -1 || 
+        input.indexOf('}') != -1) {
+      message = 'Check that you have removed the curly braces({ }) ' +
+          'surrounding the API Key in your URL.';
+    } else {
+      message = 'The API Key used in the URL is invalid. Make sure that ' +
+          'you entered your API Key correctly.';
+    }
+  } else if (errorMess.reason == 'dailyLimitExceededUnreg') {
+    message = 'There might be something wrong with your \'key\' parameter. ' +
+        'Make sure that you entered it correctly.';
+  } else if (errorMess.reason == 'invalid') {
+    var field = errorMess.location;
+    // If the error is not in table ID, tell the error location.
+    if (field!=='id') {
+      message = 'Check whether you have given the right values for the ' +
+          'parameters, in particular, the \''+field+'\' field.';
+    } else {
+      // If it contains curly braces, ask user to remove them.
+      if (input.indexOf('{') != -1 || 
+          input.indexOf('}') != -1) {
+        message = 'Check that you have removed the curly braces({ }) ' +
+            'surrounding the table ID in your URL.';
+      } else {
+        message = 'The table ID used in the URL is invalid. Check whether ' +
+            'you have given the right table ID and make sure that the table ' +
+            'has been made public. To make your table public, you can follow ' +
+            'the instructions in <a href=' +
+            '"//support.google.com/mapsengine/answer/3164737?hl=en"' +
+            '>this link</a>.';
+      }
+    }
+  } else if (errorMess.reason == 'required') {
+    message = 'A required parameter has been left out of the request. Make ' +
+        'sure that you entered all parameters needed.';
+  } else if (errorMess.reason == 'notFound') {
+    message = 'No results were found for your request. The asset might not ' +
+        'exist, not a public asset, or it has been deleted from the Google ' +
+        'Maps Engine.';
+  } else if (errorMess.reason == 'insufficientPermissions') {
+    message = 'You do not have sufficient permissions for this request. Make ' +
+        'sure you have specified version=published in the request.';
+  } else if (errorMess.reason == 'limitExceeded') {
+    message = 'The resource is too large to be accessed through the API.';
+  } else if (errorMess.reason == 'duplicate') {
+    message = 'The new feature you are trying to insert has an ID that ' +
+        'already exists in the table.';
+  } else if (errorMess.reason == 'rateLimitExceeded' || 
+             errorMess.reason == 'quotaExceeded') {
+    message = 'You have exhausted the application\'s daily quota or its ' +
+        'per-second rate limit. Please contact the Enterprise Support for ' +
+        'higher limits.';
+  } else if (errorMess.reason == 'unauthorized') {
+    message = 'Make sure you have included the required authorization header ' +
+        'with the request.';
+  } else if (errorMess.reason == 'requestTooLarge') {
+    message = 'This request contains too many features and/or vertices.';
+  } else if (errorMess.reason == 'accessNotConfigured') {
+    message = 'There is a per-IP or per-Referer restriction configured on ' +
+        'the API Key and the request does not match these restrictions, or ' +
+        'the Maps Engine API is not activated on the project ID.';
+  } else {
+    message = 'The data you requested cannot be processed. Check your ' +
+        'request to ensure that it is correct.';
+  }
+  return message;
+}
+
+/**
  * GME API submit function.
  */
-function getText() {
-  // Get user input & trim it.
-  var address =  $.trim($('.url').val());
+function getText(address) {
   var me = this;
-  var data = $('.response-content');
-  data.empty();
   if (address == 'mapsengine-api-tutorial.appspot.com/resources/' +
-         'alice-in-wonderland.txt') {
+         'alice-in-wondreland.txt') {
     // The user entered the correct input.  
     $.ajax({
       url: 'resources/alice-in-wonderland.txt',
       dataType: 'text',
       success: function(resource) {
-        data.text(resource);
+        $('response-content').text(resource);
         me.displaySuccessMessage();
-        me.complete();
       }
     });
   } else {
     // The user entered incorrect input.
     me.displayErrorMessage('Make sure that the spelling is correct, ' + 
         'all letters are in lowercase, and there are no spaces between the ' +
-        'text. Don\'t forget to add "/" between the path and the filename.');
+        'text. Don\'t forget to add \'/\' between the path and the filename.');
   } 
 }
 
 /**
  * API Key submit function.
  */
-function testAPIKey() {
-  // Get user input & trim it.
-  var userKey = $.trim($('.url').val());
+function testAPIKey(userKey) {
   var me = this;
-  var data = $('.response-content');
-  data.empty();
   // Use user's API Key to do a HTTP request.
   // If it works then it is a valid API Key.
   $.ajax({
@@ -972,7 +1000,6 @@ function testAPIKey() {
       localStorage['APIKey'] = userKey;
       populateInventory();
       me.displaySuccessMessage();
-      me.complete();
     },
     error: function(response) {
       me.displayErrorMessage('Make sure that you have created a browser key ' +
@@ -980,6 +1007,43 @@ function testAPIKey() {
     }
   })
 ;}
+
+/**
+ * Checking the correctness of user's input by comparing the response.
+ * This is used to check GET requests.
+ */
+function checkCorrectness(address) {
+  var me = this;
+  // Get the response with the correct URL.
+  $.ajax({
+    url: me.correctAns,
+    headers: me.header,
+    dataType: 'json',
+    success: function(resource) {
+      var correctResourceString = JSON.stringify(resource, null, 2);
+      // Get the response with users's input.
+      $.ajax({
+        url: address,
+        headers: me.header,
+        dataType: 'json',
+        success: function(resource2) {
+          var resourceString = JSON.stringify(resource2, null, 2);
+          $('response-content').text(resourceString);
+          // If the response is the correct response, then the user is right.
+          if (resourceString == correctResourceString) {
+            me.displaySuccessMessage();
+          } else {
+            me.displayErrorMessage('Be sure to read the instructions ' +
+                'carefully and complete the exercise requirements.');
+          } 
+        },
+        error: function(response) {
+          handleErrorResponse(response, address);
+        }
+      });
+    }
+  });
+}
 
 /**
  * Login and authorization submit function.
@@ -991,7 +1055,6 @@ function authorizeUser() {
       if (authResult['status']['signed_in']) {
         $('.request').hide();
         me.displaySuccessMessage();
-        me.complete();
       } else {
         me.displayErrorMessage('You need to grant this tutorial permissions ' +
             'if you wish to continue.');
@@ -1007,10 +1070,64 @@ function storeProjectID() {
   var projectID = $('.project-list').val();
   if (projectID) {
     localStorage['projectID'] = projectID;
-    this.complete();
     this.displaySuccessMessage();
   } else {
     this.displayErrorMessage('You need to select a project from the dropdown ' +
         'list. It may take a few seconds for new projects to appear.');
   }
+}
+
+/**
+ * Check whether a new table has been created or not.
+ */
+function checkCreateTable(input) {
+  var me = this;
+  // Find out the number of tables the user has in the project.
+  $.ajax({
+    headers: {'Authorization': 'Bearer ' + userAuthorization},
+    type: 'GET',
+    url: 'https://www.googleapis.com/mapsengine/v1/tables?projectId=' +
+        localStorage['projectID'],
+    // This request should always be successful.
+    success: function(response) {
+      // Store the number of tables the user has.
+      var initialTableCount = response.tables.length;
+      // Attempt to create a table with user's input.
+      $.ajax({
+        headers: me.header,
+        type: 'POST',
+        url: input,
+        data: JSON.stringify(me.body),
+        dataType: 'json',
+        success: function(resource){
+          var finalTableCount;
+          // If the request returns a valid object, show the output.
+          if (typeof resource == 'object') {
+            var responseString = JSON.stringify(resource, null, 2);
+            $('response-content').text(responseString); 
+          }
+          // Find out the number of tables in the project after success request.
+          $.ajax({
+            headers: {'Authorization': 'Bearer ' + userAuthorization},
+            type: 'GET',
+            url: 'https://www.googleapis.com/mapsengine/v1/tables?projectId=' +
+                localStorage['projectID'],
+            success: function(response) {
+              finalTableCount = response.tables.length;
+              // If the number of table increase, then the user is right.
+              if (finalTableCount > initialTableCount){
+                me.displaySuccessMessage();
+              } else {
+                me.displayErrorMessage('Make sure you enter the URL for ' +
+                    'create table correctly.')
+              }
+            }
+          });
+        },
+        error: function(response){
+          handleErrorResponse(response, input);
+        }
+      });
+    }
+  });
 }
