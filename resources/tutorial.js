@@ -557,8 +557,8 @@ Lesson.prototype.displayHeader = function() {
 Lesson.prototype.displayBody = function() {
   this.body.projectId = localStorage['projectID'];
   var body = JSON.stringify(this.body, null, 2);
-  $('.body-input').text(body).show();
-  $('.hidden-body-element').text(body + '\n');
+  $('.body-input').val(body).show();
+  $('.hidden-body-element').text(body);
   $('.body-input').height($('.hidden-body-element').height());
 }
 
