@@ -2,7 +2,7 @@
 // The global variables.
 var activeLesson;
 var fadeInTime = 500;
-var userAuthorization = false;
+var userAuthorization;
 /**
  * @type array of {Chapter}. Each {Chapter} contains an array of {Lesson}.
  * Need to be a global variable, since used in other functions.
@@ -217,6 +217,17 @@ function Lesson(elementId, options) {
   this.activeInput = options.activeInput;
   // Set the submission status to be false.
   this.isSubmitting = false;
+  // Load the instructions file for each lesson.
+  this.loadInstruction();
+  // Only lessons with a submission require success, answer and header content.
+  if (this.hasSubmit) {
+    this.loadSuccessMessage();
+    this.loadBody();
+    // Only lessons with an activeInput field have an answer.
+    if (this.activeInput) {
+      this.loadAnswer();
+    }
+  }
 }
 
 /**
@@ -648,11 +659,9 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         update: function() {
           Lesson.prototype.update.call(this);
           $('.url').hide();
-          if (!userAuthorization) {
-            // Activate the 'Sign In' button.
-            $('.submit-button').removeAttr('disabled');
-          } else {
-            // Else, leave the button disabled.
+          if (userAuthorization) {
+            // Dectivate the 'Sign In' button.
+            $('.submit-button').attr('disabled', 'disabled');
             // Make sure that the next lesson is always unlocked.
             this.complete();
           }
@@ -784,7 +793,7 @@ function newTasksList(firstTask, onFinished) {
   };
   me.remove = function(task) {
     delete tasks[task];
-    if (jQuery.isEmptyObject(tasks)) {
+    if ($.isEmptyObject(tasks)) {
       onFinished();
     }
   };
@@ -819,11 +828,6 @@ $(window).load(function() {
     chapter.makeMenu();
     chapter.lessons.forEach(function(lesson) {
       lesson.makeMenu();
-      // Load the markdown files for each lesson.
-      lesson.loadInstruction();
-      lesson.loadSuccessMessage();
-      lesson.loadAnswer();
-      lesson.loadBody();
     });
   });
   // Set up analytics to indicate how many times users go to the documentation 
@@ -852,12 +856,18 @@ $(window).load(function() {
  * Page-level callback to check if a user has an OAuth 2.0 token
  */
 function checkIfUserIsAuthorized(authResult) {
+  // The first time the callback is called, on page load, userAuthorization
+  // has no value.
+  if (userAuthorization == null) {
+    tasksList.remove('callback');
+  }
   if (authResult['status']['signed_in']) {
     // The user is signed in and has authorised the application.
     // We set a global variable with their authorization token.
     userAuthorization = authResult['access_token'];
+  } else {
+    userAuthorization = false;
   }
-  tasksList.remove('callback');
 }
 
 /**
