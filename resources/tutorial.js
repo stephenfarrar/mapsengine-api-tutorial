@@ -635,8 +635,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           information: '15474835347274181123-14495543923251622067'
         },
         {
-          label: 'Your API Key: ',
-          information: localStorage['APIKey']
+          label: 'Your API Key: '
         }],
         activeInput: urlInput,
         correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' + 
@@ -649,10 +648,8 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         inventoryContents: [{
           label: 'table ID: ', 
           information: '15474835347274181123-14495543923251622067'
-        },
-        {
-          label: 'Your API Key: ',
-          information: localStorage['APIKey']
+        }, {
+          label: 'Your API Key: '
         }],
         activeInput: urlInput,
         correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
@@ -668,8 +665,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           information: '15474835347274181123-14495543923251622067'
         },
         {
-          label: 'Your API Key: ',
-          information: localStorage['APIKey']
+          label: 'Your API Key: '
         }],
         activeInput: urlInput,
         correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
@@ -934,6 +930,9 @@ function populateInventory(contents) {
   inventory.empty()
       .append('<h3>Helpful information</h3>')
   contents.forEach(function(item) {
+    if (item.label == 'Your API Key: ') {
+      item.information = localStorage['APIKey'];
+    }
     inventory.append('<b>' + item.label + '</b>')
         .append('<code>' + item.information + '</code><br>')
   });
