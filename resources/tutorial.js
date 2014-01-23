@@ -137,7 +137,6 @@ function Lesson(elementId, options) {
   this.title = options.title;
   this.buttonValue = options.buttonValue || 'Next Lesson';
   this.submitButtonValue = options.submitButtonValue || 'Get';
-  this.hasAnswer = options.hasAnswer || true;
   if (options.submit) {
     // For lessons that does not take url/body input.
     this.submit = options.submit;
