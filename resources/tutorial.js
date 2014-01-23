@@ -879,7 +879,7 @@ function handleErrorResponse(response, input) {
     errorMess = response.error.errors[0];
     // Append the response to the output area.
     var responseString = JSON.stringify(errorMess, null, 2);
-    $('response-content').text(responseString); 
+    $('.response-content').text(responseString); 
   } catch (e) {
     errorMess = 'notJSONObject';
   }
@@ -980,7 +980,7 @@ function getText(address) {
       url: 'resources/alice-in-wonderland.txt',
       dataType: 'text',
       success: function(resource) {
-        $('response-content').text(resource);
+        $('.response-content').text(resource);
         me.displaySuccessMessage();
       }
     });
@@ -1036,7 +1036,7 @@ function checkCorrectness(address) {
         dataType: 'json',
         success: function(resource2) {
           var resourceString = JSON.stringify(resource2, null, 2);
-          $('response-content').text(resourceString);
+          $('.response-content').text(resourceString);
           // If the response is the correct response, then the user is right.
           if (resourceString == correctResourceString) {
             me.displaySuccessMessage();
@@ -1112,7 +1112,7 @@ function checkCreateTable(input) {
           // If the request returns a valid object, show the output.
           if (typeof resource == 'object') {
             var responseString = JSON.stringify(resource, null, 2);
-            $('response-content').text(responseString); 
+            $('.response-content').text(responseString); 
           }
           // Find out the number of tables in the project after success request.
           $.ajax({
