@@ -4,7 +4,8 @@ var activeLesson;
 var fadeInTime = 500;
 var userAuthorization = false;
 /**
- * This variable is to indicate whether user has submit by clicking enter.
+ * This variable is to indicate whether user has submit the input & the code is
+ *   still processing.
  * This is to disable double submission when the code is still processing.
  */
 var hasEntered = false;
@@ -103,9 +104,8 @@ ResizingTextarea.prototype.setup = function() {
       // Enable submit by enter, not making the enter visible in the input.
       if (event.which == 13) {
         event.preventDefault();
-        // Submit only if the button is not disabled.
+        // Submit only if the button is not disabled and has not submit.
         if (me.element.val() != '' && !hasEntered) {
-          hasEntered = true;
           activeLesson.submit();
         }
       }
@@ -255,6 +255,7 @@ Lesson.prototype.update = function() {
 Lesson.prototype.submit = function() {
   // Make the user not able to submit again for a while.
   // This is to avoid double posting.
+  hasEntered = true;
   $('.submit-button').attr('disabled', 'disabled');
   var input = $.trim(this.activeInput.element.val());
   // Empty the output area.
@@ -313,7 +314,7 @@ Lesson.prototype.displaySuccessMessage = function() {
     // The lesson is completed. Display the success message.
     this.complete();
     $('.message').html(markdown.toHTML(this.successMessage));
-    // Enable the submit button again, and enabled enter.
+    // Enable the submit button again, and enabled submission.
     hasEntered = false;
     $('.submit-button').removeAttr('disabled');
     // Display the success ribbon and message.
@@ -345,7 +346,7 @@ Lesson.prototype.displaySuccessMessage = function() {
 Lesson.prototype.displayErrorMessage = function(errorMessage) {
   $('.message').html('Sorry, that input is incorrect. ')
       .append(errorMessage).append(' Please try again.');
-  // Enable the submit button again, and enabled enter.
+  // Enable the submit button again, and enabled submission.
   hasEntered = false;
   $('.submit-button').removeAttr('disabled');
   // Display the message, hide the success ribbon.
