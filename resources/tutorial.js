@@ -365,7 +365,7 @@ Lesson.prototype.displaySuccessMessage = function() {
  * If the input is wrong, do the error responses.
  */
 Lesson.prototype.displayErrorMessage = function(errorMessage) {
-  $('.message').html('Sorry, that input is incorrect. ')
+  $('.message').html('Sorry, that is incorrect. ')
       .append(errorMessage).append(' Please try again.');
   // The submission has finished, update the submission status.
   this.isSubmitting = false;
@@ -868,7 +868,7 @@ function checkIfUserIsAuthorized(authResult) {
  * Google account.
  */
 function signinAndResume() {
-  var me = this;
+  var me = signin;
   gapi.auth.signIn({
     'callback': function(authResult) {
       if (authResult['status']['signed_in']) {
