@@ -534,6 +534,7 @@ Lesson.prototype.displayHeader = function() {
 Lesson.prototype.displayBody = function() {
   this.body.projectId = localStorage['projectID'];
   var body = JSON.stringify(this.body, null, 2);
+  // TODO(flo): This should probably use .setInput().
   $('.body-input').val(body).show();
   $('.hidden-body-element').text(body);
   $('.body-input').height($('.hidden-body-element').height());
