@@ -863,6 +863,10 @@ function checkIfUserIsAuthorized(authResult) {
   }
 }
 
+/**
+ * Function called on signin page only, for users who sign out of their
+ * Google account.
+ */
 function signinAndResume() {
   var me = this;
   gapi.auth.signIn({
@@ -874,7 +878,8 @@ function signinAndResume() {
             'if you wish to continue.');
       }
     }
-  });}
+  });
+}
 
 /**
  * Function to update the tutorial state based on the local storage.
