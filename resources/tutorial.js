@@ -16,10 +16,6 @@ var introduction;
 var resume;
 var finish;
 /**
- * @type {SubmitButtonCoordinator}
- */
-var submitButton = new SubmitButtonCoordinator();
-/**
  * Header for GET request.
  * @const {Object}
  */
@@ -34,45 +30,6 @@ var HEADER_FOR_POST = {
   'Authorization': null,
   'Content-type': 'application/json'
 };
-
-/**
- * Create object to store information needed by submit button.
- * @isSubmitting {boolean} Indicate whether the submission code is executing.
- * @isEmpty {boolean} Indicate whether textarea input is empty. 
- */
-function SubmitButtonCoordinator() {
-  this.isSubmitting = false;
-  this.isEmpty = false;
-}
-
-/**
- * Enable/disable the submit button.
-*/
-SubmitButtonCoordinator.prototype.update = function() {
-  // Disable submit button if input is empty/currently submitting.
-  // Enable it otherwise.
-  if (this.isEmpty || this.isSubmitting) {
-    $('.submit-button').attr('disabled', 'disabled');
-  } else {
-    $('.submit-button').removeAttr('disabled');
-  }
-}
-
-/**
- * Updatting the isEmpty property to true/false, according to textarea input.
- */
-SubmitButtonCoordinator.prototype.setIsEmpty = function(isEmpty) {
-  this.isEmpty = isEmpty;
-  this.update();
-}
-
-/**
- * Updatting the isSubmitting property to true/false.
- */
-SubmitButtonCoordinator.prototype.setIsSubmitting = function(isSubmitting) {
-  this.isSubmitting = isSubmitting;
-  this.update();
-}
 
 /**
  * Create object to store textarea input information.
@@ -111,7 +68,11 @@ ResizingTextarea.prototype.updateTextAreaHeight = function() {
  */
 ResizingTextarea.prototype.update = function() {
   // Enable or disable the submit button according to input.
-  submitButton.setIsEmpty(this.element.val() == '')
+  if (this.element.val() == '') {
+    $('.submit-button').attr('disabled', 'disabled');
+  } else {
+    $('.submit-button').removeAttr('disabled');
+  }
   // Set the height of the textarea.    
   this.updateTextAreaHeight();
   this.onChange(this.element.val());
@@ -304,9 +265,16 @@ Lesson.prototype.update = function() {
 Lesson.prototype.submit = function() {
   // If the lesson is currently submitting, do not proceed.
   if (this.isSubmitting) return;
-  // Else, update the submission status and check the answer.
+  // Hide the previous response.
+  $('.feedback').hide();
+  $('.next-button').hide();
+  $('.response').hide();
+  // Remove focus from the input area.
+  this.activeInput.element.blur();
+  // Else, show an overlay to stop user do something else.
+  $('.overlay').show();
+  // Update the submission status and check the answer.
   this.isSubmitting = true;
-  submitButton.setIsSubmitting(this.isSubmitting);
   var input = $.trim(this.activeInput.getInput());
   // Empty the output area.
   var data = $('.response-content');
@@ -366,7 +334,8 @@ Lesson.prototype.displaySuccessMessage = function() {
     $('.message').html(markdown.toHTML(this.successMessage));
     // The submission has finished, update the submission status.
     this.isSubmitting = false;
-    submitButton.setIsSubmitting(this.isSubmitting);
+    // Remove the overlay.
+    $('.overlay').hide();
     // Display the success ribbon and message.
     $('.feedback').hide().fadeIn(fadeInTime)
         .removeClass('failure').addClass('success');
@@ -379,7 +348,7 @@ Lesson.prototype.displaySuccessMessage = function() {
     // Show the output if there is any.
     showResponse();
     // Display the next button.
-    $('.next-button').hide().fadeIn(fadeInTime);
+    $('.next-button').fadeIn(fadeInTime);
     // Set up analytics to indicate success (how many times).
     ga('send', {
       hitType: 'event',
@@ -398,7 +367,8 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
       .append(errorMessage).append(' Please try again.');
   // The submission has finished, update the submission status.
   this.isSubmitting = false;
-  submitButton.setIsSubmitting(this.isSubmitting);
+  // Remove the overlay.
+  $('.overlay').hide();
   // Display the message, hide the success ribbon.
   $('.feedback').hide().fadeIn(fadeInTime)
       .removeClass('success').addClass('failure');
@@ -420,8 +390,6 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   $('.url').addClass('alert');
   // Show the output if there is any.
   showResponse();
-  // Hide the next button.
-  $('.next-button').hide();
   // Set up analytics to indicate failure (how many times).
   ga('send', {
     hitType: 'event',
@@ -435,11 +403,9 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
  * Display the response(output).
  */
 function showResponse() {
-  if (!$('.response-content').text()) {
-    // If there is no response, do not display output.
-    $('.response').hide();
-  } else {
-    $('.response').hide().fadeIn(fadeInTime);
+  if ($('.response-content').text()) {
+    // Only display output if there is response.
+    $('.response').fadeIn(fadeInTime);
   }
 }
 
