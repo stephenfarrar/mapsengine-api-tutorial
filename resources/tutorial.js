@@ -16,6 +16,10 @@ var introduction;
 var resume;
 var finish;
 /**
+ * @type {SubmitButtonCoordinator}
+ */
+var submitButton = new SubmitButtonCoordinator();
+/**
  * Header for GET request.
  * @const {Object}
  */
@@ -30,6 +34,45 @@ var HEADER_FOR_POST = {
   'Authorization': null,
   'Content-type': 'application/json'
 };
+
+/**
+ * Create object to store information needed by submit button.
+ * @isSubmitting {boolean} Indicate whether the submission code is executing.
+ * @isEmpty {boolean} Indicate whether textarea input is empty. 
+ */
+function SubmitButtonCoordinator() {
+  this.isSubmitting = false;
+  this.isEmpty = false;
+}
+
+/**
+ * Enable/disable the submit button.
+*/
+SubmitButtonCoordinator.prototype.update = function() {
+  // Disable submit button if input is empty/currently submitting.
+  // Enable it otherwise.
+  if (this.isEmpty || this.isSubmitting) {
+    $('.submit-button').attr('disabled', 'disabled');
+  } else {
+    $('.submit-button').removeAttr('disabled');
+  }
+}
+
+/**
+ * Updatting the isEmpty property to true/false, according to textarea input.
+ */
+SubmitButtonCoordinator.prototype.setIsEmpty = function(isEmpty) {
+  this.isEmpty = isEmpty;
+  this.update();
+}
+
+/**
+ * Updatting the isSubmitting property to true/false.
+ */
+SubmitButtonCoordinator.prototype.setIsSubmitting = function(isSubmitting) {
+  this.isSubmitting = isSubmitting;
+  this.update();
+}
 
 /**
  * Create object to store textarea input information.
@@ -64,22 +107,11 @@ ResizingTextarea.prototype.updateTextAreaHeight = function() {
 }
 
 /**
- * Disable the submit button if there is empty input.
- */
-ResizingTextarea.prototype.updateSubmitButton = function() {
-  if (this.element.val() == '') {
-    $('.submit-button').attr('disabled','disabled');
-  } else {
-    $('.submit-button').removeAttr('disabled');
-  }
-}
-
-/**
  * Changes that need to happen everytime input changes.
  */
 ResizingTextarea.prototype.update = function() {
-  // Enable or disable the submit button.
-  this.updateSubmitButton();
+  // Enable or disable the submit button according to input.
+  submitButton.setIsEmpty(this.element.val() == '')
   // Set the height of the textarea.    
   this.updateTextAreaHeight();
   this.onChange(this.element.val());
@@ -92,18 +124,18 @@ ResizingTextarea.prototype.setup = function() {
   var me = this;
   // Set events on keypress.
   this.element.keypress(function(event) {
+    me.update(); 
     // Check if the input needs enter submission behaviour.
     if (me.enterSubmission) {
       // Enable submit by enter, not making the enter visible in the input.
       if (event.which == 13) {
         event.preventDefault();
-        // Submit only if the input is not blank.
-        if (me.element.val() !== '') {
+        // Try to submit if the input is not empty.
+        if (me.element.val() != '') {
           activeLesson.submit();
         }
       }
-    }
-    me.update();
+    }    
   });
   // Set events on keyup, to handle backspaces.
   this.element.keyup(function() {
@@ -116,6 +148,21 @@ ResizingTextarea.prototype.setup = function() {
     }, 0);
   });
 };
+
+/**
+ * Set the input of the textarea and update the height/submit button.
+ */
+ResizingTextarea.prototype.setInput = function(input) {
+  this.element.val(input);
+  this.update();
+}
+
+/**
+ * Get the input from the textarea.
+ */
+ResizingTextarea.prototype.getInput = function() {
+  return this.element.val();
+}
 
 /**
  * Function to store input in local storage.
@@ -168,6 +215,8 @@ function Lesson(elementId, options) {
   }
   // Indicate which input submission is needed.
   this.activeInput = options.activeInput;
+  // Set the submission status to be false.
+  this.isSubmitting = false;
   // Load the instructions file for each lesson.
   this.loadInstruction();
   // Only lessons with a submission require success, answer and header content.
@@ -238,9 +287,7 @@ Lesson.prototype.update = function() {
       this.activeInput.element.removeAttr('disabled'); 
       // Update the input (placeholder/saved URL/saved body).
       var storedInput = retrieveInput();
-      this.activeInput.element.val(storedInput || '');
-      this.activeInput.updateTextAreaHeight();
-      this.activeInput.updateSubmitButton();
+      this.activeInput.setInput(storedInput || '');
     }
   }
   // Set up analytics for the page visited by the user (number of times the page
@@ -255,10 +302,12 @@ Lesson.prototype.update = function() {
  * Handles the input the user has submitted.
  */
 Lesson.prototype.submit = function() {
-  // Make the user not able to submit again for a while.
-  // This is to avoid double posting.
-  $('.submit-button').attr('disabled', 'disabled');
-  var input = $.trim(this.activeInput.element.val());
+  // If the lesson is currently submitting, do not proceed.
+  if (this.isSubmitting) return;
+  // Else, update the submission status and check the answer.
+  this.isSubmitting = true;
+  submitButton.setIsSubmitting(this.isSubmitting);
+  var input = $.trim(this.activeInput.getInput());
   // Empty the output area.
   var data = $('.response-content');
   data.empty();
@@ -315,8 +364,9 @@ Lesson.prototype.displaySuccessMessage = function() {
     // The lesson is completed. Display the success message.
     this.complete();
     $('.message').html(markdown.toHTML(this.successMessage));
-    // Enable the submit button again.
-    $('.submit-button').removeAttr('disabled');
+    // The submission has finished, update the submission status.
+    this.isSubmitting = false;
+    submitButton.setIsSubmitting(this.isSubmitting);
     // Display the success ribbon and message.
     $('.feedback').hide().fadeIn(fadeInTime)
         .removeClass('failure').addClass('success');
@@ -346,8 +396,9 @@ Lesson.prototype.displaySuccessMessage = function() {
 Lesson.prototype.displayErrorMessage = function(errorMessage) {
   $('.message').html('Sorry, that input is incorrect. ')
       .append(errorMessage).append(' Please try again.');
-  // Enable the submit button again.
-  $('.submit-button').removeAttr('disabled');
+  // The submission has finished, update the submission status.
+  this.isSubmitting = false;
+  submitButton.setIsSubmitting(this.isSubmitting);
   // Display the message, hide the success ribbon.
   $('.feedback').hide().fadeIn(fadeInTime)
       .removeClass('success').addClass('failure');
@@ -517,8 +568,8 @@ Lesson.prototype.displayHeader = function() {
 Lesson.prototype.displayBody = function() {
   this.body.projectId = localStorage['projectID'];
   var body = JSON.stringify(this.body, null, 2);
-  $('.body-input').text(body).show();
-  $('.hidden-body-element').text(body + '\n');
+  $('.body-input').val(body).show();
+  $('.hidden-body-element').text(body);
   $('.body-input').height($('.hidden-body-element').height());
 }
 
@@ -916,7 +967,7 @@ function decideErrorMessage(errorMess, input) {
   } else if (errorMess.reason == 'invalid') {
     var field = errorMess.location;
     // If the error is not in table ID, tell the error location.
-    if (field!=='id') {
+    if (field != 'id') {
       message = 'Check whether you have given the right values for the ' +
           'parameters, in particular, the \''+field+'\' field.';
     } else {
@@ -976,7 +1027,7 @@ function decideErrorMessage(errorMess, input) {
 function getText(address) {
   var me = this;
   if (address == 'mapsengine-api-tutorial.appspot.com/resources/' +
-         'alice-in-wondreland.txt') {
+         'alice-in-wonderland.txt') {
     // The user entered the correct input.  
     $.ajax({
       url: 'resources/alice-in-wonderland.txt',
