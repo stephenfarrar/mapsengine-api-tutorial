@@ -725,7 +725,6 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       new Lesson('lesson8-listprojects', {
         title: 'List Projects',
         checkAnswer: checkCorrectness,
-        submitButtonValue: 'Get',
         activeInput: urlInput,
         header: HEADER_FOR_GET,
         testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/projects',
@@ -777,7 +776,6 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           label: USER_TABLE_ID
         }],
         checkAnswer: checkCorrectness,
-        submitButtonValue: 'Get',
         activeInput: urlInput,
         header: HEADER_FOR_GET,
         testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/' +
@@ -830,7 +828,6 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           label: USER_TABLE_ID
         }],
         checkAnswer: checkCorrectness,
-        submitButtonValue: 'Get',
         activeInput: urlInput,
         header: HEADER_FOR_GET,
         testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/' +
