@@ -868,13 +868,12 @@ function checkIfUserIsAuthorized(authResult) {
  * Google account.
  */
 function signinAndResume() {
-  var me = signin;
   gapi.auth.signIn({
     'callback': function(authResult) {
       if (authResult['status']['signed_in']) {
         signin.next.update();
       } else {
-        me.displayErrorMessage('You need to grant this tutorial permissions ' +
+        signin.displayErrorMessage('You need to grant this tutorial permissions ' +
             'if you wish to continue.');
       }
     }
