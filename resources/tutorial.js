@@ -31,10 +31,12 @@ var HEADER_FOR_POST = {
   'Content-type': 'application/json'
 };
 /**
- * Label for API key in inventory.
+ * Label for items in inventory.
  * @const {string}
  */
 var API_KEY_LABEL = 'Your API Key: ';
+var USER_PROJECT_ID = 'Your Project ID: ';
+var USER_TABLE_ID = '\'World Famous Mountains\' Table ID: '
 
 /**
  * Create object to store textarea input information.
@@ -576,8 +578,7 @@ Lesson.prototype.displayBody = function() {
   this.body.projectId = localStorage['projectID'];
   if (this.body.features) {
     // Generate random number for gx_id.
-    var randomNumber = Math.floor(Math.random()*1001);
-    console.log(randomNumber);
+    var randomNumber = Math.floor(Math.random()*100001);
     this.body.features[0].properties.gx_id = randomNumber.toString();
   }
   var body = JSON.stringify(this.body, null, 2);
@@ -753,6 +754,9 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       }),
       new Lesson('lesson10-createtable2', {
         title: 'Create Table II',
+        inventoryContents: [{
+          label: USER_PROJECT_ID
+        }],
         checkAnswer: checkCreateRequest,
         submitButtonValue: 'Post',
         activeInput: bodyInput,
@@ -769,6 +773,9 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       }),
       new Lesson('lesson11-getprivatetable', {
         title: 'Get Private Table',
+        inventoryContents: [{
+          label: USER_TABLE_ID
+        }],
         checkAnswer: checkCorrectness,
         submitButtonValue: 'Get',
         activeInput: urlInput,
@@ -784,6 +791,9 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
     new Chapter('chapter3-features', {title: 'Adding Features', lessons: [
       new Lesson('lesson12-createfeatures1', {
         title: 'Create Features I',
+        inventoryContents: [{
+          label: USER_TABLE_ID
+        }],
         checkAnswer: checkCreateRequest,
         submitButtonValue: 'Post',
         activeInput: urlInput,
@@ -816,6 +826,9 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       }),
       new Lesson('lesson14-listprivatefeatures', {
         title: 'List Private Features',
+        inventoryContents: [{
+          label: USER_TABLE_ID
+        }],
         checkAnswer: checkCorrectness,
         submitButtonValue: 'Get',
         activeInput: urlInput,
@@ -1020,6 +1033,14 @@ function populateInventory(contents) {
     if (item.label == API_KEY_LABEL) {
       item.information = localStorage['APIKey'];
     }
+    // Load the user's project ID.
+    if (item.label == USER_PROJECT_ID) {
+      item.information = localStorage['projectID'];
+    }
+    // Load the user's 'World Famous Mountains' table ID.
+    if (item.label == USER_TABLE_ID) {
+      item.information = localStorage['tableID'];
+    }
     // Add the item to the inventory element.
     inventory.append('<b>' + item.label + '</b>')
         .append('<code>' + item.information + '</code><br>');
@@ -1120,6 +1141,9 @@ function decideErrorMessage(errorMess, input) {
     message = 'There is a per-IP or per-Referer restriction configured on ' +
         'the API Key and the request does not match these restrictions, or ' +
         'the Maps Engine API is not activated on the project ID.';
+  } else if (errorMess.reason == 'parseError') {
+    message = 'The body you entered is not a valid JSON object. Make sure ' +
+        'that you format your data correctly.';
   } else {
     message = 'The data you requested cannot be processed. Check your ' +
         'request to ensure that it is correct.';
@@ -1256,7 +1280,8 @@ function checkCreateRequest(input) {
     // This request should always be successful.
     success: function(resource) {
       // Store the number of tables/features the user has.
-      var initialCount = resource.tables.length || resource.features.length;
+      var initialArray = resource.tables || resource.features;
+      var initialCount = initialArray.length;
       // Attempt to create a table with user's input.
       $.ajax({
         headers: me.header,
@@ -1277,8 +1302,8 @@ function checkCreateRequest(input) {
             url: me.testingURL,
             success: function(resource3) {
               // Count the final number of tables/features.
-              var finalCount = resource3.tables.length || 
-                  resource3.features.length;
+              var finalArray = resource3.tables || resource3.features;
+              var finalCount = finalArray.length;
               // If the number of table/feature increase, the user is right.
               if (finalCount > initialCount) {
                 me.displaySuccessMessage();
@@ -1288,7 +1313,7 @@ function checkCreateRequest(input) {
                   localStorage['tableID'] = resource2.id;
                 }
               } else {
-                me.displayErrorMessage('Make sure you enter the URL correctly');
+                me.displayErrorMessage('Make sure you enter the URL correctly.');
               }
             }
           });
