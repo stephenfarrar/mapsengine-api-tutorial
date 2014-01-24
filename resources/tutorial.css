@@ -21,6 +21,30 @@ a:active {
   color: #DD4B39;
 }
 
+/* Cover for Submission */
+.overlay {
+  background-color: rgba(204, 204, 204, 0.6);
+  display: none;
+  height: 100%;
+  left: 0px;
+  position: fixed;
+  top: 0px;
+  width: 100%;
+  z-index: 100;
+}
+
+.submission {
+  background-color: #F9EDBE;
+  color: #000000;
+  font-family: arial;
+  font-size: 13px;
+  font-weight: bold;
+  left: 500px;
+  padding: 10px;
+  position: fixed;
+  top: 20px;
+}
+
 /* HTML Content */
 .content {
   margin-bottom: 20px;

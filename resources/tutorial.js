@@ -17,10 +17,6 @@ var resume;
 var finish;
 var signin;
 /**
- * @type {SubmitButtonCoordinator}
- */
-var submitButton = new SubmitButtonCoordinator();
-/**
  * Header for GET request.
  * @const {Object}
  */
@@ -35,45 +31,11 @@ var HEADER_FOR_POST = {
   'Authorization': null,
   'Content-type': 'application/json'
 };
-
 /**
- * Create object to store information needed by submit button.
- * @isSubmitting {boolean} Indicate whether the submission code is executing.
- * @isEmpty {boolean} Indicate whether textarea input is empty. 
+ * Label for API key in inventory.
+ * @const {string}
  */
-function SubmitButtonCoordinator() {
-  this.isSubmitting = false;
-  this.isEmpty = false;
-}
-
-/**
- * Enable/disable the submit button.
-*/
-SubmitButtonCoordinator.prototype.update = function() {
-  // Disable submit button if input is empty/currently submitting.
-  // Enable it otherwise.
-  if (this.isEmpty || this.isSubmitting) {
-    $('.submit-button').attr('disabled', 'disabled');
-  } else {
-    $('.submit-button').removeAttr('disabled');
-  }
-}
-
-/**
- * Updatting the isEmpty property to true/false, according to textarea input.
- */
-SubmitButtonCoordinator.prototype.setIsEmpty = function(isEmpty) {
-  this.isEmpty = isEmpty;
-  this.update();
-}
-
-/**
- * Updatting the isSubmitting property to true/false.
- */
-SubmitButtonCoordinator.prototype.setIsSubmitting = function(isSubmitting) {
-  this.isSubmitting = isSubmitting;
-  this.update();
-}
+var API_KEY_LABEL = 'Your API Key: ';
 
 /**
  * Create object to store textarea input information.
@@ -112,7 +74,11 @@ ResizingTextarea.prototype.updateTextAreaHeight = function() {
  */
 ResizingTextarea.prototype.update = function() {
   // Enable or disable the submit button according to input.
-  submitButton.setIsEmpty(this.element.val() == '')
+  if (this.element.val() == '') {
+    $('.submit-button').attr('disabled', 'disabled');
+  } else {
+    $('.submit-button').removeAttr('disabled');
+  }
   // Set the height of the textarea.    
   this.updateTextAreaHeight();
   this.onChange(this.element.val());
@@ -185,6 +151,7 @@ function Lesson(elementId, options) {
   this.title = options.title;
   this.buttonValue = options.buttonValue || 'Next Lesson';
   this.submitButtonValue = options.submitButtonValue || 'Get';
+  this.inventoryContents = options.inventoryContents;
   if (options.submit) {
     // For lessons that does not take url/body input.
     this.submit = options.submit;
@@ -209,11 +176,6 @@ function Lesson(elementId, options) {
   // Done is 'true' if the user has submitted correctly.
   this.done = false;
   this.unlocked = false;
-  if (options.showInventory) {
-    this.showInventory = options.showInventory;
-  } else {
-    this.showInventory = false;
-  }
   // Indicate which input submission is needed.
   this.activeInput = options.activeInput;
   // Set the submission status to be false.
@@ -235,12 +197,7 @@ function Lesson(elementId, options) {
  * Create update function for every lesson, called when loading a lesson.
  */
 Lesson.prototype.update = function() {
-  if (!userAuthorization) {
-
-  }
-  // If the lesson is still locked, it can't be accessed.
-  if (!this.unlocked) return;
-  // Else, the lesson can be accessed. Scroll to top of the page.
+  // Scroll to top of the page.
   $('html, body').animate({scrollTop: 0}, 500);
   activeLesson = this;
   document.title = this.title;
@@ -261,7 +218,9 @@ Lesson.prototype.update = function() {
     $('.request').show();
     $('.url').show();
     // Show inventory if needed.
-    if (this.showInventory) {
+    if (this.inventoryContents) {
+      // Update the inventory contents.
+      populateInventory(this.inventoryContents);
       $('.inventory').show();
     } else {
       $('.inventory').hide();
@@ -308,9 +267,16 @@ Lesson.prototype.update = function() {
 Lesson.prototype.submit = function() {
   // If the lesson is currently submitting, do not proceed.
   if (this.isSubmitting) return;
-  // Else, update the submission status and check the answer.
+  // Else, hide the previous response.
+  $('.feedback').hide();
+  $('.next-button').hide();
+  $('.response').hide();
+  // Remove focus from the input area.
+  this.activeInput.element.blur();
+  // Show an overlay to stop user do something else.
+  $('.overlay').show();
+  // Update the submission status and check the answer.
   this.isSubmitting = true;
-  submitButton.setIsSubmitting(this.isSubmitting);
   var input = $.trim(this.activeInput.getInput());
   // Empty the output area.
   var data = $('.response-content');
@@ -370,7 +336,8 @@ Lesson.prototype.displaySuccessMessage = function() {
     $('.message').html(markdown.toHTML(this.successMessage));
     // The submission has finished, update the submission status.
     this.isSubmitting = false;
-    submitButton.setIsSubmitting(this.isSubmitting);
+    // Remove the overlay.
+    $('.overlay').hide();
     // Display the success ribbon and message.
     $('.feedback').hide().fadeIn(fadeInTime)
         .removeClass('failure').addClass('success');
@@ -383,7 +350,7 @@ Lesson.prototype.displaySuccessMessage = function() {
     // Show the output if there is any.
     showResponse();
     // Display the next button.
-    $('.next-button').hide().fadeIn(fadeInTime);
+    $('.next-button').fadeIn(fadeInTime);
     // Set up analytics to indicate success (how many times).
     ga('send', {
       hitType: 'event',
@@ -402,7 +369,8 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
       .append(errorMessage).append(' Please try again.');
   // The submission has finished, update the submission status.
   this.isSubmitting = false;
-  submitButton.setIsSubmitting(this.isSubmitting);
+  // Remove the overlay.
+  $('.overlay').hide();
   // Display the message, hide the success ribbon.
   $('.feedback').hide().fadeIn(fadeInTime)
       .removeClass('success').addClass('failure');
@@ -424,8 +392,6 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   $('.url').addClass('alert');
   // Show the output if there is any.
   showResponse();
-  // Hide the next button.
-  $('.next-button').hide();
   // Set up analytics to indicate failure (how many times).
   ga('send', {
     hitType: 'event',
@@ -439,11 +405,9 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
  * Display the response(output).
  */
 function showResponse() {
-  if (!$('.response-content').text()) {
-    // If there is no response, do not display output.
-    $('.response').hide();
-  } else {
-    $('.response').hide().fadeIn(fadeInTime);
+  if ($('.response-content').text()) {
+    // Only display output if there is response.
+    $('.response').fadeIn(fadeInTime);
   }
 }
 
@@ -468,9 +432,14 @@ Lesson.prototype.tick = function() {
  * Marks a lesson as unlocked.
  */
 Lesson.prototype.unlock = function() {
+  var me = this;
   this.unlocked = true;
   if (this.hasSubmit) {
-    this.menuElement.removeClass('locked').addClass('unlocked');
+    this.menuElement.removeClass('locked')
+        .addClass('unlocked')
+        .click(function() {
+          me.update();
+        });
     this.chapter.menuElement.removeClass('locked').addClass('unlocked');
   }
 };
@@ -493,10 +462,7 @@ Lesson.prototype.makeMenu = function() {
   // Add text.
   var newLink = $('<a>')
       .text(this.title)
-      .addClass('lesson-link pointer')
-      .click(function() {
-        me.update();
-      });
+      .addClass('lesson-link pointer');
   newDiv.append(newLink);
   menu.append(newDiv);
   // Add div to lesson object.
@@ -628,7 +594,12 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
     new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
       new Lesson('lesson3-gettable', {
         title: 'Get Table',
-        showInventory: true,
+        inventoryContents: [{
+          label: 'Table ID: ',
+          information: '15474835347274181123-14495543923251622067'
+        }, {
+          label: API_KEY_LABEL
+        }],
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
         correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' + 
@@ -637,7 +608,12 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       }),
       new Lesson('lesson4-listfeatures', {
         title: 'List Features',
-        showInventory: true,
+        inventoryContents: [{
+          label: 'Table ID: ',
+          information: '15474835347274181123-14495543923251622067'
+        }, {
+          label: API_KEY_LABEL
+        }],
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
         correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
@@ -647,7 +623,12 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       }),
       new Lesson('lesson5-queries', {
         title: 'Queries',
-        showInventory: true,
+        inventoryContents: [{
+          label: 'Table ID: ',
+          information: '15474835347274181123-14495543923251622067'
+        }, {
+          label: API_KEY_LABEL
+        }],
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
         correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
@@ -831,10 +812,6 @@ $(window).load(function() {
       });
   // Create the chapters + lesson objects
   makeChaptersAndLessons(urlInput, bodyInput);
-  // Load the markdown files for the introduction, resume, and finish page.
-  introduction.loadInstruction();
-  resume.loadInstruction();
-  finish.loadInstruction();
   // Create the chapter + lesson buttons + load markdown files for lessons.
   chapters.forEach(function(chapter) {
     chapter.makeMenu();
@@ -909,8 +886,6 @@ function loadState() {
   chapters[0].lessons[0].unlock();
   // Make the active lesson the last opened page/default to introduction page.
   var activeLessonId = localStorage['currentLesson'] || 'introduction';
-  // Update the inventory box.
-  populateInventory();
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
       // Restore user completion information.
@@ -950,14 +925,19 @@ function loadState() {
 /**
  * Updating the inventory box.
  */
-function populateInventory() {
+function populateInventory(contents) {
   var inventory = $('.inventory');
   inventory.empty()
-      .append('<h3>Helpful information</h3>')
-      .append('<b>table ID: </b>')
-      .append('<code>15474835347274181123-14495543923251622067</code><br>')
-      .append('<b>your API Key: </b>')
-      .append($('<code>').text(localStorage['APIKey']));
+      .append('<h3>Helpful information</h3>');
+  contents.forEach(function(item) {
+    // Load the API key.
+    if (item.label == API_KEY_LABEL) {
+      item.information = localStorage['APIKey'];
+    }
+    // Add the item to the inventory element.
+    inventory.append('<b>' + item.label + '</b>')
+        .append('<code>' + item.information + '</code><br>');
+  });
 }
 
 /**
@@ -1098,7 +1078,6 @@ function testAPIKey(userKey) {
     dataType: 'json',
     success: function(resource) {
       localStorage['APIKey'] = userKey;
-      populateInventory();
       me.displaySuccessMessage();
     },
     error: function(response) {
