@@ -235,9 +235,7 @@ function Lesson(elementId, options) {
  * Create update function for every lesson, called when loading a lesson.
  */
 Lesson.prototype.update = function() {
-  // If the lesson is still locked, it can't be accessed.
-  if (!this.unlocked) return;
-  // Else, the lesson can be accessed. Scroll to top of the page.
+  // Scroll to top of the page.
   $('html, body').animate({scrollTop: 0}, 500);
   activeLesson = this;
   document.title = this.title;
@@ -467,9 +465,14 @@ Lesson.prototype.tick = function() {
  * Marks a lesson as unlocked.
  */
 Lesson.prototype.unlock = function() {
+  var me = this;
   this.unlocked = true;
   if (this.hasSubmit) {
-    this.menuElement.removeClass('locked').addClass('unlocked');
+    this.menuElement.removeClass('locked')
+        .addClass('unlocked')
+        .click(function() {
+          me.update();
+        });
     this.chapter.menuElement.removeClass('locked').addClass('unlocked');
   }
 };
@@ -492,10 +495,7 @@ Lesson.prototype.makeMenu = function() {
   // Add text.
   var newLink = $('<a>')
       .text(this.title)
-      .addClass('lesson-link pointer')
-      .click(function() {
-        me.update();
-      });
+      .addClass('lesson-link pointer');
   newDiv.append(newLink);
   menu.append(newDiv);
   // Add div to lesson object.
