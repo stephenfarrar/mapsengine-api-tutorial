@@ -2,7 +2,7 @@
 // The global variables.
 var activeLesson;
 var fadeInTime = 500;
-var userAuthorization = false;
+var userAuthorization;
 /**
  * @type array of {Chapter}. Each {Chapter} contains an array of {Lesson}.
  * Need to be a global variable, since used in other functions.
@@ -15,6 +15,10 @@ var chapters;
 var introduction;
 var resume;
 var finish;
+/**
+ * @type {SubmitButtonCoordinator}
+ */
+var submitButton = new SubmitButtonCoordinator();
 /**
  * Header for GET request.
  * @const {Object}
@@ -30,6 +34,45 @@ var HEADER_FOR_POST = {
   'Authorization': null,
   'Content-type': 'application/json'
 };
+
+/**
+ * Create object to store information needed by submit button.
+ * @isSubmitting {boolean} Indicate whether the submission code is executing.
+ * @isEmpty {boolean} Indicate whether textarea input is empty. 
+ */
+function SubmitButtonCoordinator() {
+  this.isSubmitting = false;
+  this.isEmpty = false;
+}
+
+/**
+ * Enable/disable the submit button.
+*/
+SubmitButtonCoordinator.prototype.update = function() {
+  // Disable submit button if input is empty/currently submitting.
+  // Enable it otherwise.
+  if (this.isEmpty || this.isSubmitting) {
+    $('.submit-button').attr('disabled', 'disabled');
+  } else {
+    $('.submit-button').removeAttr('disabled');
+  }
+}
+
+/**
+ * Updatting the isEmpty property to true/false, according to textarea input.
+ */
+SubmitButtonCoordinator.prototype.setIsEmpty = function(isEmpty) {
+  this.isEmpty = isEmpty;
+  this.update();
+}
+
+/**
+ * Updatting the isSubmitting property to true/false.
+ */
+SubmitButtonCoordinator.prototype.setIsSubmitting = function(isSubmitting) {
+  this.isSubmitting = isSubmitting;
+  this.update();
+}
 
 /**
  * Create object to store textarea input information.
@@ -64,22 +107,11 @@ ResizingTextarea.prototype.updateTextAreaHeight = function() {
 }
 
 /**
- * Disable the submit button if there is empty input.
- */
-ResizingTextarea.prototype.updateSubmitButton = function() {
-  if (this.element.val() == '') {
-    $('.submit-button').attr('disabled','disabled');
-  } else {
-    $('.submit-button').removeAttr('disabled');
-  }
-}
-
-/**
  * Changes that need to happen everytime input changes.
  */
 ResizingTextarea.prototype.update = function() {
-  // Enable or disable the submit button.
-  this.updateSubmitButton();
+  // Enable or disable the submit button according to input.
+  submitButton.setIsEmpty(this.element.val() == '')
   // Set the height of the textarea.    
   this.updateTextAreaHeight();
   this.onChange(this.element.val());
@@ -92,18 +124,18 @@ ResizingTextarea.prototype.setup = function() {
   var me = this;
   // Set events on keypress.
   this.element.keypress(function(event) {
+    me.update(); 
     // Check if the input needs enter submission behaviour.
     if (me.enterSubmission) {
       // Enable submit by enter, not making the enter visible in the input.
       if (event.which == 13) {
         event.preventDefault();
-        // Submit only if the input is not blank.
-        if (me.element.val() !== '') {
+        // Try to submit if the input is not empty.
+        if (me.element.val() != '') {
           activeLesson.submit();
         }
       }
-    }
-    me.update();
+    }    
   });
   // Set events on keyup, to handle backspaces.
   this.element.keyup(function() {
@@ -116,6 +148,21 @@ ResizingTextarea.prototype.setup = function() {
     }, 0);
   });
 };
+
+/**
+ * Set the input of the textarea and update the height/submit button.
+ */
+ResizingTextarea.prototype.setInput = function(input) {
+  this.element.val(input);
+  this.update();
+}
+
+/**
+ * Get the input from the textarea.
+ */
+ResizingTextarea.prototype.getInput = function() {
+  return this.element.val();
+}
 
 /**
  * Function to store input in local storage.
@@ -158,8 +205,8 @@ function Lesson(elementId, options) {
   if (options.hasBodyFile) {
     this.hasBodyFile = options.hasBodyFile;
   }
-  if (options.correctAns) {
-    this.correctAns = options.correctAns;
+  if (options.testingURLTemplate) {
+    this.testingURLTemplate = options.testingURLTemplate;
   }
   // Done is 'true' if the user has submitted correctly.
   this.done = false;
@@ -171,6 +218,20 @@ function Lesson(elementId, options) {
   }
   // Indicate which input submission is needed.
   this.activeInput = options.activeInput;
+  // Set the submission status to be false.
+  this.isSubmitting = false;
+  // Load the instructions file for each lesson.
+  this.loadInstruction();
+  // Only lessons with a submission require success, answer and header content.
+  if (this.hasSubmit) {
+    this.loadSuccessMessage();
+    this.loadBody();
+    this.loadUrl();
+    // Only lessons with an activeInput field have an answer.
+    if (this.activeInput) {
+      this.loadAnswer();
+    }
+  }
 }
 
 /**
@@ -230,9 +291,7 @@ Lesson.prototype.update = function() {
       this.activeInput.element.removeAttr('disabled'); 
       // Update the input (placeholder/saved URL/saved body).
       var storedInput = retrieveInput();
-      this.activeInput.element.val(storedInput || '');
-      this.activeInput.updateTextAreaHeight();
-      this.activeInput.updateSubmitButton();
+      this.activeInput.setInput(storedInput || '');
     }
   }
   // Set up analytics for the page visited by the user (number of times the page
@@ -247,13 +306,24 @@ Lesson.prototype.update = function() {
  * Handles the input the user has submitted.
  */
 Lesson.prototype.submit = function() {
-  // Make the user not able to submit again for a while.
-  // This is to avoid double posting.
-  $('.submit-button').attr('disabled', 'disabled');
-  var input = $.trim(this.activeInput.element.val());
+  // If the lesson is currently submitting, do not proceed.
+  if (this.isSubmitting) return;
+  // Else, update the submission status and check the answer.
+  this.isSubmitting = true;
+  submitButton.setIsSubmitting(this.isSubmitting);
+  var input = $.trim(this.activeInput.getInput());
   // Empty the output area.
   var data = $('.response-content');
   data.empty();
+  // Change URL Template to a real URL with some data in local storage.
+  if (this.testingURLTemplate) {
+    // Change if there is table ID in the template URL.
+    this.testingURL = this.testingURLTemplate.replace('{userTableId}', 
+        localStorage['tableID']);
+    // Change if there is project ID in the template URL.
+    this.testingURL = this.testingURL.replace('{userProjectId}',
+        localStorage['projectID']);
+  }
   // Check the correctness of user input.
   this.checkAnswer(input);
 }
@@ -307,8 +377,9 @@ Lesson.prototype.displaySuccessMessage = function() {
     // The lesson is completed. Display the success message.
     this.complete();
     $('.message').html(markdown.toHTML(this.successMessage));
-    // Enable the submit button again.
-    $('.submit-button').removeAttr('disabled');
+    // The submission has finished, update the submission status.
+    this.isSubmitting = false;
+    submitButton.setIsSubmitting(this.isSubmitting);
     // Display the success ribbon and message.
     $('.feedback').hide().fadeIn(fadeInTime)
         .removeClass('failure').addClass('success');
@@ -338,8 +409,9 @@ Lesson.prototype.displaySuccessMessage = function() {
 Lesson.prototype.displayErrorMessage = function(errorMessage) {
   $('.message').html('Sorry, that input is incorrect. ')
       .append(errorMessage).append(' Please try again.');
-  // Enable the submit button again.
-  $('.submit-button').removeAttr('disabled');
+  // The submission has finished, update the submission status.
+  this.isSubmitting = false;
+  submitButton.setIsSubmitting(this.isSubmitting);
   // Display the message, hide the success ribbon.
   $('.feedback').hide().fadeIn(fadeInTime)
       .removeClass('success').addClass('failure');
@@ -488,7 +560,7 @@ Lesson.prototype.loadUrl = function() {
     var filename = this.elementId + '-url.txt';
     tasksList.add(filename);
     $.get('resources/' + filename, function(response) {
-      me.url = response;
+      me.urlTemplate = response;
       tasksList.remove(filename);
     });
   }
@@ -533,6 +605,12 @@ Lesson.prototype.displayHeader = function() {
  */
 Lesson.prototype.displayBody = function() {
   this.body.projectId = localStorage['projectID'];
+  if (this.body.features) {
+    // Generate random number for gx_id.
+    var randomNumber = Math.floor(Math.random()*1001);
+    console.log(randomNumber);
+    this.body.features[0].properties.gx_id = randomNumber.toString();
+  }
   var body = JSON.stringify(this.body, null, 2);
   $('.body-input').val(body).show();
   $('.hidden-body-element').text(body);
@@ -592,7 +670,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         showInventory: true,
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
-        correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' + 
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/tables/' + 
                 '15474835347274181123-14495543923251622067?' +
                 'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco'       
       }),
@@ -601,7 +679,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         showInventory: true,
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
-        correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/tables/' +
                 '15474835347274181123-14495543923251622067/features?' +
                 'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1v' +
                 'pHQdco'
@@ -611,7 +689,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         showInventory: true,
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
-        correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/tables/' +
                 '15474835347274181123-14495543923251622067/features?'+ 
                 'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1v' +
                 'pHQdco&where=Population<2000000'
@@ -625,11 +703,9 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         update: function() {
           Lesson.prototype.update.call(this);
           $('.url').hide();
-          if (!userAuthorization) {
-            // Activate the 'Sign In' button.
-            $('.submit-button').removeAttr('disabled');
-          } else {
-            // Else, leave the button disabled.
+          if (userAuthorization) {
+            // Dectivate the 'Sign In' button.
+            $('.submit-button').attr('disabled', 'disabled');
             // Make sure that the next lesson is always unlocked.
             this.complete();
           }
@@ -667,7 +743,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         submitButtonValue: 'Get',
         activeInput: urlInput,
         header: HEADER_FOR_GET,
-        correctAns: 'https://www.googleapis.com/mapsengine/v1/projects',
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/projects',
         update: function() {
           Lesson.prototype.update.call(this);
           this.displayHeader();
@@ -677,11 +753,13 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
     new Chapter('chapter2-table', {title: 'Making a Table', lessons: [
       new Lesson('lesson9-createtable1', {
         title: 'Create Table I',
-        checkAnswer: checkCreateTable,
+        checkAnswer: checkCreateRequest,
         submitButtonValue: 'Post',
         activeInput: urlInput,
         hasBodyFile: true,
         header: HEADER_FOR_POST,
+        testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/tables?' +
+            'projectId={userProjectId}',
         update: function() {
           Lesson.prototype.update.call(this);
           this.displayHeader();
@@ -691,16 +769,78 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       }),
       new Lesson('lesson10-createtable2', {
         title: 'Create Table II',
-        checkAnswer: checkCreateTable,
+        checkAnswer: checkCreateRequest,
         submitButtonValue: 'Post',
         activeInput: bodyInput,
         hasUrlFile: true,
         header: HEADER_FOR_POST,
+        testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/tables?' +
+            'projectId={userProjectId}',
         update: function() {
           Lesson.prototype.update.call(this);
           this.displayUrl();
           this.displayHeader();
           $('.body-input').show();
+        }
+      }),
+      new Lesson('lesson11-getprivatetable', {
+        title: 'Get Private Table',
+        checkAnswer: checkCorrectness,
+        submitButtonValue: 'Get',
+        activeInput: urlInput,
+        header: HEADER_FOR_GET,
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/' +
+            'tables/{userTableId}',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          this.displayHeader();
+        }
+      })
+    ]}),
+    new Chapter('chapter3-features', {title: 'Adding Features', lessons: [
+      new Lesson('lesson12-createfeatures1', {
+        title: 'Create Features I',
+        checkAnswer: checkCreateRequest,
+        submitButtonValue: 'Post',
+        activeInput: urlInput,
+        hasBodyFile: true,
+        header: HEADER_FOR_POST,
+        testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/' +
+            'tables/{userTableId}/features',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          this.displayHeader();
+          this.displayBody();
+          $('.body-input').show();
+        }
+      }),
+      new Lesson('lesson13-createfeatures2', {
+        title: 'Create Features II',
+        checkAnswer: checkCreateRequest,
+        submitButtonValue: 'Post',
+        activeInput: bodyInput,
+        hasUrlFile: true,
+        header: HEADER_FOR_POST,
+        testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/' +
+            'tables/{userTableId}/features',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          this.displayUrl();
+          this.displayHeader();
+          $('.body-input').show();
+        }
+      }),
+      new Lesson('lesson14-listprivatefeatures', {
+        title: 'List Private Features',
+        checkAnswer: checkCorrectness,
+        submitButtonValue: 'Get',
+        activeInput: urlInput,
+        header: HEADER_FOR_GET,
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/' +
+            'tables/{userTableId}/features',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          this.displayHeader();
         }
       })
     ]})
@@ -775,7 +915,7 @@ function newTasksList(firstTask, onFinished) {
   };
   me.remove = function(task) {
     delete tasks[task];
-    if (jQuery.isEmptyObject(tasks)) {
+    if ($.isEmptyObject(tasks)) {
       onFinished();
     }
   };
@@ -810,12 +950,6 @@ $(window).load(function() {
     chapter.makeMenu();
     chapter.lessons.forEach(function(lesson) {
       lesson.makeMenu();
-      // Load the markdown files for each lesson.
-      lesson.loadInstruction();
-      lesson.loadSuccessMessage();
-      lesson.loadAnswer();
-      lesson.loadUrl();
-      lesson.loadBody();
     });
   });
   // Set up analytics to indicate how many times users go to the documentation 
@@ -844,12 +978,18 @@ $(window).load(function() {
  * Page-level callback to check if a user has an OAuth 2.0 token
  */
 function checkIfUserIsAuthorized(authResult) {
+  // The first time the callback is called, on page load, userAuthorization
+  // has no value.
+  if (userAuthorization == null) {
+    tasksList.remove('callback');
+  }
   if (authResult['status']['signed_in']) {
     // The user is signed in and has authorised the application.
     // We set a global variable with their authorization token.
     userAuthorization = authResult['access_token'];
+  } else {
+    userAuthorization = false;
   }
-  tasksList.remove('callback');
 }
 
 /**
@@ -949,7 +1089,7 @@ function decideErrorMessage(errorMess, input) {
   } else if (errorMess.reason == 'invalid') {
     var field = errorMess.location;
     // If the error is not in table ID, tell the error location.
-    if (field!=='id') {
+    if (field != 'id') {
       message = 'Check whether you have given the right values for the ' +
           'parameters, in particular, the \''+field+'\' field.';
     } else {
@@ -981,7 +1121,8 @@ function decideErrorMessage(errorMess, input) {
     message = 'The resource is too large to be accessed through the API.';
   } else if (errorMess.reason == 'duplicate') {
     message = 'The new feature you are trying to insert has an ID that ' +
-        'already exists in the table.';
+        'already exists in the table. Try to use a different ' +
+        '<code>gx_id</code> in the body of your request.';
   } else if (errorMess.reason == 'rateLimitExceeded' || 
              errorMess.reason == 'quotaExceeded') {
     message = 'You have exhausted the application\'s daily quota or its ' +
@@ -1009,13 +1150,13 @@ function decideErrorMessage(errorMess, input) {
 function getText(address) {
   var me = this;
   if (address == 'mapsengine-api-tutorial.appspot.com/resources/' +
-         'alice-in-wondreland.txt') {
+         'alice-in-wonderland.txt') {
     // The user entered the correct input.  
     $.ajax({
       url: 'resources/alice-in-wonderland.txt',
       dataType: 'text',
       success: function(resource) {
-        $('r.esponse-content').text(resource);
+        $('.response-content').text(resource);
         me.displaySuccessMessage();
       }
     });
@@ -1059,7 +1200,7 @@ function checkCorrectness(address) {
   var me = this;
   // Get the response with the correct URL.
   $.ajax({
-    url: me.correctAns,
+    url: me.testingURL,
     headers: me.header,
     dataType: 'json',
     success: function(resource) {
@@ -1123,18 +1264,17 @@ function storeProjectID() {
 /**
  * Check whether a new table has been created or not.
  */
-function checkCreateTable(input) {
+function checkCreateRequest(input) {
   var me = this;
-  // Find out the number of tables the user has in the project.
+  // Find out the number of tables/features the user has.
   $.ajax({
     headers: {'Authorization': 'Bearer ' + userAuthorization},
     type: 'GET',
-    url: 'https://www.googleapis.com/mapsengine/v1/tables?projectId=' +
-        localStorage['projectID'],
+    url: me.testingURL,
     // This request should always be successful.
     success: function(resource) {
-      // Store the number of tables the user has.
-      var initialTableCount = resource.tables.length;
+      // Store the number of tables/features the user has.
+      var initialCount = resource.tables.length || resource.features.length;
       // Attempt to create a table with user's input.
       $.ajax({
         headers: me.header,
@@ -1143,22 +1283,22 @@ function checkCreateTable(input) {
         data: JSON.stringify(me.body) || input,
         dataType: 'json',
         success: function(resource2){
-          var finalTableCount;
           // If the request returns a valid object, show the output.
           if (typeof resource2 == 'object') {
             var responseString = JSON.stringify(resource2, null, 2);
             $('.response-content').text(responseString); 
           }
-          // Find out the number of tables in the project after success request.
+          // Find out the number of tables/features after the create request.
           $.ajax({
             headers: {'Authorization': 'Bearer ' + userAuthorization},
             type: 'GET',
-            url: 'https://www.googleapis.com/mapsengine/v1/tables?projectId=' +
-                localStorage['projectID'],
+            url: me.testingURL,
             success: function(resource3) {
-              finalTableCount = resource3.tables.length;
-              // If the number of table increase, then the user is right.
-              if (finalTableCount > initialTableCount) {
+              // Count the final number of tables/features.
+              var finalCount = resource3.tables.length || 
+                  resource3.features.length;
+              // If the number of table/feature increase, the user is right.
+              if (finalCount > initialCount) {
                 me.displaySuccessMessage();
                 // Store the table ID in local storage if it is the World
                 // Famous Mountains table (lesson9-createtable1).
@@ -1166,8 +1306,7 @@ function checkCreateTable(input) {
                   localStorage['tableID'] = resource2.id;
                 }
               } else {
-                me.displayErrorMessage('Make sure you enter the URL for ' +
-                    'create table correctly.')
+                me.displayErrorMessage('Make sure you enter the URL correctly');
               }
             }
           });
