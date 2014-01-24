@@ -15,6 +15,7 @@ var chapters;
 var introduction;
 var resume;
 var finish;
+var signin;
 /**
  * @type {SubmitButtonCoordinator}
  */
@@ -234,6 +235,9 @@ function Lesson(elementId, options) {
  * Create update function for every lesson, called when loading a lesson.
  */
 Lesson.prototype.update = function() {
+  if (!userAuthorization) {
+
+  }
   // If the lesson is still locked, it can't be accessed.
   if (!this.unlocked) return;
   // Else, the lesson can be accessed. Scroll to top of the page.
@@ -724,7 +728,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       })
     ]})
   ];
-  // Introduction, resume and final page lessons.
+  // Introduction, resume, signin and final page lessons.
   introduction = new Lesson('introduction', {
     title: 'Welcome!',
     buttonValue: 'Yes, I am!',
@@ -739,6 +743,13 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
     update: function() {
       Lesson.prototype.update.call(this);
       $('.next-button').removeClass('right-aligned').show();
+    }
+  });
+  signin = new Lesson('signin', {
+    title: 'Welcome back!',
+    update: function() {
+      Lesson.prototype.update.call(this);
+      $('.signin-button').show();
     }
   });
   finish = new Lesson('finish', {
@@ -859,8 +870,9 @@ $(window).load(function() {
 function checkIfUserIsAuthorized(authResult) {
   // The first time the callback is called, on page load, userAuthorization
   // has no value.
+  var removeTask = false;
   if (userAuthorization == null) {
-    tasksList.remove('callback');
+    removeTask = true;
   }
   if (authResult['status']['signed_in']) {
     // The user is signed in and has authorised the application.
@@ -869,7 +881,23 @@ function checkIfUserIsAuthorized(authResult) {
   } else {
     userAuthorization = false;
   }
+  if (removeTask) {
+    tasksList.remove('callback');
+  }
 }
+
+function signinAndResume() {
+  var me = this;
+  gapi.auth.signIn({
+    'callback': function(authResult) {
+      if (authResult['status']['signed_in']) {
+        signin.next.update();
+      } else {
+        me.displayErrorMessage('You need to grant this tutorial permissions ' +
+            'if you wish to continue.');
+      }
+    }
+  });}
 
 /**
  * Function to update the tutorial state based on the local storage.
@@ -892,6 +920,7 @@ function loadState() {
       // Add resume point.
       if (lesson.elementId == activeLessonId) {
         resume.next = lesson;
+        signin.next = lesson;
       }
     });
   });
@@ -903,9 +932,18 @@ function loadState() {
     // If the user left at the final page.
     if (activeLessonId == 'finish') {
       resume.next = finish;
+      signin.next = finish;
     }
-    resume.unlock();
-    resume.update();
+    // If the user has completed the Sign In page but has no token,
+    // i.e. if the user has logged out, return them to a signin page.
+    if (localStorage['lesson6-login'] && !userAuthorization) {
+      signin.unlock();
+      signin.update();
+    // Otherwise, resume as normal.
+    } else {
+      resume.unlock();
+      resume.update();
+    }
   }
 }
 
