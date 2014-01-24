@@ -265,13 +265,13 @@ Lesson.prototype.update = function() {
 Lesson.prototype.submit = function() {
   // If the lesson is currently submitting, do not proceed.
   if (this.isSubmitting) return;
-  // Hide the previous response.
+  // Else, hide the previous response.
   $('.feedback').hide();
   $('.next-button').hide();
   $('.response').hide();
   // Remove focus from the input area.
   this.activeInput.element.blur();
-  // Else, show an overlay to stop user do something else.
+  // Show an overlay to stop user do something else.
   $('.overlay').show();
   // Update the submission status and check the answer.
   this.isSubmitting = true;
