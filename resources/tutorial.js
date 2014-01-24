@@ -1268,7 +1268,7 @@ function storeProjectID() {
 }
 
 /**
- * Check whether a new table has been created or not.
+ * Check whether a new table/feature has been created or not.
  */
 function checkCreateRequest(input) {
   var me = this;
