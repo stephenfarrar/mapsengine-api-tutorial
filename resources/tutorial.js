@@ -513,7 +513,7 @@ Lesson.prototype.loadBody = function() {
  * Update and display the url of lesson.
  */
 Lesson.prototype.displayUrl = function() {
-  this.url = this.url.replace('{userTableId}', localStorage['tableID']);
+  this.url = this.urlTemplate.replace('{userTableId}', localStorage['tableID']);
   $('.url').val(this.url).show();
   $('.hidden-url-element').text(this.url);
   $('.url').height($('.hidden-url-element').height());
