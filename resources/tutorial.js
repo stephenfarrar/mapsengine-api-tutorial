@@ -1309,7 +1309,7 @@ function checkCreateRequest(input) {
                 me.displaySuccessMessage();
                 // Store the table ID in local storage if it is the World
                 // Famous Mountains table (lesson9-createtable1).
-                if (me.elementId == "lesson9-createtable1") {
+                if (me.elementId == 'lesson9-createtable1') {
                   localStorage['tableID'] = resource2.id;
                 }
               } else {
