@@ -30,6 +30,11 @@ var HEADER_FOR_POST = {
   'Authorization': null,
   'Content-type': 'application/json'
 };
+/**
+ * Label for API key in inventory.
+ * @const {string}
+ */
+var API_KEY_LABEL = 'Your API Key: ';
 
 /**
  * Create object to store textarea input information.
@@ -574,7 +579,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           label: 'Table ID: ',
           information: '15474835347274181123-14495543923251622067'
         }, {
-          label: 'Your API Key: '
+          label: API_KEY_LABEL
         }],
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
@@ -588,7 +593,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           label: 'Table ID: ',
           information: '15474835347274181123-14495543923251622067'
         }, {
-          label: 'Your API Key: '
+          label: API_KEY_LABEL
         }],
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
@@ -603,7 +608,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           label: 'Table ID: ',
           information: '15474835347274181123-14495543923251622067'
         }, {
-          label: 'Your API Key: '
+          label: API_KEY_LABEL
         }],
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
@@ -873,7 +878,7 @@ function populateInventory(contents) {
       .append('<h3>Helpful information</h3>');
   contents.forEach(function(item) {
     // Load the API key.
-    if (item.label == 'Your API Key: ') {
+    if (item.label == API_KEY_LABEL) {
       item.information = localStorage['APIKey'];
     }
     // Add the item to the inventory element.
