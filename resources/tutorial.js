@@ -15,6 +15,7 @@ var chapters;
 var introduction;
 var resume;
 var finish;
+var signin;
 /**
  * Url for create tables.
  * @const {String}
@@ -388,7 +389,7 @@ Lesson.prototype.displaySuccessMessage = function() {
  * If the input is wrong, do the error responses.
  */
 Lesson.prototype.displayErrorMessage = function(errorMessage) {
-  $('.message').html('Sorry, that input is incorrect. ')
+  $('.message').html('Sorry, that is incorrect. ')
       .append(errorMessage).append(' Please try again.');
   // The submission has finished, update the submission status.
   this.isSubmitting = false;
@@ -840,7 +841,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       })
     ]})
   ];
-  // Introduction, resume and final page lessons.
+  // Introduction, resume, signin and final page lessons.
   introduction = new Lesson('introduction', {
     title: 'Welcome!',
     buttonValue: 'Yes, I am!',
@@ -855,6 +856,13 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
     update: function() {
       Lesson.prototype.update.call(this);
       $('.next-button').removeClass('right-aligned').show();
+    }
+  });
+  signin = new Lesson('signin', {
+    title: 'Welcome back!',
+    update: function() {
+      Lesson.prototype.update.call(this);
+      $('.signin-button').show();
     }
   });
   finish = new Lesson('finish', {
@@ -971,8 +979,9 @@ $(window).load(function() {
 function checkIfUserIsAuthorized(authResult) {
   // The first time the callback is called, on page load, userAuthorization
   // has no value.
+  var removeTask = false;
   if (userAuthorization == null) {
-    tasksList.remove('callback');
+    removeTask = true;
   }
   if (authResult['status']['signed_in']) {
     // The user is signed in and has authorised the application.
@@ -981,6 +990,26 @@ function checkIfUserIsAuthorized(authResult) {
   } else {
     userAuthorization = false;
   }
+  if (removeTask) {
+    tasksList.remove('callback');
+  }
+}
+
+/**
+ * Function called on signin page only, for users who sign out of their
+ * Google account.
+ */
+function signinAndResume() {
+  gapi.auth.signIn({
+    'callback': function(authResult) {
+      if (authResult['status']['signed_in']) {
+        signin.next.update();
+      } else {
+        signin.displayErrorMessage('You need to grant this tutorial permissions ' +
+            'if you wish to continue.');
+      }
+    }
+  });
 }
 
 /**
@@ -1002,6 +1031,7 @@ function loadState() {
       // Add resume point.
       if (lesson.elementId == activeLessonId) {
         resume.next = lesson;
+        signin.next = lesson;
       }
     });
   });
@@ -1013,9 +1043,18 @@ function loadState() {
     // If the user left at the final page.
     if (activeLessonId == 'finish') {
       resume.next = finish;
+      signin.next = finish;
     }
-    resume.unlock();
-    resume.update();
+    // If the user has completed the Sign In page but has no token,
+    // i.e. if the user has logged out, return them to a signin page.
+    if (localStorage['lesson6-login'] && !userAuthorization) {
+      signin.unlock();
+      signin.update();
+    // Otherwise, resume as normal.
+    } else {
+      resume.unlock();
+      resume.update();
+    }
   }
 }
 
