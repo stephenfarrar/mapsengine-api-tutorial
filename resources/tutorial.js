@@ -560,8 +560,7 @@ Lesson.prototype.displayUrl = function() {
 Lesson.prototype.displayHeader = function() {
   this.header.Authorization = 'Bearer ' + userAuthorization;
   var header = JSON.stringify(this.header, null, 2);
-  $('.header-input').text(header);
-  $('.header').show();
+  $('.header-input').text(header).show();
 }
 
 /**
