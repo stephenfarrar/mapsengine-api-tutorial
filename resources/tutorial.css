@@ -267,6 +267,11 @@ code {
   word-wrap: break-word;
 }
 
+.input:disabled {
+  background-color: #EEEEEE;
+  opacity: 0.5;
+}
+
 .url {
   display: inline-block;
   min-height: 21px;
@@ -294,6 +299,8 @@ code {
 }
 
 .header-input {
+  background-color: #EEEEEE;
+  opacity: 0.5;
   width: 559px;
   white-space: pre;
 }

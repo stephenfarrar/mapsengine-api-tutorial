@@ -16,6 +16,16 @@ var introduction;
 var resume;
 var finish;
 /**
+ * Url for create tables.
+ * @const {String}
+ */
+var URL_FOR_TABLES = 'https://www.googleapis.com/mapsengine/v1/tables';
+/**
+ * Url for create features.
+ * @const {String}
+ */
+var URL_FOR_FEATURES = 'https://www.googleapis.com/mapsengine/v1/tables/{userTableId}/features/batchInsert';
+/**
  * Header for GET request.
  * @const {Object}
  */
@@ -165,8 +175,8 @@ function Lesson(elementId, options) {
   if (options.update) {
     this.update = options.update;
   }
-  if (options.hasUrlFile) {
-    this.hasUrlFile = options.hasUrlFile;
+  if (options.urlTemplate) {
+    this.urlTemplate = options.urlTemplate;
   }
   if (options.header) {
     this.header = options.header;
@@ -190,7 +200,6 @@ function Lesson(elementId, options) {
   if (this.hasSubmit) {
     this.loadSuccessMessage();
     this.loadBody();
-    this.loadUrl();
     // Only lessons with an activeInput field have an answer.
     if (this.activeInput) {
       this.loadAnswer();
@@ -523,21 +532,6 @@ Lesson.prototype.loadAnswer = function() {
 };
 
 /**
- * Load the url markdown, where applicable.
- */
-Lesson.prototype.loadUrl = function() {
-  var me = this;
-  if (this.hasUrlFile) {
-    var filename = this.elementId + '-url.txt';
-    tasksList.add(filename);
-    $.get('resources/' + filename, function(response) {
-      me.urlTemplate = response;
-      tasksList.remove(filename);
-    });
-  }
-}
-
-/**
  * Load the body markdown, where applicable.
  */
 Lesson.prototype.loadBody = function() {
@@ -557,9 +551,7 @@ Lesson.prototype.loadBody = function() {
  */
 Lesson.prototype.displayUrl = function() {
   this.url = this.urlTemplate.replace('{userTableId}', localStorage['tableID']);
-  $('.url').val(this.url).show();
-  $('.hidden-url-element').text(this.url);
-  $('.url').height($('.hidden-url-element').height());
+  setDisabledElementContent($('.url'), $('.hidden-url-element'), this.url);
 }
 
 /**
@@ -568,23 +560,35 @@ Lesson.prototype.displayUrl = function() {
 Lesson.prototype.displayHeader = function() {
   this.header.Authorization = 'Bearer ' + userAuthorization;
   var header = JSON.stringify(this.header, null, 2);
-  $('.header-input').text(header).show();
+  $('.header-input').text(header);
+  $('.header').show();
 }
 
 /**
  * Update and display the body of lesson.
  */
 Lesson.prototype.displayBody = function() {
-  this.body.projectId = localStorage['projectID'];
+  if (this.body.projectId) {
+    this.body.projectId = localStorage['projectID'];
+  }
   if (this.body.features) {
     // Generate random number for gx_id.
-    var randomNumber = Math.floor(Math.random()*100001);
+    var randomNumber = Math.floor(Math.random()*1000000001);
     this.body.features[0].properties.gx_id = randomNumber.toString();
   }
   var body = JSON.stringify(this.body, null, 2);
-  $('.body-input').val(body).show();
-  $('.hidden-body-element').text(body);
-  $('.body-input').height($('.hidden-body-element').height());
+  setDisabledElementContent($('.body-input'), $('.hidden-body-element'), body);
+}
+
+/**
+ * Set the text and height of disabled element.
+ * The parameter 'element' is a textarea.
+ * The parameter 'hiddenElement' is a div.
+ */
+function setDisabledElementContent(element, hiddenElement, input) {
+  element.val(input).show();
+  hiddenElement.text(input);
+  element.height(hiddenElement.height());
 }
 
 /**
@@ -748,7 +752,6 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           Lesson.prototype.update.call(this);
           this.displayHeader();
           this.displayBody();
-          $('.body-input').show();
         }
       }),
       new Lesson('lesson10-createtable2', {
@@ -759,7 +762,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         checkAnswer: checkCreateRequest,
         submitButtonValue: 'Post',
         activeInput: bodyInput,
-        hasUrlFile: true,
+        urlTemplate: URL_FOR_TABLES,
         header: HEADER_FOR_POST,
         testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/tables?' +
             'projectId={userProjectId}',
@@ -803,7 +806,6 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           Lesson.prototype.update.call(this);
           this.displayHeader();
           this.displayBody();
-          $('.body-input').show();
         }
       }),
       new Lesson('lesson13-createfeatures2', {
@@ -811,7 +813,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         checkAnswer: checkCreateRequest,
         submitButtonValue: 'Post',
         activeInput: bodyInput,
-        hasUrlFile: true,
+        urlTemplate: URL_FOR_FEATURES,
         header: HEADER_FOR_POST,
         testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/' +
             'tables/{userTableId}/features',
