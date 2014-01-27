@@ -3,4 +3,4 @@ This tutorial will take you through getting set up as a Google developer and beg
 It seems you have already started this tutorial. If you are ready to resume your work, click the button below!
 
 [![introduction-cat-image](images/introduction-cat.png "Meow!")](//www.flickr.com/photos/12632039@N05/1373008133)  
-Underlying image by [Jennifer Barnard](//www.flickr.com/photos/12632039@N05) used under [CC-BY-SA-2.0](//creativecommons.org/licenses/by-sa/2.0).
+_Underlying image by [Jennifer Barnard](//www.flickr.com/photos/12632039@N05) used under [CC-BY-SA-2.0](//creativecommons.org/licenses/by-sa/2.0)._

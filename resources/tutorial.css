@@ -327,7 +327,6 @@ code {
 img[alt=introduction-cat-image], img[alt=finish-cat-image] {
   display: block;
   height: 300px;
-  margin-bottom: 20px;
   margin-top: 20px;
 }
 
