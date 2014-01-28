@@ -552,6 +552,7 @@ Lesson.prototype.loadBody = function() {
  */
 Lesson.prototype.displayUrl = function() {
   this.url = this.urlTemplate.replace('{userTableId}', localStorage['tableID']);
+  $('.url-header').show();
   setDisabledElementContent($('.url'), $('.hidden-url-element'), this.url);
 }
 
@@ -561,7 +562,8 @@ Lesson.prototype.displayUrl = function() {
 Lesson.prototype.displayHeader = function() {
   this.header.Authorization = 'Bearer ' + userAuthorization;
   var header = JSON.stringify(this.header, null, 2);
-  $('.header-input').text(header).show();
+  $('.header-input').text(header);
+  $('.header').show();
 }
 
 /**
@@ -577,6 +579,7 @@ Lesson.prototype.displayBody = function() {
     this.body.features[0].properties.gx_id = randomNumber.toString();
   }
   var body = JSON.stringify(this.body, null, 2);
+  $('.body').show();
   setDisabledElementContent($('.body-input'), $('.hidden-body-element'), body);
 }
 
@@ -586,7 +589,7 @@ Lesson.prototype.displayBody = function() {
  * The parameter 'hiddenElement' is a div.
  */
 function setDisabledElementContent(element, hiddenElement, input) {
-  element.val(input).show();
+  element.val(input);
   hiddenElement.text(input);
   element.height(hiddenElement.height());
 }
@@ -735,6 +738,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         update: function() {
           Lesson.prototype.update.call(this);
           this.displayHeader();
+          $('.url-header').show();
         }
       })
     ]}),
@@ -752,6 +756,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           Lesson.prototype.update.call(this);
           this.displayHeader();
           this.displayBody();
+          $('.url-header').show();
         }
       }),
       new Lesson('lesson10-createtable2', {
@@ -770,7 +775,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           Lesson.prototype.update.call(this);
           this.displayUrl();
           this.displayHeader();
-          $('.body-input').show();
+          $('.body').show();
         }
       }),
       new Lesson('lesson11-getprivatetable', {
@@ -786,6 +791,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         update: function() {
           Lesson.prototype.update.call(this);
           this.displayHeader();
+          $('.url-header').show();
         }
       })
     ]}),
@@ -806,6 +812,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           Lesson.prototype.update.call(this);
           this.displayHeader();
           this.displayBody();
+          $('.url-header').show();
         }
       }),
       new Lesson('lesson13-createfeatures2', {
@@ -821,7 +828,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           Lesson.prototype.update.call(this);
           this.displayUrl();
           this.displayHeader();
-          $('.body-input').show();
+          $('.body').show();
         }
       }),
       new Lesson('lesson14-listprivatefeatures', {
@@ -837,6 +844,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         update: function() {
           Lesson.prototype.update.call(this);
           this.displayHeader();
+          $('.url-header').show();
         }
       })
     ]})

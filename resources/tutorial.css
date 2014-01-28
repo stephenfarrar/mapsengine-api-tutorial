@@ -132,14 +132,12 @@ a:active {
   font-size: 11px;
   height: 27px;
   margin-top: 10px;
-  min-width: 80px;
+  min-width: 87px;
 }
 
 .submit-button {
-  display: inline;
-  float: right;
   margin-right: 0px;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .blue-button {
@@ -169,7 +167,7 @@ a:active {
 }
 
 .lesson-button {
-  margin-left: 568px;
+  margin-left: 564px;
 }
 
 /* Lesson */
@@ -255,15 +253,15 @@ code {
   -moz-box-shadow: 4px 4px 8px #CCC;
   -webkit-box-shadow: 4px 4px 8px #CCC;
   color: black;
+  display: block;
   font-family: monospace;
   font-size: 13px;
   height: auto;
   line-height: 1.5;
-  margin-top: 20px;
   min-height: 21px;
   overflow-y: hidden;
   resize: none;
-  width: 555px;
+  width: 645px;
   word-wrap: break-word;
 }
 
@@ -272,8 +270,25 @@ code {
   opacity: 0.5;
 }
 
+.input-header {
+  color: black;
+  font-family: arial;
+  font-size: 13px;
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 5px;
+  padding-left: 0px;
+}
+
+.url-wrapper {
+  margin-top: 20px; 
+}
+
+.url-header {
+  margin-top: 0px;
+}
+
 .url {
-  display: inline-block;
   min-height: 21px;
 }
 
@@ -288,9 +303,8 @@ code {
   height: auto;
   line-height: 1.5;
   overflow-y: hidden;
-  resize: none;
   white-space: pre-wrap;
-  width: 555px;
+  width: 647px;
   word-wrap: break-word;
 }
 
@@ -301,16 +315,16 @@ code {
 .header-input {
   background-color: #EEEEEE;
   opacity: 0.5;
-  width: 559px;
   white-space: pre;
+  width: 650px;
 }
 
 .body-input {
-  min-height: 100px;
+  min-height: 200px;
 }
 
 .hidden-body-element {
-  min-height: 100px;
+  min-height: 200px;
 }
 
 /* Project List Dropdown */
