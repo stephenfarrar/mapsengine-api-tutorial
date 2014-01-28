@@ -20,12 +20,12 @@ var signin;
  * Url for create tables.
  * @const {String}
  */
-var URL_FOR_TABLES = 'https://www.googleapis.com/mapsengine/v1/tables';
+var TABLES_URL = 'https://www.googleapis.com/mapsengine/v1/tables';
 /**
  * Url for create features.
  * @const {String}
  */
-var URL_FOR_FEATURES = 'https://www.googleapis.com/mapsengine/v1/tables/{userTableId}/features/batchInsert';
+var BATCH_INSERT_URL = TABLES_URL + '/{userTableId}/features/batchInsert';
 /**
  * Header for GET request.
  * @const {Object}
@@ -85,15 +85,17 @@ ResizingTextarea.prototype.updateTextAreaHeight = function() {
  * Changes that need to happen everytime input changes.
  */
 ResizingTextarea.prototype.update = function() {
-  // Enable or disable the submit button according to input.
-  if (this.element.val() == '') {
-    $('.submit-button').attr('disabled', 'disabled');
-  } else {
-    $('.submit-button').removeAttr('disabled');
-  }
   // Set the height of the textarea.    
   this.updateTextAreaHeight();
-  this.onChange(this.element.val());
+  if (this.isEnabled) {
+    // Enable or disable the submit button according to input.
+    if (this.element.val() == '') {
+      $('.submit-button').attr('disabled', 'disabled');
+    } else {
+      $('.submit-button').removeAttr('disabled');
+    }
+    this.onChange(this.element.val());
+  }
 };
 
 /**
@@ -141,6 +143,22 @@ ResizingTextarea.prototype.setInput = function(input) {
  */
 ResizingTextarea.prototype.getInput = function() {
   return this.element.val();
+}
+
+/**
+ * Enabling textarea.
+ */
+ResizingTextarea.prototype.enable = function() {
+  this.isEnabled = true;
+  this.element.removeAttr('disabled');
+}
+
+/**
+ * Disabling textarea.
+ */
+ResizingTextarea.prototype.disable = function() {
+  this.isEnabled = false;
+  this.element.attr('disabled', 'disabled');
 }
 
 /**
@@ -193,6 +211,8 @@ function Lesson(elementId, options) {
   this.unlocked = false;
   // Indicate which input submission is needed.
   this.activeInput = options.activeInput;
+  // Indicate the inactive input.
+  this.inactiveInput = options.inactiveInput;
   // Set the submission status to be false.
   this.isSubmitting = false;
   // Load the instructions file for each lesson.
@@ -257,12 +277,13 @@ Lesson.prototype.update = function() {
     // If the input is empty, user should not be allowed to submit.
     // Do this for the lessons with their own specific inputs.
     // Enabled/disabled the input based on the activeInput.
+    if (this.inactiveInput) {
+      // Disabled the inactive input.
+      this.inactiveInput.disable();
+    }
     if (this.activeInput) {
-      // Disabled both input area first.
-      $('.url').attr('disabled', 'disabled');
-      $('.body-input').attr('disabled', 'disabled');
       // Enabled the specific input area for each lesson.
-      this.activeInput.element.removeAttr('disabled'); 
+      this.activeInput.enable(); 
       // Update the input (placeholder/saved URL/saved body).
       var storedInput = retrieveInput();
       this.activeInput.setInput(storedInput || '');
@@ -552,7 +573,7 @@ Lesson.prototype.loadBody = function() {
  */
 Lesson.prototype.displayUrl = function() {
   this.url = this.urlTemplate.replace('{userTableId}', localStorage['tableID']);
-  setDisabledElementContent($('.url'), $('.hidden-url-element'), this.url);
+  this.inactiveInput.setInput(this.url);
 }
 
 /**
@@ -573,22 +594,12 @@ Lesson.prototype.displayBody = function() {
   }
   if (this.body.features) {
     // Generate random number for gx_id.
-    var randomNumber = Math.floor(Math.random()*1000000001);
+    var randomNumber = Math.floor(Math.random() * 1000000001);
     this.body.features[0].properties.gx_id = randomNumber.toString();
   }
   var body = JSON.stringify(this.body, null, 2);
-  setDisabledElementContent($('.body-input'), $('.hidden-body-element'), body);
-}
-
-/**
- * Set the text and height of disabled element.
- * The parameter 'element' is a textarea.
- * The parameter 'hiddenElement' is a div.
- */
-function setDisabledElementContent(element, hiddenElement, input) {
-  element.val(input).show();
-  hiddenElement.text(input);
-  element.height(hiddenElement.height());
+  $('.body-input').show();
+  this.inactiveInput.setInput(body);
 }
 
 /**
@@ -730,6 +741,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         title: 'List Projects',
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
+        inactiveInput: bodyInput,
         header: HEADER_FOR_GET,
         testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/projects',
         update: function() {
@@ -744,6 +756,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         checkAnswer: checkCreateRequest,
         submitButtonValue: 'Post',
         activeInput: urlInput,
+        inactiveInput: bodyInput,
         hasBodyFile: true,
         header: HEADER_FOR_POST,
         testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/tables?' +
@@ -762,7 +775,8 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         checkAnswer: checkCreateRequest,
         submitButtonValue: 'Post',
         activeInput: bodyInput,
-        urlTemplate: URL_FOR_TABLES,
+        inactiveInput: urlInput,
+        urlTemplate: TABLES_URL,
         header: HEADER_FOR_POST,
         testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/tables?' +
             'projectId={userProjectId}',
@@ -780,6 +794,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         }],
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
+        inactiveInput: bodyInput,
         header: HEADER_FOR_GET,
         testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/' +
             'tables/{userTableId}',
@@ -798,6 +813,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         checkAnswer: checkCreateRequest,
         submitButtonValue: 'Post',
         activeInput: urlInput,
+        inactiveInput: bodyInput,
         hasBodyFile: true,
         header: HEADER_FOR_POST,
         testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/' +
@@ -813,7 +829,8 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         checkAnswer: checkCreateRequest,
         submitButtonValue: 'Post',
         activeInput: bodyInput,
-        urlTemplate: URL_FOR_FEATURES,
+        inactiveInput: urlInput,
+        urlTemplate: BATCH_INSERT_URL,
         header: HEADER_FOR_POST,
         testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/' +
             'tables/{userTableId}/features',
@@ -831,6 +848,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         }],
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
+        inactiveInput: bodyInput,
         header: HEADER_FOR_GET,
         testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/' +
             'tables/{userTableId}/features',
