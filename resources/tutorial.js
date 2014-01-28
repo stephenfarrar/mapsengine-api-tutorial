@@ -41,12 +41,11 @@ var HEADER_FOR_POST = {
   'Authorization': null,
   'Content-type': 'application/json'
 };
-/**
- * Label for items in inventory.
- * @const {string}
- */
+/** @const {string} Label for a user's API Key in the inventory. */
 var API_KEY_LABEL = 'Your API Key: ';
+/** @const {string} Label for a user's project ID in the inventory. */
 var USER_PROJECT_ID = 'Your Project ID: ';
+/** @const {string} Label for a user's table ID in the inventory. */
 var USER_TABLE_ID = '\'World Famous Mountains\' Table ID: '
 
 /**
@@ -1023,8 +1022,8 @@ function signinAndResume() {
       if (authResult['status']['signed_in']) {
         signin.next.update();
       } else {
-        signin.displayErrorMessage('You need to grant this tutorial permissions ' +
-            'if you wish to continue.');
+        signin.displayErrorMessage('You need to grant this tutorial ' +
+            'permissions if you wish to continue.');
       }
     }
   });
@@ -1368,7 +1367,7 @@ function checkCreateRequest(input) {
                   localStorage['tableID'] = resource2.id;
                 }
               } else {
-                me.displayErrorMessage('Make sure you enter the URL correctly.');
+                me.displayErrorMessage('Make sure you enter the correct URL.');
               }
             }
           });
