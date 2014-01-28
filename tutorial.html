@@ -2,7 +2,7 @@
 <html>
   <head>
     <!-- clientid for mapsengine-api-tutorial.googleplex.com :  -->
-    <meta name="google-signin-clientid" content="1091468104574-ulkp9t220linf0tsqmekcmi7is1ejba6.apps.googleusercontent.com"/>
+    <meta name="google-signin-clientid" content="363281989429-k2sru2lgv4o6iavl5q1gnvjhkmbm32pb.apps.googleusercontent.com"/>
     <meta name="google-signin-scope" content="https://www.googleapis.com/auth/mapsengine"/>
     <meta name="google-signin-cookiepolicy" content="single_host_origin"/>
     <meta name="google-signin-callback" content="checkIfUserIsAuthorized"/>
@@ -37,8 +37,8 @@
         <div class="request hidden-by-default">
           <input type="button" id="show-button" class="kennedy-button gray-button lesson-button pointer invisible-by-default" value="Show Answer" onclick="activeLesson.showAnswer()">
           <div class="answer butter-bar hidden-by-default"></div>
-          <div class="url-wrapper">
-            <div class="input-header url-header hidden-by-default">Url</div>
+          <div class="url-wrapper hidden-by-default">
+            <div class="input-header url-header"></div>
             <textarea class="input url" placeholder="Enter your input here, press enter or click 'Get' to submit."></textarea>
             <div class="hidden-input hidden-url-element"></div>
           </div>
@@ -51,12 +51,12 @@
             <textarea class="input body-input" placeholder="Please type the body of your request here."></textarea>
             <div class="hidden-input hidden-body-element"></div>
           </div>
+          <form class="project-menu hidden-by-default">
+            <select class="project-list">
+            </select>
+          </form>
           <input type="button" class="kennedy-button blue-button submit-button pointer lesson-button" onclick="activeLesson.submit()"/>
         </div>
-        <form class="project-menu hidden-by-default">
-          <select class="project-list">
-          </select>
-        </form>
         <!--FEEDBACK-->
         <div class="feedback hidden-by-default">
           <div class="ribbon">Great work!</div>

@@ -18,14 +18,14 @@ var finish;
 var signin;
 /**
  * Url for create tables.
- * @const {String}
+ * @const {string}
  */
-var URL_FOR_TABLES = 'https://www.googleapis.com/mapsengine/v1/tables';
+var TABLES_URL = 'https://www.googleapis.com/mapsengine/v1/tables';
 /**
  * Url for create features.
- * @const {String}
+ * @const {string}
  */
-var URL_FOR_FEATURES = 'https://www.googleapis.com/mapsengine/v1/tables/{userTableId}/features/batchInsert';
+var BATCH_INSERT_URL = TABLES_URL + '/{userTableId}/features/batchInsert';
 /**
  * Header for GET request.
  * @const {Object}
@@ -41,26 +41,28 @@ var HEADER_FOR_POST = {
   'Authorization': null,
   'Content-type': 'application/json'
 };
-/**
- * Label for items in inventory.
- * @const {string}
- */
+/** @const {string} Label for a user's API Key in the inventory. */
 var API_KEY_LABEL = 'Your API Key: ';
+/** @const {string} Label for a user's project ID in the inventory. */
 var USER_PROJECT_ID = 'Your Project ID: ';
+/** @const {string} Label for a user's table ID in the inventory. */
 var USER_TABLE_ID = '\'World Famous Mountains\' Table ID: '
 
 /**
  * Create object to store textarea input information.
  * A textarea that resizes itself to fit its contents.
- * @element {string} A jQuery object of textarea.
- * @hiddenElement {string} A jQuery object of hidden div. 
+ * @element {Object} A jQuery object of textarea.
+ * @hiddenElement {Object} A jQuery object of hidden div. 
  * @enterSubmission {boolean} Indicate the need of enter submission/not.
+ * @onChange {function} Function executed when the input changes.
+ * @inputArea {Object} A jQuery object that indicates the input area div.
  */
 function ResizingTextarea(element, hiddenElement, options) {
   this.element = element;
   this.hiddenElement = hiddenElement;
   this.enterSubmission = options.enterSubmission;
   this.onChange = options.onChange;
+  this.inputArea = options.inputArea;
   this.setup();
 }
 
@@ -85,15 +87,17 @@ ResizingTextarea.prototype.updateTextAreaHeight = function() {
  * Changes that need to happen everytime input changes.
  */
 ResizingTextarea.prototype.update = function() {
-  // Enable or disable the submit button according to input.
-  if (this.element.val() == '') {
-    $('.submit-button').attr('disabled', 'disabled');
-  } else {
-    $('.submit-button').removeAttr('disabled');
-  }
   // Set the height of the textarea.    
   this.updateTextAreaHeight();
-  this.onChange(this.element.val());
+  if (this.isEnabled) {
+    // Enable or disable the submit button according to input.
+    if (this.element.val() == '') {
+      $('.submit-button').attr('disabled', 'disabled');
+    } else {
+      $('.submit-button').removeAttr('disabled');
+    }
+    this.onChange(this.element.val());
+  }
 };
 
 /**
@@ -134,6 +138,8 @@ ResizingTextarea.prototype.setup = function() {
 ResizingTextarea.prototype.setInput = function(input) {
   this.element.val(input);
   this.update();
+  // Show the input area.
+  this.inputArea.show();
 }
 
 /**
@@ -141,6 +147,22 @@ ResizingTextarea.prototype.setInput = function(input) {
  */
 ResizingTextarea.prototype.getInput = function() {
   return this.element.val();
+}
+
+/**
+ * Enabling textarea.
+ */
+ResizingTextarea.prototype.enable = function() {
+  this.isEnabled = true;
+  this.element.removeAttr('disabled');
+}
+
+/**
+ * Disabling textarea.
+ */
+ResizingTextarea.prototype.disable = function() {
+  this.isEnabled = false;
+  this.element.attr('disabled', 'disabled');
 }
 
 /**
@@ -163,6 +185,7 @@ function Lesson(elementId, options) {
   this.title = options.title;
   this.buttonValue = options.buttonValue || 'Next Lesson';
   this.submitButtonValue = options.submitButtonValue || 'Get';
+  this.inputHeader = options.inputHeader || 'Url';
   this.inventoryContents = options.inventoryContents;
   if (options.submit) {
     // For lessons that does not take url/body input.
@@ -193,6 +216,8 @@ function Lesson(elementId, options) {
   this.unlocked = false;
   // Indicate which input submission is needed.
   this.activeInput = options.activeInput;
+  // Indicate the inactive input.
+  this.inactiveInput = options.inactiveInput;
   // Set the submission status to be false.
   this.isSubmitting = false;
   // Load the instructions file for each lesson.
@@ -231,7 +256,8 @@ Lesson.prototype.update = function() {
     // Show the necessary elements for lesson.
     $('.menu-area').show();
     $('.request').show();
-    $('.url').show();
+    // Update the header.
+    $('.url-header').text(this.inputHeader);
     // Show inventory if needed.
     if (this.inventoryContents) {
       // Update the inventory contents.
@@ -257,12 +283,13 @@ Lesson.prototype.update = function() {
     // If the input is empty, user should not be allowed to submit.
     // Do this for the lessons with their own specific inputs.
     // Enabled/disabled the input based on the activeInput.
+    if (this.inactiveInput) {
+      // Disabled the inactive input.
+      this.inactiveInput.disable();
+    }
     if (this.activeInput) {
-      // Disabled both input area first.
-      $('.url').attr('disabled', 'disabled');
-      $('.body-input').attr('disabled', 'disabled');
       // Enabled the specific input area for each lesson.
-      this.activeInput.element.removeAttr('disabled'); 
+      this.activeInput.enable(); 
       // Update the input (placeholder/saved URL/saved body).
       var storedInput = retrieveInput();
       this.activeInput.setInput(storedInput || '');
@@ -553,7 +580,7 @@ Lesson.prototype.loadBody = function() {
 Lesson.prototype.displayUrl = function() {
   this.url = this.urlTemplate.replace('{userTableId}', localStorage['tableID']);
   $('.url-header').show();
-  setDisabledElementContent($('.url'), $('.hidden-url-element'), this.url);
+  this.inactiveInput.setInput(this.url);
 }
 
 /**
@@ -575,23 +602,12 @@ Lesson.prototype.displayBody = function() {
   }
   if (this.body.features) {
     // Generate random number for gx_id.
-    var randomNumber = Math.floor(Math.random()*1000000001);
+    var randomNumber = Math.floor(Math.random() * 1000000001);
     this.body.features[0].properties.gx_id = randomNumber.toString();
   }
   var body = JSON.stringify(this.body, null, 2);
   $('.body').show();
-  setDisabledElementContent($('.body-input'), $('.hidden-body-element'), body);
-}
-
-/**
- * Set the text and height of disabled element.
- * The parameter 'element' is a textarea.
- * The parameter 'hiddenElement' is a div.
- */
-function setDisabledElementContent(element, hiddenElement, input) {
-  element.val(input);
-  hiddenElement.text(input);
-  element.height(hiddenElement.height());
+  this.inactiveInput.setInput(body);
 }
 
 /**
@@ -638,7 +654,8 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         title: 'API Key',
         checkAnswer: testAPIKey,
         submitButtonValue: 'Submit',
-        activeInput: urlInput
+        activeInput: urlInput,
+        inputHeader: 'Your API Key'
       })
     ]}),
     new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
@@ -694,7 +711,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         submitButtonValue: 'Sign In',
         update: function() {
           Lesson.prototype.update.call(this);
-          $('.url').hide();
+          $('.url-wrapper').hide();
           if (userAuthorization) {
             // Dectivate the 'Sign In' button.
             $('.submit-button').attr('disabled', 'disabled');
@@ -709,7 +726,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         submitButtonValue: 'Select',
         update: function() {
           Lesson.prototype.update.call(this);
-          $('.url').hide();
+          $('.url-wrapper').hide();
           $('.project-menu').show();
           $('.submit-button').removeAttr('disabled');
           setInterval(function() {
@@ -733,12 +750,12 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         title: 'List Projects',
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
+        inactiveInput: bodyInput,
         header: HEADER_FOR_GET,
         testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/projects',
         update: function() {
           Lesson.prototype.update.call(this);
           this.displayHeader();
-          $('.url-header').show();
         }
       })
     ]}),
@@ -748,6 +765,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         checkAnswer: checkCreateRequest,
         submitButtonValue: 'Post',
         activeInput: urlInput,
+        inactiveInput: bodyInput,
         hasBodyFile: true,
         header: HEADER_FOR_POST,
         testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/tables?' +
@@ -756,7 +774,6 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           Lesson.prototype.update.call(this);
           this.displayHeader();
           this.displayBody();
-          $('.url-header').show();
         }
       }),
       new Lesson('lesson10-createtable2', {
@@ -767,7 +784,8 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         checkAnswer: checkCreateRequest,
         submitButtonValue: 'Post',
         activeInput: bodyInput,
-        urlTemplate: URL_FOR_TABLES,
+        inactiveInput: urlInput,
+        urlTemplate: TABLES_URL,
         header: HEADER_FOR_POST,
         testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/tables?' +
             'projectId={userProjectId}',
@@ -775,7 +793,6 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           Lesson.prototype.update.call(this);
           this.displayUrl();
           this.displayHeader();
-          $('.body').show();
         }
       }),
       new Lesson('lesson11-getprivatetable', {
@@ -785,13 +802,13 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         }],
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
+        inactiveInput: bodyInput,
         header: HEADER_FOR_GET,
         testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/' +
             'tables/{userTableId}',
         update: function() {
           Lesson.prototype.update.call(this);
           this.displayHeader();
-          $('.url-header').show();
         }
       })
     ]}),
@@ -804,6 +821,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         checkAnswer: checkCreateRequest,
         submitButtonValue: 'Post',
         activeInput: urlInput,
+        inactiveInput: bodyInput,
         hasBodyFile: true,
         header: HEADER_FOR_POST,
         testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/' +
@@ -812,7 +830,6 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           Lesson.prototype.update.call(this);
           this.displayHeader();
           this.displayBody();
-          $('.url-header').show();
         }
       }),
       new Lesson('lesson13-createfeatures2', {
@@ -820,7 +837,8 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         checkAnswer: checkCreateRequest,
         submitButtonValue: 'Post',
         activeInput: bodyInput,
-        urlTemplate: URL_FOR_FEATURES,
+        inactiveInput: urlInput,
+        urlTemplate: BATCH_INSERT_URL,
         header: HEADER_FOR_POST,
         testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/' +
             'tables/{userTableId}/features',
@@ -828,7 +846,6 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           Lesson.prototype.update.call(this);
           this.displayUrl();
           this.displayHeader();
-          $('.body').show();
         }
       }),
       new Lesson('lesson14-listprivatefeatures', {
@@ -838,13 +855,13 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         }],
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
+        inactiveInput: bodyInput,
         header: HEADER_FOR_GET,
         testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/' +
             'tables/{userTableId}/features',
         update: function() {
           Lesson.prototype.update.call(this);
           this.displayHeader();
-          $('.url-header').show();
         }
       })
     ]})
@@ -943,12 +960,14 @@ $(window).load(function() {
   // Create textarea objects and events associated with the input changes.
   var urlInput = new ResizingTextarea($('.url'), $('.hidden-url-element'), {
         enterSubmission: true,
-        onChange: storeInput
+        onChange: storeInput,
+        inputArea: $('.url-wrapper')
       });
   var bodyInput = new ResizingTextarea($('.body-input'), 
       $('.hidden-body-element'), {
         enterSubmission: false,
-        onChange: storeInput
+        onChange: storeInput,
+        inputArea: $('.body')
       });
   // Create the chapters + lesson objects
   makeChaptersAndLessons(urlInput, bodyInput);
@@ -1013,8 +1032,8 @@ function signinAndResume() {
       if (authResult['status']['signed_in']) {
         signin.next.update();
       } else {
-        signin.displayErrorMessage('You need to grant this tutorial permissions ' +
-            'if you wish to continue.');
+        signin.displayErrorMessage('You need to grant this tutorial ' +
+            'permissions if you wish to continue.');
       }
     }
   });
@@ -1358,7 +1377,7 @@ function checkCreateRequest(input) {
                   localStorage['tableID'] = resource2.id;
                 }
               } else {
-                me.displayErrorMessage('Make sure you enter the URL correctly.');
+                me.displayErrorMessage('Make sure you enter the correct URL.');
               }
             }
           });
