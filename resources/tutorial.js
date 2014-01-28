@@ -18,12 +18,12 @@ var finish;
 var signin;
 /**
  * Url for create tables.
- * @const {String}
+ * @const {string}
  */
 var TABLES_URL = 'https://www.googleapis.com/mapsengine/v1/tables';
 /**
  * Url for create features.
- * @const {String}
+ * @const {string}
  */
 var BATCH_INSERT_URL = TABLES_URL + '/{userTableId}/features/batchInsert';
 /**
