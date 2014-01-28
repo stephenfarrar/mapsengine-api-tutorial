@@ -736,7 +736,12 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           }
           // List the projects once initially, then refresh every five seconds.
           getProjects();
-          setInterval(getProjects, 5000);
+          (function loop(){
+            setTimeout(function(){
+              getProjects();
+              loop();
+            }, 5000);
+          })();
         }
       }), 
       new Lesson('lesson8-listprojects', {
