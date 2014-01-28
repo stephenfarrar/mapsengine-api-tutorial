@@ -136,10 +136,10 @@ ResizingTextarea.prototype.setup = function() {
  * Set the input of the textarea and update the height/submit button.
  */
 ResizingTextarea.prototype.setInput = function(input) {
-  this.element.val(input);
-  this.update();
   // Show the input area.
   this.inputArea.show();
+  this.element.val(input);
+  this.update();
 }
 
 /**
