@@ -719,8 +719,8 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           $('.url').hide();
           $('.project-menu').show();
           $('.submit-button').removeAttr('disabled');
-          setInterval(function() {
-            gapi.client.request({
+          var getProjects = function() {
+              gapi.client.request({
               path: '/mapsengine/v1/projects/',
               method: 'GET',
               callback: function(jsonBody) {
@@ -733,7 +733,10 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
                 });
               }
             });
-          }, 5000); //5 seconds
+          }
+          // List the projects once initially, then refresh every five seconds.
+          getProjects();
+          setInterval(getProjects, 5000);
         }
       }), 
       new Lesson('lesson8-listprojects', {
