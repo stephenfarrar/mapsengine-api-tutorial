@@ -377,6 +377,11 @@ Lesson.prototype.displaySuccessMessage = function() {
   if (this.successMessage) {
     // The lesson is completed. Display the success message.
     this.complete();
+    // Replace any templates, such as PROJECT_ID and ASSET_ID.
+    this.successMessage = this.successMessage.replace('{PROJECT_ID}',
+        localStorage['projectID']);
+    this.successMessage = this.successMessage.replace('{ASSET_ID}',
+        localStorage['tableID']);
     $('.message').html(markdown.toHTML(this.successMessage));
     // The submission has finished, update the submission status.
     this.isSubmitting = false;
@@ -1360,12 +1365,12 @@ function checkCreateRequest(input) {
               var finalCount = finalArray.length;
               // If the number of table/feature increase, the user is right.
               if (finalCount > initialCount) {
-                me.displaySuccessMessage();
                 // Store the table ID in local storage if it is the World
                 // Famous Mountains table (lesson9-createtable1).
                 if (me.elementId == 'lesson9-createtable1') {
                   localStorage['tableID'] = resource2.id;
                 }
+                me.displaySuccessMessage();
               } else {
                 me.displayErrorMessage('Make sure you enter the correct URL.');
               }
