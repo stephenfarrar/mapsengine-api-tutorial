@@ -579,7 +579,6 @@ Lesson.prototype.loadBody = function() {
  */
 Lesson.prototype.displayUrl = function() {
   this.url = this.urlTemplate.replace('{userTableId}', localStorage['tableID']);
-  $('.url-header').show();
   this.inactiveInput.setInput(this.url);
 }
 
@@ -606,7 +605,6 @@ Lesson.prototype.displayBody = function() {
     this.body.features[0].properties.gx_id = randomNumber.toString();
   }
   var body = JSON.stringify(this.body, null, 2);
-  $('.body').show();
   this.inactiveInput.setInput(body);
 }
 
