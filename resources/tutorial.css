@@ -270,7 +270,7 @@ code {
   opacity: 0.5;
 }
 
-.input-header {
+.input-label {
   color: black;
   font-family: arial;
   font-size: 13px;
@@ -280,19 +280,19 @@ code {
   padding-left: 0px;
 }
 
-.url-wrapper {
+.url {
   margin-top: 20px; 
 }
 
-.url-header {
+.url-label {
   margin-top: 0px;
 }
 
-.url {
+.url-input {
   min-height: 21px;
 }
 
-.url.alert {
+.url-input.alert {
   border-color: #DD4B39;
 }
 
@@ -380,7 +380,7 @@ code {
   margin-top: 20px;
 }
 
-.response-header {
+.response-label {
   background-color: #CCCCCC;
   border-bottom: 1px solid #999999;
   color: black;

@@ -51,11 +51,11 @@ var USER_TABLE_ID = '\'World Famous Mountains\' Table ID: '
 /**
  * Create object to store textarea input information.
  * A textarea that resizes itself to fit its contents.
- * @element {Object} A jQuery object of textarea.
- * @hiddenElement {Object} A jQuery object of hidden div. 
- * @enterSubmission {boolean} Indicate the need of enter submission/not.
- * @onChange {function} Function executed when the input changes.
- * @inputArea {Object} A jQuery object that indicates the input area div.
+ * @param {JQuery} element The textarea.
+ * @param {JQuery} hiddenElement The hidden div. 
+ * @param {boolean} enterSubmission Indicate the need of enter submission/not.
+ * @param {function(string)} onChange Function executed when the input changes.
+ * @param {JQuery} inputArea Indicates the input area div.
  */
 function ResizingTextarea(element, hiddenElement, options) {
   this.element = element;
@@ -185,7 +185,7 @@ function Lesson(elementId, options) {
   this.title = options.title;
   this.buttonValue = options.buttonValue || 'Next Lesson';
   this.submitButtonValue = options.submitButtonValue || 'Get';
-  this.inputHeader = options.inputHeader || 'Url';
+  this.inputLabel = options.inputLabel || 'Url';
   this.inventoryContents = options.inventoryContents;
   if (options.submit) {
     // For lessons that does not take url/body input.
@@ -256,8 +256,8 @@ Lesson.prototype.update = function() {
     // Show the necessary elements for lesson.
     $('.menu-area').show();
     $('.request').show();
-    // Update the header.
-    $('.url-header').text(this.inputHeader);
+    // Update the label.
+    $('.url-label').text(this.inputLabel);
     // Show inventory if needed.
     if (this.inventoryContents) {
       // Update the inventory contents.
@@ -267,7 +267,7 @@ Lesson.prototype.update = function() {
       $('.inventory').hide();
     }
     // Make the border black again.
-    $('.url').removeClass('alert');
+    $('.url-input').removeClass('alert');
     // Right aligned the green button.
     $('.next-button').addClass('lesson-button');
     // Make text on menu for active lesson red, and all others black.
@@ -397,7 +397,7 @@ Lesson.prototype.displaySuccessMessage = function() {
     var successTop = $('.feedback').position().top;
     $('html, body').animate({scrollTop: successTop - 25}, 500);
     // Change border colour to black.
-    $('.url').removeClass('alert');
+    $('.url-input').removeClass('alert');
     // Show the output if there is any.
     showResponse();
     // Display the next button.
@@ -440,7 +440,7 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   var errorTop = $('.feedback').position().top;
   $('html, body').animate({scrollTop: errorTop - 225}, 500);
   // Change border colour to red.
-  $('.url').addClass('alert');
+  $('.url-input').addClass('alert');
   // Show the output if there is any.
   showResponse();
   // Set up analytics to indicate failure (how many times).
@@ -653,7 +653,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         checkAnswer: testAPIKey,
         submitButtonValue: 'Submit',
         activeInput: urlInput,
-        inputHeader: 'Your API Key'
+        inputLabel: 'Your API Key'
       })
     ]}),
     new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
@@ -709,7 +709,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         submitButtonValue: 'Sign In',
         update: function() {
           Lesson.prototype.update.call(this);
-          $('.url-wrapper').hide();
+          $('.url').hide();
           if (userAuthorization) {
             // Dectivate the 'Sign In' button.
             $('.submit-button').attr('disabled', 'disabled');
@@ -724,7 +724,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         submitButtonValue: 'Select',
         update: function() {
           Lesson.prototype.update.call(this);
-          $('.url-wrapper').hide();
+          $('.url').hide();
           $('.project-menu').show();
           $('.submit-button').removeAttr('disabled');
           setInterval(function() {
@@ -956,10 +956,11 @@ var tasksList = newTasksList('callback', loadState);
  */
 $(window).load(function() {
   // Create textarea objects and events associated with the input changes.
-  var urlInput = new ResizingTextarea($('.url'), $('.hidden-url-element'), {
+  var urlInput = new ResizingTextarea($('.url-input'), 
+      $('.hidden-url-element'), {
         enterSubmission: true,
         onChange: storeInput,
-        inputArea: $('.url-wrapper')
+        inputArea: $('.url')
       });
   var bodyInput = new ResizingTextarea($('.body-input'), 
       $('.hidden-body-element'), {
