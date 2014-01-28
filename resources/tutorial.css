@@ -284,15 +284,15 @@ code {
   margin-top: 20px; 
 }
 
-.url-label {
+.url .input-label {
   margin-top: 0px;
 }
 
-.url-input {
+.url .input {
   min-height: 21px;
 }
 
-.url-input.alert {
+.url .input.alert {
   border-color: #DD4B39;
 }
 
@@ -308,22 +308,22 @@ code {
   word-wrap: break-word;
 }
 
-.hidden-url-element {
+.url .hidden-input {
   min-height: 21px;
 }
 
-.header-input {
+.header .input {
   background-color: #EEEEEE;
   opacity: 0.5;
   white-space: pre;
   width: 650px;
 }
 
-.body-input {
+.body .input {
   min-height: 200px;
 }
 
-.hidden-body-element {
+.body .hidden-input {
   min-height: 200px;
 }
 

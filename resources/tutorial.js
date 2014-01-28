@@ -257,7 +257,7 @@ Lesson.prototype.update = function() {
     $('.menu-area').show();
     $('.request').show();
     // Update the label.
-    $('.url-label').text(this.inputLabel);
+    $('.url .input-label').text(this.inputLabel);
     // Show inventory if needed.
     if (this.inventoryContents) {
       // Update the inventory contents.
@@ -267,7 +267,7 @@ Lesson.prototype.update = function() {
       $('.inventory').hide();
     }
     // Make the border black again.
-    $('.url-input').removeClass('alert');
+    $('.url .input').removeClass('alert');
     // Right aligned the green button.
     $('.next-button').addClass('lesson-button');
     // Make text on menu for active lesson red, and all others black.
@@ -397,7 +397,7 @@ Lesson.prototype.displaySuccessMessage = function() {
     var successTop = $('.feedback').position().top;
     $('html, body').animate({scrollTop: successTop - 25}, 500);
     // Change border colour to black.
-    $('.url-input').removeClass('alert');
+    $('.url .input').removeClass('alert');
     // Show the output if there is any.
     showResponse();
     // Display the next button.
@@ -440,7 +440,7 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   var errorTop = $('.feedback').position().top;
   $('html, body').animate({scrollTop: errorTop - 225}, 500);
   // Change border colour to red.
-  $('.url-input').addClass('alert');
+  $('.url .input').addClass('alert');
   // Show the output if there is any.
   showResponse();
   // Set up analytics to indicate failure (how many times).
@@ -588,7 +588,7 @@ Lesson.prototype.displayUrl = function() {
 Lesson.prototype.displayHeader = function() {
   this.header.Authorization = 'Bearer ' + userAuthorization;
   var header = JSON.stringify(this.header, null, 2);
-  $('.header-input').text(header);
+  $('.header .input').text(header);
   $('.header').show();
 }
 
@@ -956,14 +956,14 @@ var tasksList = newTasksList('callback', loadState);
  */
 $(window).load(function() {
   // Create textarea objects and events associated with the input changes.
-  var urlInput = new ResizingTextarea($('.url-input'), 
-      $('.hidden-url-element'), {
+  var urlInput = new ResizingTextarea($('.url .input'), 
+      $('.url .hidden-input'), {
         enterSubmission: true,
         onChange: storeInput,
         inputArea: $('.url')
       });
-  var bodyInput = new ResizingTextarea($('.body-input'), 
-      $('.hidden-body-element'), {
+  var bodyInput = new ResizingTextarea($('.body .input'), 
+      $('.body .hidden-input'), {
         enterSubmission: false,
         onChange: storeInput,
         inputArea: $('.body')
