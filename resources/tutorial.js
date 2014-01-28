@@ -17,6 +17,16 @@ var resume;
 var finish;
 var signin;
 /**
+ * Url for create tables.
+ * @const {string}
+ */
+var TABLES_URL = 'https://www.googleapis.com/mapsengine/v1/tables';
+/**
+ * Url for create features.
+ * @const {string}
+ */
+var BATCH_INSERT_URL = TABLES_URL + '/{userTableId}/features/batchInsert';
+/**
  * Header for GET request.
  * @const {Object}
  */
@@ -31,11 +41,12 @@ var HEADER_FOR_POST = {
   'Authorization': null,
   'Content-type': 'application/json'
 };
-/**
- * Label for API key in inventory.
- * @const {string}
- */
+/** @const {string} Label for a user's API Key in the inventory. */
 var API_KEY_LABEL = 'Your API Key: ';
+/** @const {string} Label for a user's project ID in the inventory. */
+var USER_PROJECT_ID = 'Your Project ID: ';
+/** @const {string} Label for a user's table ID in the inventory. */
+var USER_TABLE_ID = '\'World Famous Mountains\' Table ID: '
 
 /**
  * Create object to store textarea input information.
@@ -73,15 +84,17 @@ ResizingTextarea.prototype.updateTextAreaHeight = function() {
  * Changes that need to happen everytime input changes.
  */
 ResizingTextarea.prototype.update = function() {
-  // Enable or disable the submit button according to input.
-  if (this.element.val() == '') {
-    $('.submit-button').attr('disabled', 'disabled');
-  } else {
-    $('.submit-button').removeAttr('disabled');
-  }
   // Set the height of the textarea.    
   this.updateTextAreaHeight();
-  this.onChange(this.element.val());
+  if (this.isEnabled) {
+    // Enable or disable the submit button according to input.
+    if (this.element.val() == '') {
+      $('.submit-button').attr('disabled', 'disabled');
+    } else {
+      $('.submit-button').removeAttr('disabled');
+    }
+    this.onChange(this.element.val());
+  }
 };
 
 /**
@@ -132,6 +145,22 @@ ResizingTextarea.prototype.getInput = function() {
 }
 
 /**
+ * Enabling textarea.
+ */
+ResizingTextarea.prototype.enable = function() {
+  this.isEnabled = true;
+  this.element.removeAttr('disabled');
+}
+
+/**
+ * Disabling textarea.
+ */
+ResizingTextarea.prototype.disable = function() {
+  this.isEnabled = false;
+  this.element.attr('disabled', 'disabled');
+}
+
+/**
  * Function to store input in local storage.
  */
 function storeInput(inputValue) {
@@ -164,20 +193,25 @@ function Lesson(elementId, options) {
   if (options.update) {
     this.update = options.update;
   }
+  if (options.urlTemplate) {
+    this.urlTemplate = options.urlTemplate;
+  }
   if (options.header) {
     this.header = options.header;
   }
   if (options.hasBodyFile) {
     this.hasBodyFile = options.hasBodyFile;
   }
-  if (options.correctAns) {
-    this.correctAns = options.correctAns;
+  if (options.testingURLTemplate) {
+    this.testingURLTemplate = options.testingURLTemplate;
   }
   // Done is 'true' if the user has submitted correctly.
   this.done = false;
   this.unlocked = false;
   // Indicate which input submission is needed.
   this.activeInput = options.activeInput;
+  // Indicate the inactive input.
+  this.inactiveInput = options.inactiveInput;
   // Set the submission status to be false.
   this.isSubmitting = false;
   // Load the instructions file for each lesson.
@@ -242,12 +276,13 @@ Lesson.prototype.update = function() {
     // If the input is empty, user should not be allowed to submit.
     // Do this for the lessons with their own specific inputs.
     // Enabled/disabled the input based on the activeInput.
+    if (this.inactiveInput) {
+      // Disabled the inactive input.
+      this.inactiveInput.disable();
+    }
     if (this.activeInput) {
-      // Disabled both input area first.
-      $('.url').attr('disabled', 'disabled');
-      $('.body-input').attr('disabled', 'disabled');
       // Enabled the specific input area for each lesson.
-      this.activeInput.element.removeAttr('disabled'); 
+      this.activeInput.enable(); 
       // Update the input (placeholder/saved URL/saved body).
       var storedInput = retrieveInput();
       this.activeInput.setInput(storedInput || '');
@@ -281,6 +316,15 @@ Lesson.prototype.submit = function() {
   // Empty the output area.
   var data = $('.response-content');
   data.empty();
+  // Change URL Template to a real URL with some data in local storage.
+  if (this.testingURLTemplate) {
+    // Change if there is table ID in the template URL.
+    this.testingURL = this.testingURLTemplate.replace('{userTableId}', 
+        localStorage['tableID']);
+    // Change if there is project ID in the template URL.
+    this.testingURL = this.testingURL.replace('{userProjectId}',
+        localStorage['projectID']);
+  }
   // Check the correctness of user input.
   this.checkAnswer(input);
 }
@@ -524,6 +568,14 @@ Lesson.prototype.loadBody = function() {
 }
 
 /**
+ * Update and display the url of lesson.
+ */
+Lesson.prototype.displayUrl = function() {
+  this.url = this.urlTemplate.replace('{userTableId}', localStorage['tableID']);
+  this.inactiveInput.setInput(this.url);
+}
+
+/**
  * Update and display the header of lesson.
  */
 Lesson.prototype.displayHeader = function() {
@@ -536,12 +588,17 @@ Lesson.prototype.displayHeader = function() {
  * Update and display the body of lesson.
  */
 Lesson.prototype.displayBody = function() {
-  this.body.projectId = localStorage['projectID'];
+  if (this.body.projectId) {
+    this.body.projectId = localStorage['projectID'];
+  }
+  if (this.body.features) {
+    // Generate random number for gx_id.
+    var randomNumber = Math.floor(Math.random() * 1000000001);
+    this.body.features[0].properties.gx_id = randomNumber.toString();
+  }
   var body = JSON.stringify(this.body, null, 2);
-  // TODO(flo): This should probably use .setInput().
-  $('.body-input').val(body).show();
-  $('.hidden-body-element').text(body);
-  $('.body-input').height($('.hidden-body-element').height());
+  $('.body-input').show();
+  this.inactiveInput.setInput(body);
 }
 
 /**
@@ -602,7 +659,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         }],
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
-        correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' + 
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/tables/' + 
                 '15474835347274181123-14495543923251622067?' +
                 'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco'       
       }),
@@ -616,7 +673,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         }],
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
-        correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/tables/' +
                 '15474835347274181123-14495543923251622067/features?' +
                 'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1v' +
                 'pHQdco'
@@ -631,7 +688,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         }],
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
-        correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/tables/' +
                 '15474835347274181123-14495543923251622067/features?'+ 
                 'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1v' +
                 'pHQdco&where=Population<2000000'
@@ -682,10 +739,10 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       new Lesson('lesson8-listprojects', {
         title: 'List Projects',
         checkAnswer: checkCorrectness,
-        submitButtonValue: 'Get',
         activeInput: urlInput,
+        inactiveInput: bodyInput,
         header: HEADER_FOR_GET,
-        correctAns: 'https://www.googleapis.com/mapsengine/v1/projects',
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/projects',
         update: function() {
           Lesson.prototype.update.call(this);
           this.displayHeader();
@@ -695,16 +752,108 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
     new Chapter('chapter2-table', {title: 'Making a Table', lessons: [
       new Lesson('lesson9-createtable1', {
         title: 'Create Table I',
-        checkAnswer: checkCreateTable,
+        checkAnswer: checkCreateRequest,
         submitButtonValue: 'Post',
         activeInput: urlInput,
+        inactiveInput: bodyInput,
         hasBodyFile: true,
         header: HEADER_FOR_POST,
+        testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/tables?' +
+            'projectId={userProjectId}',
         update: function() {
           Lesson.prototype.update.call(this);
           this.displayHeader();
           this.displayBody();
+        }
+      }),
+      new Lesson('lesson10-createtable2', {
+        title: 'Create Table II',
+        inventoryContents: [{
+          label: USER_PROJECT_ID
+        }],
+        checkAnswer: checkCreateRequest,
+        submitButtonValue: 'Post',
+        activeInput: bodyInput,
+        inactiveInput: urlInput,
+        urlTemplate: TABLES_URL,
+        header: HEADER_FOR_POST,
+        testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/tables?' +
+            'projectId={userProjectId}',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          this.displayUrl();
+          this.displayHeader();
           $('.body-input').show();
+        }
+      }),
+      new Lesson('lesson11-getprivatetable', {
+        title: 'Get Private Table',
+        inventoryContents: [{
+          label: USER_TABLE_ID
+        }],
+        checkAnswer: checkCorrectness,
+        activeInput: urlInput,
+        inactiveInput: bodyInput,
+        header: HEADER_FOR_GET,
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/' +
+            'tables/{userTableId}',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          this.displayHeader();
+        }
+      })
+    ]}),
+    new Chapter('chapter3-features', {title: 'Adding Features', lessons: [
+      new Lesson('lesson12-createfeatures1', {
+        title: 'Create Features I',
+        inventoryContents: [{
+          label: USER_TABLE_ID
+        }],
+        checkAnswer: checkCreateRequest,
+        submitButtonValue: 'Post',
+        activeInput: urlInput,
+        inactiveInput: bodyInput,
+        hasBodyFile: true,
+        header: HEADER_FOR_POST,
+        testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/' +
+            'tables/{userTableId}/features',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          this.displayHeader();
+          this.displayBody();
+        }
+      }),
+      new Lesson('lesson13-createfeatures2', {
+        title: 'Create Features II',
+        checkAnswer: checkCreateRequest,
+        submitButtonValue: 'Post',
+        activeInput: bodyInput,
+        inactiveInput: urlInput,
+        urlTemplate: BATCH_INSERT_URL,
+        header: HEADER_FOR_POST,
+        testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/' +
+            'tables/{userTableId}/features',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          this.displayUrl();
+          this.displayHeader();
+          $('.body-input').show();
+        }
+      }),
+      new Lesson('lesson14-listprivatefeatures', {
+        title: 'List Private Features',
+        inventoryContents: [{
+          label: USER_TABLE_ID
+        }],
+        checkAnswer: checkCorrectness,
+        activeInput: urlInput,
+        inactiveInput: bodyInput,
+        header: HEADER_FOR_GET,
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/' +
+            'tables/{userTableId}/features',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          this.displayHeader();
         }
       })
     ]})
@@ -873,8 +1022,8 @@ function signinAndResume() {
       if (authResult['status']['signed_in']) {
         signin.next.update();
       } else {
-        signin.displayErrorMessage('You need to grant this tutorial permissions ' +
-            'if you wish to continue.');
+        signin.displayErrorMessage('You need to grant this tutorial ' +
+            'permissions if you wish to continue.');
       }
     }
   });
@@ -937,6 +1086,14 @@ function populateInventory(contents) {
     // Load the API key.
     if (item.label == API_KEY_LABEL) {
       item.information = localStorage['APIKey'];
+    }
+    // Load the user's project ID.
+    if (item.label == USER_PROJECT_ID) {
+      item.information = localStorage['projectID'];
+    }
+    // Load the user's 'World Famous Mountains' table ID.
+    if (item.label == USER_TABLE_ID) {
+      item.information = localStorage['tableID'];
     }
     // Add the item to the inventory element.
     inventory.append('<b>' + item.label + '</b>')
@@ -1022,7 +1179,8 @@ function decideErrorMessage(errorMess, input) {
     message = 'The resource is too large to be accessed through the API.';
   } else if (errorMess.reason == 'duplicate') {
     message = 'The new feature you are trying to insert has an ID that ' +
-        'already exists in the table.';
+        'already exists in the table. Try to use a different ' +
+        '<code>gx_id</code> in the body of your request.';
   } else if (errorMess.reason == 'rateLimitExceeded' || 
              errorMess.reason == 'quotaExceeded') {
     message = 'You have exhausted the application\'s daily quota or its ' +
@@ -1037,6 +1195,9 @@ function decideErrorMessage(errorMess, input) {
     message = 'There is a per-IP or per-Referer restriction configured on ' +
         'the API Key and the request does not match these restrictions, or ' +
         'the Maps Engine API is not activated on the project ID.';
+  } else if (errorMess.reason == 'parseError') {
+    message = 'The body you entered is not a valid JSON object. Make sure ' +
+        'that you format your data correctly.';
   } else {
     message = 'The data you requested cannot be processed. Check your ' +
         'request to ensure that it is correct.';
@@ -1099,7 +1260,7 @@ function checkCorrectness(address) {
   var me = this;
   // Get the response with the correct URL.
   $.ajax({
-    url: me.correctAns,
+    url: me.testingURL,
     headers: me.header,
     dataType: 'json',
     success: function(resource) {
@@ -1161,48 +1322,52 @@ function storeProjectID() {
 }
 
 /**
- * Check whether a new table has been created or not.
+ * Check whether a new table/feature has been created or not.
  */
-function checkCreateTable(input) {
+function checkCreateRequest(input) {
   var me = this;
-  // Find out the number of tables the user has in the project.
+  // Find out the number of tables/features the user has.
   $.ajax({
     headers: {'Authorization': 'Bearer ' + userAuthorization},
     type: 'GET',
-    url: 'https://www.googleapis.com/mapsengine/v1/tables?projectId=' +
-        localStorage['projectID'],
+    url: me.testingURL,
     // This request should always be successful.
-    success: function(response) {
-      // Store the number of tables the user has.
-      var initialTableCount = response.tables.length;
+    success: function(resource) {
+      // Store the number of tables/features the user has.
+      var initialArray = resource.tables || resource.features;
+      var initialCount = initialArray.length;
       // Attempt to create a table with user's input.
       $.ajax({
         headers: me.header,
         type: 'POST',
-        url: input,
-        data: JSON.stringify(me.body),
+        url: me.url || input,
+        data: JSON.stringify(me.body) || input,
         dataType: 'json',
-        success: function(resource){
-          var finalTableCount;
+        success: function(resource2){
           // If the request returns a valid object, show the output.
-          if (typeof resource == 'object') {
-            var responseString = JSON.stringify(resource, null, 2);
+          if (typeof resource2 == 'object') {
+            var responseString = JSON.stringify(resource2, null, 2);
             $('.response-content').text(responseString); 
           }
-          // Find out the number of tables in the project after success request.
+          // Find out the number of tables/features after the create request.
           $.ajax({
             headers: {'Authorization': 'Bearer ' + userAuthorization},
             type: 'GET',
-            url: 'https://www.googleapis.com/mapsengine/v1/tables?projectId=' +
-                localStorage['projectID'],
-            success: function(response) {
-              finalTableCount = response.tables.length;
-              // If the number of table increase, then the user is right.
-              if (finalTableCount > initialTableCount){
+            url: me.testingURL,
+            success: function(resource3) {
+              // Count the final number of tables/features.
+              var finalArray = resource3.tables || resource3.features;
+              var finalCount = finalArray.length;
+              // If the number of table/feature increase, the user is right.
+              if (finalCount > initialCount) {
                 me.displaySuccessMessage();
+                // Store the table ID in local storage if it is the World
+                // Famous Mountains table (lesson9-createtable1).
+                if (me.elementId == 'lesson9-createtable1') {
+                  localStorage['tableID'] = resource2.id;
+                }
               } else {
-                me.displayErrorMessage('Make sure you enter the URL for ' +
-                    'create table correctly.')
+                me.displayErrorMessage('Make sure you enter the correct URL.');
               }
             }
           });
