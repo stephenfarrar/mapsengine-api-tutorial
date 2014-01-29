@@ -51,33 +51,36 @@ var USER_TABLE_ID = '\'World Famous Mountains\' Table ID: '
 /**
  * Create object to store textarea input information.
  * A textarea that resizes itself to fit its contents.
- * @element {string} A jQuery object of textarea.
- * @hiddenElement {string} A jQuery object of hidden div. 
- * @enterSubmission {boolean} Indicate the need of enter submission/not.
+ * @param {JQuery} textareaElement The textarea.
+ * @param {JQuery} hiddenElement The hidden div. 
+ * @param {boolean} enterSubmission Indicate the need of enter submission/not.
+ * @param {function(string)} onChange Function executed when the input changes.
+ * @param {JQuery} textareaAndLabelElement Indicates the input area div.
  */
-function ResizingTextarea(element, hiddenElement, options) {
-  this.element = element;
+function ResizingTextarea(textareaElement, hiddenElement, options) {
+  this.textareaElement = textareaElement;
   this.hiddenElement = hiddenElement;
   this.enterSubmission = options.enterSubmission;
   this.onChange = options.onChange;
+  this.textareaAndLabelElement = options.textareaAndLabelElement;
   this.setup();
 }
 
 /**
  * Set the height of textarea based on the input height.
  */
-ResizingTextarea.prototype.updateTextAreaHeight = function() {
+ResizingTextarea.prototype.updateTextareaHeight = function() {
   // Store it in the hidden div, get the height and set the textarea height.
   if (this.enterSubmission) {
     // Always store one more character to make the height change smoother.
     // This is for textarea that has enter submission property.
-    this.hiddenElement.text(this.element.val() + 'a');
+    this.hiddenElement.text(this.textareaElement.val() + 'a');
   } else {
     // Append one more line at the end to make height change smoother.
     // This is for textarea that has no enter submission property.
-    this.hiddenElement.text(this.element.val() + '\n\n');
+    this.hiddenElement.text(this.textareaElement.val() + '\n\n');
   }
-  this.element.height(this.hiddenElement.height());
+  this.textareaElement.height(this.hiddenElement.height());
 }
 
 /**
@@ -85,15 +88,15 @@ ResizingTextarea.prototype.updateTextAreaHeight = function() {
  */
 ResizingTextarea.prototype.update = function() {
   // Set the height of the textarea.    
-  this.updateTextAreaHeight();
+  this.updateTextareaHeight();
   if (this.isEnabled) {
     // Enable or disable the submit button according to input.
-    if (this.element.val() == '') {
+    if (this.textareaElement.val() == '') {
       $('.submit-button').attr('disabled', 'disabled');
     } else {
       $('.submit-button').removeAttr('disabled');
     }
-    this.onChange(this.element.val());
+    this.onChange(this.textareaElement.val());
   }
 };
 
@@ -103,7 +106,7 @@ ResizingTextarea.prototype.update = function() {
 ResizingTextarea.prototype.setup = function() {
   var me = this;
   // Set events on keypress.
-  this.element.keypress(function(event) {
+  this.textareaElement.keypress(function(event) {
     me.update(); 
     // Check if the input needs enter submission behaviour.
     if (me.enterSubmission) {
@@ -111,18 +114,18 @@ ResizingTextarea.prototype.setup = function() {
       if (event.which == 13) {
         event.preventDefault();
         // Try to submit if the input is not empty.
-        if (me.element.val() != '') {
+        if (me.textareaElement.val() != '') {
           activeLesson.submit();
         }
       }
     }    
   });
   // Set events on keyup, to handle backspaces.
-  this.element.keyup(function() {
+  this.textareaElement.keyup(function() {
     me.update();
   });
   // Set events on paste and cut.
-  this.element.on('paste cut', function() {
+  this.textareaElement.on('paste cut', function() {
     setTimeout(function() {
       me.update();
     }, 0);
@@ -133,7 +136,9 @@ ResizingTextarea.prototype.setup = function() {
  * Set the input of the textarea and update the height/submit button.
  */
 ResizingTextarea.prototype.setInput = function(input) {
-  this.element.val(input);
+  // Show the input area.
+  this.textareaAndLabelElement.show();
+  this.textareaElement.val(input);
   this.update();
 }
 
@@ -141,7 +146,7 @@ ResizingTextarea.prototype.setInput = function(input) {
  * Get the input from the textarea.
  */
 ResizingTextarea.prototype.getInput = function() {
-  return this.element.val();
+  return this.textareaElement.val();
 }
 
 /**
@@ -149,7 +154,7 @@ ResizingTextarea.prototype.getInput = function() {
  */
 ResizingTextarea.prototype.enable = function() {
   this.isEnabled = true;
-  this.element.removeAttr('disabled');
+  this.textareaElement.removeAttr('disabled');
 }
 
 /**
@@ -157,7 +162,14 @@ ResizingTextarea.prototype.enable = function() {
  */
 ResizingTextarea.prototype.disable = function() {
   this.isEnabled = false;
-  this.element.attr('disabled', 'disabled');
+  this.textareaElement.attr('disabled', 'disabled');
+}
+
+/**
+ * Set the focus out of textarea. 
+ */
+ResizingTextarea.prototype.blur = function() {
+  this.textareaElement.blur();
 }
 
 /**
@@ -180,6 +192,7 @@ function Lesson(elementId, options) {
   this.title = options.title;
   this.buttonValue = options.buttonValue || 'Next Lesson';
   this.submitButtonValue = options.submitButtonValue || 'Get';
+  this.inputLabel = options.inputLabel || 'Url';
   this.inventoryContents = options.inventoryContents;
   if (options.submit) {
     // For lessons that does not take url/body input.
@@ -250,7 +263,8 @@ Lesson.prototype.update = function() {
     // Show the necessary elements for lesson.
     $('.menu-area').show();
     $('.request').show();
-    $('.url').show();
+    // Update the label.
+    $('.url .input-label').text(this.inputLabel);
     // Show inventory if needed.
     if (this.inventoryContents) {
       // Update the inventory contents.
@@ -260,7 +274,7 @@ Lesson.prototype.update = function() {
       $('.inventory').hide();
     }
     // Make the border black again.
-    $('.url').removeClass('alert');
+    $('.url .input').removeClass('alert');
     // Right aligned the green button.
     $('.next-button').addClass('lesson-button');
     // Make text on menu for active lesson red, and all others black.
@@ -307,7 +321,7 @@ Lesson.prototype.submit = function() {
   $('.next-button').hide();
   $('.response').hide();
   // Remove focus from the input area.
-  this.activeInput.element.blur();
+  this.activeInput.blur();
   // Show an overlay to stop user do something else.
   $('.overlay').show();
   // Update the submission status and check the answer.
@@ -390,7 +404,7 @@ Lesson.prototype.displaySuccessMessage = function() {
     var successTop = $('.feedback').position().top;
     $('html, body').animate({scrollTop: successTop - 25}, 500);
     // Change border colour to black.
-    $('.url').removeClass('alert');
+    $('.url .input').removeClass('alert');
     // Show the output if there is any.
     showResponse();
     // Display the next button.
@@ -433,7 +447,7 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   var errorTop = $('.feedback').position().top;
   $('html, body').animate({scrollTop: errorTop - 225}, 500);
   // Change border colour to red.
-  $('.url').addClass('alert');
+  $('.url .input').addClass('alert');
   // Show the output if there is any.
   showResponse();
   // Set up analytics to indicate failure (how many times).
@@ -581,7 +595,8 @@ Lesson.prototype.displayUrl = function() {
 Lesson.prototype.displayHeader = function() {
   this.header.Authorization = 'Bearer ' + userAuthorization;
   var header = JSON.stringify(this.header, null, 2);
-  $('.header-input').text(header).show();
+  $('.header .input').text(header);
+  $('.header').show();
 }
 
 /**
@@ -597,7 +612,6 @@ Lesson.prototype.displayBody = function() {
     this.body.features[0].properties.gx_id = randomNumber.toString();
   }
   var body = JSON.stringify(this.body, null, 2);
-  $('.body-input').show();
   this.inactiveInput.setInput(body);
 }
 
@@ -645,7 +659,8 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         title: 'API Key',
         checkAnswer: testAPIKey,
         submitButtonValue: 'Submit',
-        activeInput: urlInput
+        activeInput: urlInput,
+        inputLabel: 'Your API Key'
       })
     ]}),
     new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
@@ -783,7 +798,6 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           Lesson.prototype.update.call(this);
           this.displayUrl();
           this.displayHeader();
-          $('.body-input').show();
         }
       }),
       new Lesson('lesson11-getprivatetable', {
@@ -837,7 +851,6 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           Lesson.prototype.update.call(this);
           this.displayUrl();
           this.displayHeader();
-          $('.body-input').show();
         }
       }),
       new Lesson('lesson14-listprivatefeatures', {
@@ -950,14 +963,17 @@ var tasksList = newTasksList('callback', loadState);
  */
 $(window).load(function() {
   // Create textarea objects and events associated with the input changes.
-  var urlInput = new ResizingTextarea($('.url'), $('.hidden-url-element'), {
+  var urlInput = new ResizingTextarea($('.url .input'), 
+      $('.url .hidden-input'), {
         enterSubmission: true,
-        onChange: storeInput
+        onChange: storeInput,
+        textareaAndLabelElement: $('.url')
       });
-  var bodyInput = new ResizingTextarea($('.body-input'), 
-      $('.hidden-body-element'), {
+  var bodyInput = new ResizingTextarea($('.body .input'), 
+      $('.body .hidden-input'), {
         enterSubmission: false,
-        onChange: storeInput
+        onChange: storeInput,
+        textareaAndLabelElement: $('.body')
       });
   // Create the chapters + lesson objects
   makeChaptersAndLessons(urlInput, bodyInput);
