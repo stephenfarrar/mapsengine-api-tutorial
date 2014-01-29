@@ -581,8 +581,8 @@ function getText() {
   var me = this;
   var data = $('.response-content');
   data.empty();
-  var correctAddress = new RegExp('(http:\/\/|https:\/\/|)mapsengine-api-' +
-      'tutorial\.appspot\.com\/resources\/alice-in-wonderland\.txt');
+  var correctAddress = new RegExp('^(https?://)?mapsengine-api-tutorial' +
+    '\.appspot\.com\/resources\/alice-in-wonderland\.txt');
   if (correctAddress.test(address)) {
     // The user entered the correct input.  
     $.ajax({
