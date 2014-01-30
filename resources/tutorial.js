@@ -341,10 +341,13 @@ Lesson.prototype.submit = function() {
 
 /**
  * Display instruction if there is any.
+ * Replace any template in the instruction.
  */
 Lesson.prototype.displayInstructions = function() {
   if (this.instructions) {
-    $('.instructions').html(markdown.toHTML(this.instructions));
+    var instruction = markdown.toHTML(this.instructions);
+    instruction = replaceTemplate(instruction);
+    $('.instructions').html(instruction);
   }
 };
 
