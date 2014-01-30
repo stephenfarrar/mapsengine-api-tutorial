@@ -652,7 +652,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
   chapters = [
     new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
       new Lesson('lesson1-gmeapi', {
-        title: 'GME API',
+        title: 'Google Maps Engine API',
         checkAnswer: getText,
         activeInput: urlInput
       }),
