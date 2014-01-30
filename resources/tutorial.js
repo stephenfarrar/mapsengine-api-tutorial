@@ -594,7 +594,16 @@ Lesson.prototype.displayUrl = function() {
  */
 Lesson.prototype.displayHeader = function() {
   this.header.Authorization = 'Bearer ' + userAuthorization;
-  var header = JSON.stringify(this.header, null, 2);
+  var header = JSON.stringify(this.header, null, 1);
+  header = header.replace('\n', '');
+  header = header.replace('{', '');
+  header = header.replace('}', '');
+  header = header.replace(',', '');
+  header = header.replace(/ /g, '');
+  header = header.replace(/"/g, '');
+  header = header.replace(/'/g, '');
+  header = header.replace(/:/g, ': ');
+  header = header.replace('Bearer', 'Bearer ');
   $('.header .input').text(header);
   $('.header').show();
 }
