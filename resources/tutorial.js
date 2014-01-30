@@ -2,8 +2,7 @@
 // The global variables.
 var activeLesson;
 var fadeInTime = 500;
-var pendingFiles = {};
-var userAuthorization = false;
+var userAuthorization;
 /**
  * @type array of {Chapter}. Each {Chapter} contains an array of {Lesson}.
  * Need to be a global variable, since used in other functions.
@@ -16,59 +15,89 @@ var chapters;
 var introduction;
 var resume;
 var finish;
+var signin;
+/**
+ * Url for create tables.
+ * @const {string}
+ */
+var TABLES_URL = 'https://www.googleapis.com/mapsengine/v1/tables';
+/**
+ * Url for create features.
+ * @const {string}
+ */
+var BATCH_INSERT_URL = TABLES_URL + '/{userTableId}/features/batchInsert';
+/**
+ * Header for GET request.
+ * @const {Object}
+ */
+var HEADER_FOR_GET = {
+  'Authorization': null
+};
+/**
+ * Header for POST request.
+ * @const {Object}
+ */
+var HEADER_FOR_POST = {
+  'Authorization': null,
+  'Content-type': 'application/json'
+};
+/** @const {string} Label for a user's API Key in the inventory. */
+var API_KEY_LABEL = 'Your API Key: ';
+/** @const {string} Label for a user's project ID in the inventory. */
+var USER_PROJECT_ID = 'Your Project ID: ';
+/** @const {string} Label for a user's table ID in the inventory. */
+var USER_TABLE_ID = '\'World Famous Mountains\' Table ID: '
 
 /**
  * Create object to store textarea input information.
  * A textarea that resizes itself to fit its contents.
- * @element {string} A jQuery object of textarea.
- * @hiddenElement {string} A jQuery object of hidden div. 
- * @enterSubmission {boolean} Indicate the need of enter submission/not.
+ * @param {JQuery} textareaElement The textarea.
+ * @param {JQuery} hiddenElement The hidden div. 
+ * @param {boolean} enterSubmission Indicate the need of enter submission/not.
+ * @param {function(string)} onChange Function executed when the input changes.
+ * @param {JQuery} textareaAndLabelElement Indicates the input area div.
  */
-function ResizingTextarea(element, hiddenElement, options) {
-  this.element = element;
+function ResizingTextarea(textareaElement, hiddenElement, options) {
+  this.textareaElement = textareaElement;
   this.hiddenElement = hiddenElement;
   this.enterSubmission = options.enterSubmission;
   this.onChange = options.onChange;
+  this.textareaAndLabelElement = options.textareaAndLabelElement;
   this.setup();
 }
 
 /**
  * Set the height of textarea based on the input height.
  */
-ResizingTextarea.prototype.updateTextAreaHeight = function() {
+ResizingTextarea.prototype.updateTextareaHeight = function() {
   // Store it in the hidden div, get the height and set the textarea height.
   if (this.enterSubmission) {
     // Always store one more character to make the height change smoother.
     // This is for textarea that has enter submission property.
-    this.hiddenElement.text(this.element.val() + 'a');
+    this.hiddenElement.text(this.textareaElement.val() + 'a');
   } else {
     // Append one more line at the end to make height change smoother.
     // This is for textarea that has no enter submission property.
-    this.hiddenElement.text(this.element.val() + '\n\n');
+    this.hiddenElement.text(this.textareaElement.val() + '\n\n');
   }
-  this.element.height(this.hiddenElement.height());
-}
-
-/**
- * Disable the submit button if there is empty input.
- */
-ResizingTextarea.prototype.updateSubmitButton = function() {
-  if (this.element.val() == '') {
-    $('.submit-button').attr('disabled','disabled');
-  } else {
-    $('.submit-button').removeAttr('disabled');
-  }
+  this.textareaElement.height(this.hiddenElement.height());
 }
 
 /**
  * Changes that need to happen everytime input changes.
  */
 ResizingTextarea.prototype.update = function() {
-  // Enable or disable the submit button.
-  this.updateSubmitButton();
   // Set the height of the textarea.    
-  this.updateTextAreaHeight();
-  this.onChange(this.element.val());
+  this.updateTextareaHeight();
+  if (this.isEnabled) {
+    // Enable or disable the submit button according to input.
+    if (this.textareaElement.val() == '') {
+      $('.submit-button').attr('disabled', 'disabled');
+    } else {
+      $('.submit-button').removeAttr('disabled');
+    }
+    this.onChange(this.textareaElement.val());
+  }
 };
 
 /**
@@ -77,31 +106,71 @@ ResizingTextarea.prototype.update = function() {
 ResizingTextarea.prototype.setup = function() {
   var me = this;
   // Set events on keypress.
-  this.element.keypress(function(event) {
+  this.textareaElement.keypress(function(event) {
+    me.update(); 
     // Check if the input needs enter submission behaviour.
     if (me.enterSubmission) {
       // Enable submit by enter, not making the enter visible in the input.
       if (event.which == 13) {
         event.preventDefault();
-        // Submit only if the input is not blank.
-        if (me.element.val() !== '') {
+        // Try to submit if the input is not empty.
+        if (me.textareaElement.val() != '') {
           activeLesson.submit();
         }
       }
-    }
-    me.update();
+    }    
   });
   // Set events on keyup, to handle backspaces.
-  this.element.keyup(function() {
+  this.textareaElement.keyup(function() {
     me.update();
   });
   // Set events on paste and cut.
-  this.element.on('paste cut', function() {
+  this.textareaElement.on('paste cut', function() {
     setTimeout(function() {
       me.update();
     }, 0);
   });
 };
+
+/**
+ * Set the input of the textarea and update the height/submit button.
+ */
+ResizingTextarea.prototype.setInput = function(input) {
+  // Show the input area.
+  this.textareaAndLabelElement.show();
+  this.textareaElement.val(input);
+  this.update();
+}
+
+/**
+ * Get the input from the textarea.
+ */
+ResizingTextarea.prototype.getInput = function() {
+  return this.textareaElement.val();
+}
+
+/**
+ * Enabling textarea.
+ */
+ResizingTextarea.prototype.enable = function() {
+  this.isEnabled = true;
+  this.textareaElement.removeAttr('disabled');
+}
+
+/**
+ * Disabling textarea.
+ */
+ResizingTextarea.prototype.disable = function() {
+  this.isEnabled = false;
+  this.textareaElement.attr('disabled', 'disabled');
+}
+
+/**
+ * Set the focus out of textarea. 
+ */
+ResizingTextarea.prototype.blur = function() {
+  this.textareaElement.blur();
+}
 
 /**
  * Function to store input in local storage.
@@ -123,40 +192,59 @@ function Lesson(elementId, options) {
   this.title = options.title;
   this.buttonValue = options.buttonValue || 'Next Lesson';
   this.submitButtonValue = options.submitButtonValue || 'Get';
+  this.inputLabel = options.inputLabel || 'Url';
+  this.inventoryContents = options.inventoryContents;
   if (options.submit) {
+    // For lessons that does not take url/body input.
     this.submit = options.submit;
     this.hasSubmit = true;
-  } else {
-    this.hasSubmit = !!options.hasSubmit;
+  } else if (options.checkAnswer) {
+    // For lessons that needs to take url/body input.
+    this.checkAnswer = options.checkAnswer;
+    this.hasSubmit = true;
   }
   if (options.update) {
     this.update = options.update;
   }
-  if (options.headerFile) {
-    this.headerFile = options.headerFile;
+  if (options.urlTemplate) {
+    this.urlTemplate = options.urlTemplate;
   }
-  if (options.correctAns) {
-    this.correctAns = options.correctAns;
+  if (options.header) {
+    this.header = options.header;
+  }
+  if (options.hasBodyFile) {
+    this.hasBodyFile = options.hasBodyFile;
+  }
+  if (options.testingURLTemplate) {
+    this.testingURLTemplate = options.testingURLTemplate;
   }
   // Done is 'true' if the user has submitted correctly.
   this.done = false;
   this.unlocked = false;
-  if (options.showInventory) {
-    this.showInventory = options.showInventory;
-  } else {
-    this.showInventory = false;
-  }
   // Indicate which input submission is needed.
   this.activeInput = options.activeInput;
+  // Indicate the inactive input.
+  this.inactiveInput = options.inactiveInput;
+  // Set the submission status to be false.
+  this.isSubmitting = false;
+  // Load the instructions file for each lesson.
+  this.loadInstruction();
+  // Only lessons with a submission require success, answer and header content.
+  if (this.hasSubmit) {
+    this.loadSuccessMessage();
+    this.loadBody();
+    // Only lessons with an activeInput field have an answer.
+    if (this.activeInput) {
+      this.loadAnswer();
+    }
+  }
 }
 
 /**
  * Create update function for every lesson, called when loading a lesson.
  */
 Lesson.prototype.update = function() {
-  // If the lesson is still locked, it can't be accessed.
-  if (!this.unlocked) return;
-  // Else, the lesson can be accessed. Scroll to top of the page.
+  // Scroll to top of the page.
   $('html, body').animate({scrollTop: 0}, 500);
   activeLesson = this;
   document.title = this.title;
@@ -175,15 +263,18 @@ Lesson.prototype.update = function() {
     // Show the necessary elements for lesson.
     $('.menu-area').show();
     $('.request').show();
-    $('.url').show();
+    // Update the label.
+    $('.url .input-label').text(this.inputLabel);
     // Show inventory if needed.
-    if (this.showInventory) {
+    if (this.inventoryContents) {
+      // Update the inventory contents.
+      populateInventory(this.inventoryContents);
       $('.inventory').show();
     } else {
       $('.inventory').hide();
     }
     // Make the border black again.
-    $('.url').removeClass('alert');
+    $('.url .input').removeClass('alert');
     // Right aligned the green button.
     $('.next-button').addClass('lesson-button');
     // Make text on menu for active lesson red, and all others black.
@@ -198,12 +289,17 @@ Lesson.prototype.update = function() {
     // The previous input stored should be loaded and shown in the input area.
     // If the input is empty, user should not be allowed to submit.
     // Do this for the lessons with their own specific inputs.
+    // Enabled/disabled the input based on the activeInput.
+    if (this.inactiveInput) {
+      // Disabled the inactive input.
+      this.inactiveInput.disable();
+    }
     if (this.activeInput) {
+      // Enabled the specific input area for each lesson.
+      this.activeInput.enable(); 
       // Update the input (placeholder/saved URL/saved body).
       var storedInput = retrieveInput();
-      this.activeInput.element.val(storedInput || '');
-      this.activeInput.updateTextAreaHeight();
-      this.activeInput.updateSubmitButton();
+      this.activeInput.setInput(storedInput || '');
     }
   }
   // Set up analytics for the page visited by the user (number of times the page
@@ -218,143 +314,33 @@ Lesson.prototype.update = function() {
  * Handles the input the user has submitted.
  */
 Lesson.prototype.submit = function() {
-  var address = $.trim($('.url').val());
-  this.checkCorrectness(address);
-}
-
-/**
- * Checking the correctness of user's input using the GME API.
- */
-Lesson.prototype.checkCorrectness = function(address) {
-  var me = this;
-  var data = $('.response-content');
+  // If the lesson is currently submitting, do not proceed.
+  if (this.isSubmitting) return;
+  // Else, hide the previous response.
+  $('.feedback').hide();
+  $('.next-button').hide();
+  $('.response').hide();
+  // Remove focus from the input area.
+  this.activeInput.blur();
+  // Show an overlay to stop user do something else.
+  $('.overlay').show();
+  // Update the submission status and check the answer.
+  this.isSubmitting = true;
+  var input = $.trim(this.activeInput.getInput());
   // Empty the output area.
+  var data = $('.response-content');
   data.empty();
-  // Get the response with the correct URL.
-  $.ajax({
-    url: me.correctAns,
-    headers: me.header,
-    dataType: 'json',
-    success: function(resource) {
-      var correctResourceString = JSON.stringify(resource, null, 2);
-      // Get the response with users's input.
-      $.ajax({
-        url: address,
-        headers: me.header,
-        dataType: 'json',
-        success: function(resource2) {
-          var resourceString = JSON.stringify(resource2, null, 2);
-          data.text(resourceString);
-          // If the response is the correct response, then the user is right.
-          if (resourceString == correctResourceString) {
-            me.displaySuccessMessage();
-            me.complete();
-          } else {
-            me.displayErrorMessage('Be sure to read the instructions ' +
-                'carefully and complete the exercise ' +
-                'requirements.');
-          } 
-        },
-        error: function(response) {
-          // Try parsing the response.
-          var errorMess;
-          try {
-            response = JSON.parse(response.responseText);
-            errorMess = response.error.errors[0];
-            // Append the response to the output area.
-            var responseString = JSON.stringify(errorMess, null, 2);
-            data.text(responseString); 
-          } catch (e) {
-            errorMess = 'notJSONObject';
-          }
-          // Giving messages for different error reasons.
-          if (errorMess == 'notJSONObject') {
-            me.displayErrorMessage('The URL is not a valid Google Maps ' +
-                'Engine API URL.');
-          } else if (errorMess.reason == 'authError') {
-            me.displayErrorMessage('It appears that your authorization ' +
-                'token is invalid. Make sure that you entered the correct ' +
-                'header for this request.');
-          } else if (errorMess.reason == 'keyInvalid') {
-            // If it contains curly braces, ask user to remove them.
-            if (addressString.indexOf('{') != -1 || 
-                addressString.indexOf('}') != -1) {
-              me.displayErrorMessage('Check that you have removed the ' +
-                  'curly braces({ }) surrounding the API Key in your URL.');
-            } else {
-              me.displayErrorMessage('The API Key used in the URL is ' +
-                  'invalid. Make sure that you entered your API Key ' +
-                  'correctly.');
-            }
-          } else if (errorMess.reason == 'dailyLimitExceededUnreg') {
-            me.displayErrorMessage('There might be something wrong with ' +
-                'your \'key\' parameter. Make sure that you entered it ' +
-                'correctly.');
-          } else if (errorMess.reason == 'invalid') {
-            var field = errorMess.location;
-            // If the error is not in table ID, tell the error location.
-            if (field!=='id') {
-              me.displayErrorMessage('Check whether you have given the ' +
-                  'right values for the parameters, in particular, ' +
-                  'the \''+field+'\' field.');
-            } else {
-              // If it contains curly braces, ask user to remove them.
-              if (addressString.indexOf('{') != -1 || 
-                  addressString.indexOf('}') != -1) {
-                me.displayErrorMessage('Check that you have removed the ' +
-                    'curly braces({ }) surrounding the table ID in your URL.');
-              } else {
-                me.displayErrorMessage('The table ID used in the URL is ' +
-                    'invalid. Check whether you have given the right table ' +
-                    'ID and make sure that the table has been made public. ' +
-                    'To make your table public, you can follow the ' +
-                    'instructions in <a href=' +
-                    '"//support.google.com/mapsengine/answer/3164737?hl=en"' +
-                    '>this link</a>.');
-              }
-            }
-          } else if (errorMess.reason == 'required') {
-            me.displayErrorMessage('A required parameter has been left ' +
-                'out of the request. Make sure that you entered all ' +
-                'parameters needed.');
-          } else if (errorMess.reason == 'notFound') {
-            me.displayErrorMessage('No results were found for your ' +
-                'request. The asset might not exist, not a public asset, ' +
-                'or it has been deleted from the Google Maps Engine.');
-          } else if (errorMess.reason == 'insufficientPermissions') {
-            me.displayErrorMessage('You do not have sufficient ' +
-                'permissions for this request. Make sure you have specified ' +
-                'version=published in the request.');
-          } else if (errorMess.reason == 'limitExceeded') {
-            me.displayErrorMessage('The resource is too large to be ' +
-                'accessed through the API.');
-          } else if (errorMess.reason == 'duplicate') {
-            me.displayErrorMessage('The new feature you are trying to ' +
-                'insert has an ID that already exists in the table.');
-          } else if (errorMess.reason == 'rateLimitExceeded' || 
-                     errorMess.reason == 'quotaExceeded') {
-            me.displayErrorMessage('You have exhausted the ' +
-                'application\'s daily quota or its per-second rate limit. ' +
-                'Please contact the Enterprise Support for higher limits.');
-          } else if (errorMess.reason == 'unauthorized') {
-            me.displayErrorMessage('Make sure you have included the ' +
-                'required authorization header with the request.');
-          } else if (errorMess.reason == 'requestTooLarge') {
-            me.displayErrorMessage('This request contains too many ' +
-                'features and/or vertices.');
-          } else if (errorMess.reason == 'accessNotConfigured') {
-            me.displayErrorMessage('There is a per-IP or per-Referer ' +
-                'restriction configured on the API Key and the request does ' +
-                'not match these restrictions, or the Maps Engine API is not ' +
-                'activated on the project ID.');
-          } else {
-            me.displayErrorMessage('The data you requested cannot be ' +
-                'processed. Check your request to ensure that it is correct.');
-          }
-        }
-      });
-    }
-  });
+  // Change URL Template to a real URL with some data in local storage.
+  if (this.testingURLTemplate) {
+    // Change if there is table ID in the template URL.
+    this.testingURL = this.testingURLTemplate.replace('{userTableId}', 
+        localStorage['tableID']);
+    // Change if there is project ID in the template URL.
+    this.testingURL = this.testingURL.replace('{userProjectId}',
+        localStorage['projectID']);
+  }
+  // Check the correctness of user input.
+  this.checkAnswer(input);
 }
 
 /**
@@ -371,11 +357,17 @@ Lesson.prototype.displayInstructions = function() {
  */
 Lesson.prototype.showAnswer = function() {
   if (this.answer) {
-    // Replace userAPIKey with the API Key stored in local storage.
     // Change the markdown files to HTML and combined with the API Key.
     var htmlAnswer = markdown.toHTML(this.answer);
+    // Replace userAPIKey with the API Key stored in local storage.
     var htmlKey =  $('<span>').text(localStorage['APIKey']).html();
     htmlAnswer = htmlAnswer.replace('{userAPIKey}', htmlKey);
+    // Replace userTableId with World Famous Mountain table ID.
+    var htmlTableId =  $('<span>').text(localStorage['tableID']).html();
+    htmlAnswer = htmlAnswer.replace('{userTableId}', htmlTableId);
+    // Replace userProjectId with the project ID they chose.
+    var htmlProjectId =  $('<span>').text(localStorage['projectID']).html();
+    htmlAnswer = htmlAnswer.replace('{userProjectId}', htmlProjectId);
     // Change the html of answer area.
     $('.answer').html(htmlAnswer);
     // Hide button once clicked.
@@ -397,7 +389,18 @@ Lesson.prototype.showAnswer = function() {
  */
 Lesson.prototype.displaySuccessMessage = function() {
   if (this.successMessage) {
+    // The lesson is completed. Display the success message.
+    this.complete();
+    // Replace any templates, such as PROJECT_ID and ASSET_ID.
+    this.successMessage = this.successMessage.replace('{PROJECT_ID}',
+        localStorage['projectID']);
+    this.successMessage = this.successMessage.replace('{ASSET_ID}',
+        localStorage['tableID']);
     $('.message').html(markdown.toHTML(this.successMessage));
+    // The submission has finished, update the submission status.
+    this.isSubmitting = false;
+    // Remove the overlay.
+    $('.overlay').hide();
     // Display the success ribbon and message.
     $('.feedback').hide().fadeIn(fadeInTime)
         .removeClass('failure').addClass('success');
@@ -406,11 +409,11 @@ Lesson.prototype.displaySuccessMessage = function() {
     var successTop = $('.feedback').position().top;
     $('html, body').animate({scrollTop: successTop - 25}, 500);
     // Change border colour to black.
-    $('.url').removeClass('alert');
+    $('.url .input').removeClass('alert');
     // Show the output if there is any.
     showResponse();
     // Display the next button.
-    $('.next-button').hide().fadeIn(fadeInTime);
+    $('.next-button').fadeIn(fadeInTime);
     // Set up analytics to indicate success (how many times).
     ga('send', {
       hitType: 'event',
@@ -425,8 +428,12 @@ Lesson.prototype.displaySuccessMessage = function() {
  * If the input is wrong, do the error responses.
  */
 Lesson.prototype.displayErrorMessage = function(errorMessage) {
-  $('.message').html('Sorry, that input is incorrect. ')
+  $('.message').html('Sorry, that is incorrect. ')
       .append(errorMessage).append(' Please try again.');
+  // The submission has finished, update the submission status.
+  this.isSubmitting = false;
+  // Remove the overlay.
+  $('.overlay').hide();
   // Display the message, hide the success ribbon.
   $('.feedback').hide().fadeIn(fadeInTime)
       .removeClass('success').addClass('failure');
@@ -445,11 +452,9 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   var errorTop = $('.feedback').position().top;
   $('html, body').animate({scrollTop: errorTop - 225}, 500);
   // Change border colour to red.
-  $('.url').addClass('alert');
+  $('.url .input').addClass('alert');
   // Show the output if there is any.
   showResponse();
-  // Hide the next button.
-  $('.next-button').hide();
   // Set up analytics to indicate failure (how many times).
   ga('send', {
     hitType: 'event',
@@ -463,11 +468,9 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
  * Display the response(output).
  */
 function showResponse() {
-  if (!$('.response-content').text()) {
-    // If there is no response, do not display output.
-    $('.response').hide();
-  } else {
-    $('.response').hide().fadeIn(fadeInTime);
+  if ($('.response-content').text()) {
+    // Only display output if there is response.
+    $('.response').fadeIn(fadeInTime);
   }
 }
 
@@ -492,9 +495,14 @@ Lesson.prototype.tick = function() {
  * Marks a lesson as unlocked.
  */
 Lesson.prototype.unlock = function() {
+  var me = this;
   this.unlocked = true;
   if (this.hasSubmit) {
-    this.menuElement.removeClass('locked').addClass('unlocked');
+    this.menuElement.removeClass('locked')
+        .addClass('unlocked')
+        .click(function() {
+          me.update();
+        });
     this.chapter.menuElement.removeClass('locked').addClass('unlocked');
   }
 };
@@ -517,10 +525,7 @@ Lesson.prototype.makeMenu = function() {
   // Add text.
   var newLink = $('<a>')
       .text(this.title)
-      .addClass('lesson-link pointer')
-      .click(function() {
-        me.update();
-      });
+      .addClass('lesson-link pointer');
   newDiv.append(newLink);
   menu.append(newDiv);
   // Add div to lesson object.
@@ -533,11 +538,10 @@ Lesson.prototype.makeMenu = function() {
 Lesson.prototype.loadInstruction = function() {
   var me = this;
   var filename = this.elementId + '.txt';
-  pendingFiles[filename] = true;
+  tasksList.add(filename);
   $.get('resources/' + filename, function(response) {
     me.instructions = response;
-    delete pendingFiles[filename];
-    checkNoFilesPending();
+    tasksList.remove(filename);
   });
 };
 
@@ -547,11 +551,10 @@ Lesson.prototype.loadInstruction = function() {
 Lesson.prototype.loadSuccessMessage = function() {
   var me = this;
   var filename = this.elementId + '-success.txt';
-  pendingFiles[filename] = true;
+  tasksList.add(filename);
   $.get('resources/' + filename, function(response) {
     me.successMessage = response;
-    delete pendingFiles[filename];
-    checkNoFilesPending();
+    tasksList.remove(filename);
   });
 };
 
@@ -561,31 +564,61 @@ Lesson.prototype.loadSuccessMessage = function() {
 Lesson.prototype.loadAnswer = function() {
   var me = this;
   var filename = this.elementId + '-answer.txt';
-  pendingFiles[filename] = true;
+  tasksList.add(filename);
   $.get('resources/' + filename, function(response) {
     me.answer = response;
-    delete pendingFiles[filename];
-    checkNoFilesPending();
+    tasksList.remove(filename);
   });
 };
 
 /**
- * Load the headers markdown, where applicable.
+ * Load the body markdown, where applicable.
  */
-Lesson.prototype.loadHeader = function() {
+Lesson.prototype.loadBody = function() {
   var me = this;
-  if (this.headerFile) {
-    pendingFiles[me.headerFile] = true;
-    $.get('resources/' + me.headerFile, function(response) {
-      me.header = JSON.parse(response);
-      delete pendingFiles[me.headerFile];
-      checkNoFilesPending();
+  if (this.hasBodyFile) {
+    var filename = this.elementId + '-body.txt';
+    tasksList.add(filename);
+    $.get('resources/' + filename, function(response) {
+      me.body = JSON.parse(response);
+      tasksList.remove(filename);
     });
-  } else {
-    // If the lesson has no header, give it an empty object.
-    this.header = {};
   }
-};
+}
+
+/**
+ * Update and display the url of lesson.
+ */
+Lesson.prototype.displayUrl = function() {
+  this.url = this.urlTemplate.replace('{userTableId}', localStorage['tableID']);
+  this.inactiveInput.setInput(this.url);
+}
+
+/**
+ * Update and display the header of lesson.
+ */
+Lesson.prototype.displayHeader = function() {
+  this.header.Authorization = 'Bearer ' + userAuthorization;
+  var header = JSON.stringify(this.header, null, 2);
+  $('.header .input').text(header);
+  $('.header').show();
+}
+
+/**
+ * Update and display the body of lesson.
+ */
+Lesson.prototype.displayBody = function() {
+  if (this.body.projectId) {
+    this.body.projectId = localStorage['projectID'];
+  }
+  if (this.body.features) {
+    // Generate random number for gx_id.
+    var randomNumber = Math.floor(Math.random() * 1000000001);
+    this.body.features[0].properties.gx_id = randomNumber.toString();
+  }
+  var body = JSON.stringify(this.body, null, 2);
+  this.inactiveInput.setInput(body);
+}
 
 /**
  * Create object to store chapter information.
@@ -624,47 +657,61 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
     new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
       new Lesson('lesson1-gmeapi', {
         title: 'GME API',
-        submit: getText,
-        showInventory: false,
+        checkAnswer: getText,
         activeInput: urlInput
       }),
       new Lesson('lesson2-apikey', {
         title: 'API Key',
-        submit: testAPIKey,
-        showInventory: false,
+        checkAnswer: testAPIKey,
         submitButtonValue: 'Submit',
-        activeInput: urlInput
+        activeInput: urlInput,
+        inputLabel: 'Your API Key'
       })
     ]}),
     new Chapter('chapter1-read', {title: 'Reading Public Data', lessons: [
       new Lesson('lesson3-gettable', {
         title: 'Get Table',
-        showInventory: true,
+        inventoryContents: [{
+          label: 'Table ID: ',
+          information: '15474835347274181123-14495543923251622067'
+        }, {
+          label: API_KEY_LABEL
+        }],
+        checkAnswer: checkCorrectness,
         activeInput: urlInput,
-        correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' + 
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/tables/' + 
                 '15474835347274181123-14495543923251622067?' +
-                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco',
-        hasSubmit: true        
+                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco'       
       }),
       new Lesson('lesson4-listfeatures', {
         title: 'List Features',
-        showInventory: true,
+        inventoryContents: [{
+          label: 'Table ID: ',
+          information: '15474835347274181123-14495543923251622067'
+        }, {
+          label: API_KEY_LABEL
+        }],
+        checkAnswer: checkCorrectness,
         activeInput: urlInput,
-        correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/tables/' +
                 '15474835347274181123-14495543923251622067/features?' +
                 'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1v' +
-                'pHQdco',
-        hasSubmit: true
+                'pHQdco'
       }),
       new Lesson('lesson5-queries', {
         title: 'Queries',
-        showInventory: true,
+        inventoryContents: [{
+          label: 'Table ID: ',
+          information: '15474835347274181123-14495543923251622067'
+        }, {
+          label: API_KEY_LABEL
+        }],
+        checkAnswer: checkCorrectness,
         activeInput: urlInput,
-        correctAns: 'https://www.googleapis.com/mapsengine/v1/tables/' +
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/tables/' +
                 '15474835347274181123-14495543923251622067/features?'+ 
                 'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1v' +
-                'pHQdco&where=Population<2000000',
-        hasSubmit: true
+                'pHQdco&where=Population<2000000'
       })
     ]}),
     new Chapter('chapter2-private', {title: 'Accessing Private Data', lessons: [
@@ -672,15 +719,12 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         title: 'Login and Authorization', 
         submit: authorizeUser,
         submitButtonValue: 'Sign In',
-        activeInput: false,
         update: function() {
           Lesson.prototype.update.call(this);
           $('.url').hide();
-          if (!userAuthorization) {
-            // Activate the 'Sign In' button.
-            $('.submit-button').removeAttr('disabled');
-          } else {
-            // Else, leave the button disabled.
+          if (userAuthorization) {
+            // Dectivate the 'Sign In' button.
+            $('.submit-button').attr('disabled', 'disabled');
             // Make sure that the next lesson is always unlocked.
             this.complete();
           }
@@ -690,47 +734,157 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         title: 'Create a Free Project',
         submit: storeProjectID,
         submitButtonValue: 'Select',
-        activeInput: false,
         update: function() {
           Lesson.prototype.update.call(this);
           $('.url').hide();
           $('.project-menu').show();
           $('.submit-button').removeAttr('disabled');
-          setInterval(function() {
+          var getProjects = function() {
             gapi.client.request({
-              path: '/mapsengine/v1/projects/',
-              method: 'GET',
-              callback: function(jsonBody) {
-                var list = $('.project-list')
-                list.empty();
-                jsonBody.projects.forEach(function(project) {
-                  var listItem = $('<option>').attr('value', project.id)
-                      .text(project.name);
-                  list.append(listItem);
-                });
-              }
-            });
-          }, 5000); //5 seconds
+            path: '/mapsengine/v1/projects/',
+            method: 'GET',
+            callback: function(jsonBody) {
+              var list = $('.project-list')
+              list.empty();
+              jsonBody.projects.forEach(function(project) {
+                var listItem = $('<option>').attr('value', project.id)
+                    .text(project.name);
+                list.append(listItem);
+              });
+            }
+          });
+          }
+          // List the projects once initially, then refresh every five seconds.
+          getProjects();
+          (function loop(){
+            setTimeout(function(){
+              getProjects();
+              loop();
+            }, 5000);
+          })();
         }
       }), 
       new Lesson('lesson8-listprojects', {
         title: 'List Projects',
-        hasSubmit: true,
-        submitButtonValue: 'Get',
+        checkAnswer: checkCorrectness,
         activeInput: urlInput,
-        headerFile: 'get-request-header.txt',
-        correctAns: 'https://www.googleapis.com/mapsengine/v1/projects',
+        inactiveInput: bodyInput,
+        header: HEADER_FOR_GET,
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/projects',
         update: function() {
           Lesson.prototype.update.call(this);
-          var header = JSON.stringify(this.header);
-          header = header.replace('{accessToken}', userAuthorization);
-          this.header = JSON.parse(header);
-          $('.header-input').text(header).show();
+          this.displayHeader();
+        }
+      })
+    ]}),
+    new Chapter('chapter2-table', {title: 'Making a Table', lessons: [
+      new Lesson('lesson9-createtable1', {
+        title: 'Create Table I',
+        checkAnswer: checkCreateRequest,
+        submitButtonValue: 'Post',
+        activeInput: urlInput,
+        inactiveInput: bodyInput,
+        hasBodyFile: true,
+        header: HEADER_FOR_POST,
+        testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/tables?' +
+            'projectId={userProjectId}',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          this.displayHeader();
+          this.displayBody();
+        }
+      }),
+      new Lesson('lesson10-createtable2', {
+        title: 'Create Table II',
+        inventoryContents: [{
+          label: USER_PROJECT_ID
+        }],
+        checkAnswer: checkCreateRequest,
+        submitButtonValue: 'Post',
+        activeInput: bodyInput,
+        inactiveInput: urlInput,
+        urlTemplate: TABLES_URL,
+        header: HEADER_FOR_POST,
+        testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/tables?' +
+            'projectId={userProjectId}',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          this.displayUrl();
+          this.displayHeader();
+        }
+      }),
+      new Lesson('lesson11-getprivatetable', {
+        title: 'Get Private Table',
+        inventoryContents: [{
+          label: USER_TABLE_ID
+        }],
+        checkAnswer: checkCorrectness,
+        activeInput: urlInput,
+        inactiveInput: bodyInput,
+        header: HEADER_FOR_GET,
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/' +
+            'tables/{userTableId}',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          this.displayHeader();
+        }
+      })
+    ]}),
+    new Chapter('chapter3-features', {title: 'Adding Features', lessons: [
+      new Lesson('lesson12-createfeatures1', {
+        title: 'Create Features I',
+        inventoryContents: [{
+          label: USER_TABLE_ID
+        }],
+        checkAnswer: checkCreateRequest,
+        submitButtonValue: 'Post',
+        activeInput: urlInput,
+        inactiveInput: bodyInput,
+        hasBodyFile: true,
+        header: HEADER_FOR_POST,
+        testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/' +
+            'tables/{userTableId}/features',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          this.displayHeader();
+          this.displayBody();
+        }
+      }),
+      new Lesson('lesson13-createfeatures2', {
+        title: 'Create Features II',
+        checkAnswer: checkCreateRequest,
+        submitButtonValue: 'Post',
+        activeInput: bodyInput,
+        inactiveInput: urlInput,
+        urlTemplate: BATCH_INSERT_URL,
+        header: HEADER_FOR_POST,
+        testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/' +
+            'tables/{userTableId}/features',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          this.displayUrl();
+          this.displayHeader();
+        }
+      }),
+      new Lesson('lesson14-listprivatefeatures', {
+        title: 'List Private Features',
+        inventoryContents: [{
+          label: USER_TABLE_ID
+        }],
+        checkAnswer: checkCorrectness,
+        activeInput: urlInput,
+        inactiveInput: bodyInput,
+        header: HEADER_FOR_GET,
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/' +
+            'tables/{userTableId}/features',
+        update: function() {
+          Lesson.prototype.update.call(this);
+          this.displayHeader();
         }
       })
     ]})
   ];
-  // Introduction, resume and final page lessons.
+  // Introduction, resume, signin and final page lessons.
   introduction = new Lesson('introduction', {
     title: 'Welcome!',
     buttonValue: 'Yes, I am!',
@@ -745,6 +899,13 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
     update: function() {
       Lesson.prototype.update.call(this);
       $('.next-button').removeClass('right-aligned').show();
+    }
+  });
+  signin = new Lesson('signin', {
+    title: 'Welcome back!',
+    update: function() {
+      Lesson.prototype.update.call(this);
+      $('.signin-button').show();
     }
   });
   finish = new Lesson('finish', {
@@ -789,37 +950,51 @@ function setNextLesson() {
   // The final page does not need to have a next.
 }
 
+/**
+ * Object to manage tasks that need completing before the page is displayed.
+ */
+function newTasksList(firstTask, onFinished) {
+  var me = {};
+  var tasks = {};
+  me.add = function(task) {
+    tasks[task] = true;
+  };
+  me.remove = function(task) {
+    delete tasks[task];
+    if ($.isEmptyObject(tasks)) {
+      onFinished();
+    }
+  };
+  me.add(firstTask);
+  return me;
+}
+
+var tasksList = newTasksList('callback', loadState);
 
 /**
  * Function executed when the window is loading.
  */
 $(window).load(function() {
   // Create textarea objects and events associated with the input changes.
-  var urlInput = new ResizingTextarea($('.url'), $('.hidden-url-element'), {
+  var urlInput = new ResizingTextarea($('.url .input'), 
+      $('.url .hidden-input'), {
         enterSubmission: true,
-        onChange: storeInput
+        onChange: storeInput,
+        textareaAndLabelElement: $('.url')
       });
-  var bodyInput = new ResizingTextarea($('.body-input'), 
-      $('.hidden-body-element'), {
+  var bodyInput = new ResizingTextarea($('.body .input'), 
+      $('.body .hidden-input'), {
         enterSubmission: false,
-        onChange: storeInput
+        onChange: storeInput,
+        textareaAndLabelElement: $('.body')
       });
   // Create the chapters + lesson objects
   makeChaptersAndLessons(urlInput, bodyInput);
-  // Load the markdown files for the introduction, resume, and finish page.
-  introduction.loadInstruction();
-  resume.loadInstruction();
-  finish.loadInstruction();
   // Create the chapter + lesson buttons + load markdown files for lessons.
   chapters.forEach(function(chapter) {
     chapter.makeMenu();
     chapter.lessons.forEach(function(lesson) {
       lesson.makeMenu();
-      // Load the markdown files for each lesson.
-      lesson.loadInstruction();
-      lesson.loadSuccessMessage();
-      lesson.loadAnswer();
-      lesson.loadHeader();
     });
   });
   // Set up analytics to indicate how many times users go to the documentation 
@@ -848,20 +1023,39 @@ $(window).load(function() {
  * Page-level callback to check if a user has an OAuth 2.0 token
  */
 function checkIfUserIsAuthorized(authResult) {
+  // The first time the callback is called, on page load, userAuthorization
+  // has no value.
+  var removeTask = false;
+  if (userAuthorization == null) {
+    removeTask = true;
+  }
   if (authResult['status']['signed_in']) {
     // The user is signed in and has authorised the application.
     // We set a global variable with their authorization token.
     userAuthorization = authResult['access_token'];
+  } else {
+    userAuthorization = false;
+  }
+  if (removeTask) {
+    tasksList.remove('callback');
   }
 }
 
 /**
- * Check if all the markdown files have been loaded.
+ * Function called on signin page only, for users who sign out of their
+ * Google account.
  */
-function checkNoFilesPending() {
-  if (jQuery.isEmptyObject(pendingFiles)) {
-    loadState();
-  }
+function signinAndResume() {
+  gapi.auth.signIn({
+    'callback': function(authResult) {
+      if (authResult['status']['signed_in']) {
+        signin.next.update();
+      } else {
+        signin.displayErrorMessage('You need to grant this tutorial ' +
+            'permissions if you wish to continue.');
+      }
+    }
+  });
 }
 
 /**
@@ -874,8 +1068,6 @@ function loadState() {
   chapters[0].lessons[0].unlock();
   // Make the active lesson the last opened page/default to introduction page.
   var activeLessonId = localStorage['currentLesson'] || 'introduction';
-  // Update the inventory box.
-  populateInventory();
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
       // Restore user completion information.
@@ -885,6 +1077,7 @@ function loadState() {
       // Add resume point.
       if (lesson.elementId == activeLessonId) {
         resume.next = lesson;
+        signin.next = lesson;
       }
     });
   });
@@ -896,31 +1089,155 @@ function loadState() {
     // If the user left at the final page.
     if (activeLessonId == 'finish') {
       resume.next = finish;
+      signin.next = finish;
     }
-    resume.unlock();
-    resume.update();
+    // If the user has completed the Sign In page but has no token,
+    // i.e. if the user has logged out, return them to a signin page.
+    if (localStorage['lesson6-login'] && !userAuthorization) {
+      signin.unlock();
+      signin.update();
+    // Otherwise, resume as normal.
+    } else {
+      resume.unlock();
+      resume.update();
+    }
   }
 }
 
 /**
  * Updating the inventory box.
  */
-function populateInventory() {
+function populateInventory(contents) {
   var inventory = $('.inventory');
   inventory.empty()
-      .append('<h3>Helpful information</h3>')
-      .append('<b>table ID: </b>')
-      .append('<code>15474835347274181123-14495543923251622067</code><br>')
-      .append('<b>your API Key: </b>')
-      .append($('<code>').text(localStorage['APIKey']));
+      .append('<h3>Helpful information</h3>');
+  contents.forEach(function(item) {
+    // Load the API key.
+    if (item.label == API_KEY_LABEL) {
+      item.information = localStorage['APIKey'];
+    }
+    // Load the user's project ID.
+    if (item.label == USER_PROJECT_ID) {
+      item.information = localStorage['projectID'];
+    }
+    // Load the user's 'World Famous Mountains' table ID.
+    if (item.label == USER_TABLE_ID) {
+      item.information = localStorage['tableID'];
+    }
+    // Add the item to the inventory element.
+    inventory.append('<b>' + item.label + '</b>')
+        .append('<code>' + item.information + '</code><br>');
+  });
+}
+
+/**
+ * Function to handle error response from Google Maps Engine server.
+ */
+function handleErrorResponse(response, input) {
+  var errorMess;
+  // Try parsing the error response.
+  try {
+    response = JSON.parse(response.responseText);
+    errorMess = response.error.errors[0];
+    // Append the response to the output area.
+    var responseString = JSON.stringify(errorMess, null, 2);
+    $('.response-content').text(responseString); 
+  } catch (e) {
+    errorMess = 'notJSONObject';
+  }
+  // Display the error with the message.
+  activeLesson.displayErrorMessage(decideErrorMessage(errorMess, input));
+}
+
+/**
+ * Function to choose error message to display.
+ */
+function decideErrorMessage(errorMess, input) {
+  // Giving messages for different error reasons.
+  var message;
+  if (errorMess == 'notJSONObject') {
+    message = 'The URL is not a valid Google Maps Engine API URL.';
+  } else if (errorMess.reason == 'authError') {
+    message = 'It appears that your authorization token is invalid. Make ' +
+        'sure that you entered the correct header for this request.';
+  } else if (errorMess.reason == 'keyInvalid') {
+    // If it contains curly braces, ask user to remove them.
+    if (input.indexOf('{') != -1 || 
+        input.indexOf('}') != -1) {
+      message = 'Check that you have removed the curly braces({ }) ' +
+          'surrounding the API Key in your URL.';
+    } else {
+      message = 'The API Key used in the URL is invalid. Make sure that ' +
+          'you entered your API Key correctly.';
+    }
+  } else if (errorMess.reason == 'dailyLimitExceededUnreg') {
+    message = 'There might be something wrong with your \'key\' parameter. ' +
+        'Make sure that you entered it correctly.';
+  } else if (errorMess.reason == 'invalid') {
+    var field = errorMess.location;
+    // If the error is not in table ID, tell the error location.
+    if (field != 'id') {
+      message = 'Check whether you have given the right values for the ' +
+          'parameters, in particular, the \''+field+'\' field.';
+    } else {
+      // If it contains curly braces, ask user to remove them.
+      if (input.indexOf('{') != -1 || 
+          input.indexOf('}') != -1) {
+        message = 'Check that you have removed the curly braces({ }) ' +
+            'surrounding the table ID in your URL.';
+      } else {
+        message = 'The table ID used in the URL is invalid. Check whether ' +
+            'you have given the right table ID and make sure that the table ' +
+            'has been made public. To make your table public, you can follow ' +
+            'the instructions in <a href=' +
+            '"//support.google.com/mapsengine/answer/3164737?hl=en"' +
+            '>this link</a>.';
+      }
+    }
+  } else if (errorMess.reason == 'required') {
+    message = 'A required parameter has been left out of the request. Make ' +
+        'sure that you entered all parameters needed.';
+  } else if (errorMess.reason == 'notFound') {
+    message = 'No results were found for your request. The asset might not ' +
+        'exist, not a public asset, or it has been deleted from the Google ' +
+        'Maps Engine.';
+  } else if (errorMess.reason == 'insufficientPermissions') {
+    message = 'You do not have sufficient permissions for this request. Make ' +
+        'sure you have specified version=published in the request.';
+  } else if (errorMess.reason == 'limitExceeded') {
+    message = 'The resource is too large to be accessed through the API.';
+  } else if (errorMess.reason == 'duplicate') {
+    message = 'The new feature you are trying to insert has an ID that ' +
+        'already exists in the table. Try to use a different ' +
+        '<code>gx_id</code> in the body of your request.';
+  } else if (errorMess.reason == 'rateLimitExceeded' || 
+             errorMess.reason == 'quotaExceeded') {
+    message = 'You have exhausted the application\'s daily quota or its ' +
+        'per-second rate limit. Please contact the Enterprise Support for ' +
+        'higher limits.';
+  } else if (errorMess.reason == 'unauthorized') {
+    message = 'Make sure you have included the required authorization header ' +
+        'with the request.';
+  } else if (errorMess.reason == 'requestTooLarge') {
+    message = 'This request contains too many features and/or vertices.';
+  } else if (errorMess.reason == 'accessNotConfigured') {
+    message = 'There is a per-IP or per-Referer restriction configured on ' +
+        'the API Key and the request does not match these restrictions, or ' +
+        'the Maps Engine API is not activated on the project ID.';
+  } else if (errorMess.reason == 'parseError') {
+    message = 'The body you entered is not a valid JSON object. Make sure ' +
+        'that you format your data correctly.';
+  } else {
+    message = 'The data you requested cannot be processed. Check your ' +
+        'request to ensure that it is correct.';
+  }
+  return message;
 }
 
 /**
  * GME API submit function.
  */
-function getText() {
-  // Get user input & trim it.
-  var address =  $.trim($('.url').val());
+function getText(address) {
   var me = this;
   var data = $('.response-content');
   data.empty();
@@ -932,28 +1249,23 @@ function getText() {
       url: 'resources/alice-in-wonderland.txt',
       dataType: 'text',
       success: function(resource) {
-        data.text(resource);
+        $('.response-content').text(resource);
         me.displaySuccessMessage();
-        me.complete();
       }
     });
   } else {
     // The user entered incorrect input.
     me.displayErrorMessage('Make sure that the spelling is correct, ' + 
         'all letters are in lowercase, and there are no spaces between the ' +
-        'text. Don\'t forget to add "/" between the path and the filename.');
+        'text. Don\'t forget to add \'/\' between the path and the filename.');
   } 
 }
 
 /**
  * API Key submit function.
  */
-function testAPIKey() {
-  // Get user input & trim it.
-  var userKey = $.trim($('.url').val());
+function testAPIKey(userKey) {
   var me = this;
-  var data = $('.response-content');
-  data.empty();
   // Use user's API Key to do a HTTP request.
   // If it works then it is a valid API Key.
   $.ajax({
@@ -963,9 +1275,7 @@ function testAPIKey() {
     dataType: 'json',
     success: function(resource) {
       localStorage['APIKey'] = userKey;
-      populateInventory();
       me.displaySuccessMessage();
-      me.complete();
     },
     error: function(response) {
       me.displayErrorMessage('Make sure that you have created a browser key ' +
@@ -973,6 +1283,43 @@ function testAPIKey() {
     }
   })
 ;}
+
+/**
+ * Checking the correctness of user's input by comparing the response.
+ * This is used to check GET requests.
+ */
+function checkCorrectness(address) {
+  var me = this;
+  // Get the response with the correct URL.
+  $.ajax({
+    url: me.testingURL,
+    headers: me.header,
+    dataType: 'json',
+    success: function(resource) {
+      var correctResourceString = JSON.stringify(resource, null, 2);
+      // Get the response with users's input.
+      $.ajax({
+        url: address,
+        headers: me.header,
+        dataType: 'json',
+        success: function(resource2) {
+          var resourceString = JSON.stringify(resource2, null, 2);
+          $('.response-content').text(resourceString);
+          // If the response is the correct response, then the user is right.
+          if (resourceString == correctResourceString) {
+            me.displaySuccessMessage();
+          } else {
+            me.displayErrorMessage('Be sure to read the instructions ' +
+                'carefully and complete the exercise requirements.');
+          } 
+        },
+        error: function(response) {
+          handleErrorResponse(response, address);
+        }
+      });
+    }
+  });
+}
 
 /**
  * Login and authorization submit function.
@@ -984,7 +1331,6 @@ function authorizeUser() {
       if (authResult['status']['signed_in']) {
         $('.request').hide();
         me.displaySuccessMessage();
-        me.complete();
       } else {
         me.displayErrorMessage('You need to grant this tutorial permissions ' +
             'if you wish to continue.');
@@ -1000,10 +1346,68 @@ function storeProjectID() {
   var projectID = $('.project-list').val();
   if (projectID) {
     localStorage['projectID'] = projectID;
-    this.complete();
     this.displaySuccessMessage();
   } else {
     this.displayErrorMessage('You need to select a project from the dropdown ' +
         'list. It may take a few seconds for new projects to appear.');
   }
+}
+
+/**
+ * Check whether a new table/feature has been created or not.
+ */
+function checkCreateRequest(input) {
+  var me = this;
+  // Find out the number of tables/features the user has.
+  $.ajax({
+    headers: {'Authorization': 'Bearer ' + userAuthorization},
+    type: 'GET',
+    url: me.testingURL,
+    // This request should always be successful.
+    success: function(resource) {
+      // Store the number of tables/features the user has.
+      var initialArray = resource.tables || resource.features;
+      var initialCount = initialArray.length;
+      // Attempt to create a table with user's input.
+      $.ajax({
+        headers: me.header,
+        type: 'POST',
+        url: me.url || input,
+        data: JSON.stringify(me.body) || input,
+        dataType: 'json',
+        success: function(resource2){
+          // If the request returns a valid object, show the output.
+          if (typeof resource2 == 'object') {
+            var responseString = JSON.stringify(resource2, null, 2);
+            $('.response-content').text(responseString); 
+          }
+          // Find out the number of tables/features after the create request.
+          $.ajax({
+            headers: {'Authorization': 'Bearer ' + userAuthorization},
+            type: 'GET',
+            url: me.testingURL,
+            success: function(resource3) {
+              // Count the final number of tables/features.
+              var finalArray = resource3.tables || resource3.features;
+              var finalCount = finalArray.length;
+              // If the number of table/feature increase, the user is right.
+              if (finalCount > initialCount) {
+                // Store the table ID in local storage if it is the World
+                // Famous Mountains table (lesson9-createtable1).
+                if (me.elementId == 'lesson9-createtable1') {
+                  localStorage['tableID'] = resource2.id;
+                }
+                me.displaySuccessMessage();
+              } else {
+                me.displayErrorMessage('Make sure you enter the correct URL.');
+              }
+            }
+          });
+        },
+        error: function(response){
+          handleErrorResponse(response, input);
+        }
+      });
+    }
+  });
 }

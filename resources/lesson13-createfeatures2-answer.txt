@@ -1,5 +1,5 @@
 ###Answer###  
-You can use this feature to add to your 'World Famous Mountains' table. 
+You can use this feature to add to your 'World Famous Mountains' table. You might need to change the `gx_id` to ensure that it is unique within the table.  
 `{
   "features": [
     {

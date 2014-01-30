@@ -1,2 +1,2 @@
 ###Answer###  
-`https://www.googleapis.com/mapsengine/v1/tables/{tableId}`
+`https://www.googleapis.com/mapsengine/v1/tables/{userTableId}`
