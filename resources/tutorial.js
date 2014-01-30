@@ -332,12 +332,8 @@ Lesson.prototype.submit = function() {
   data.empty();
   // Change URL Template to a real URL with some data in local storage.
   if (this.testingURLTemplate) {
-    // Change if there is table ID in the template URL.
-    this.testingURL = this.testingURLTemplate.replace(/{userTableId}/g, 
-        localStorage['tableID']);
-    // Change if there is project ID in the template URL.
-    this.testingURL = this.testingURL.replace(/{userProjectId}/g,
-        localStorage['projectID']);
+    // Change if there is table ID/project ID/API Key in the template URL.
+    this.testingURL = replaceTemplate(this.testingURLTemplate);
   }
   // Check the correctness of user input.
   this.checkAnswer(input);
@@ -357,17 +353,9 @@ Lesson.prototype.displayInstructions = function() {
  */
 Lesson.prototype.showAnswer = function() {
   if (this.answer) {
-    // Change the markdown files to HTML and combined with the API Key.
+    // Change the markdown files to HTML and changed the template.
     var htmlAnswer = markdown.toHTML(this.answer);
-    // Replace userAPIKey with the API Key stored in local storage.
-    var htmlKey =  $('<span>').text(localStorage['APIKey']).html();
-    htmlAnswer = htmlAnswer.replace(/{userAPIKey}/g, htmlKey);
-    // Replace userTableId with World Famous Mountain table ID.
-    var htmlTableId =  $('<span>').text(localStorage['tableID']).html();
-    htmlAnswer = htmlAnswer.replace(/{userTableId}/g, htmlTableId);
-    // Replace userProjectId with the project ID they chose.
-    var htmlProjectId =  $('<span>').text(localStorage['projectID']).html();
-    htmlAnswer = htmlAnswer.replace(/{userProjectId}/g, htmlProjectId);
+    htmlAnswer = replaceTemplate(htmlAnswer);
     // Change the html of answer area.
     $('.answer').html(htmlAnswer);
     // Hide button once clicked.
@@ -388,15 +376,13 @@ Lesson.prototype.showAnswer = function() {
  * If the input is right, do the success responses.
  */
 Lesson.prototype.displaySuccessMessage = function() {
-  if (this.successMessageTemplate) {
+  if (this.successMessage) {
     // The lesson is completed. Display the success message.
     this.complete();
-    // Replace any templates, such as PROJECT_ID and ASSET_ID.
-    this.successMessage = this.successMessageTemplate.replace(/{userProjectId}/g,
-        localStorage['projectID']);
-    this.successMessage = this.successMessage.replace(/{userTableId}/g,
-        localStorage['tableID']);
-    $('.message').html(markdown.toHTML(this.successMessage));
+    // Replace any templates, such as table/Project ID/API Key.
+    var message = markdown.toHTML(this.successMessage);
+    message = replaceTemplate(message);
+    $('.message').html(message);
     // The submission has finished, update the submission status.
     this.isSubmitting = false;
     // Remove the overlay.
@@ -553,7 +539,7 @@ Lesson.prototype.loadSuccessMessage = function() {
   var filename = this.elementId + '-success.txt';
   tasksList.add(filename);
   $.get('resources/' + filename, function(response) {
-    me.successMessageTemplate = response;
+    me.successMessage = response;
     tasksList.remove(filename);
   });
 };
@@ -590,7 +576,7 @@ Lesson.prototype.loadBody = function() {
  * Update and display the url of lesson.
  */
 Lesson.prototype.displayUrl = function() {
-  this.url = this.urlTemplate.replace(/{userTableId}/g, localStorage['tableID']);
+  this.url = replaceTemplate(this.urlTemplate);
   this.inactiveInput.setInput(this.url);
 }
 
@@ -1244,6 +1230,18 @@ function decideErrorMessage(errorMess, input) {
         'request to ensure that it is correct.';
   }
   return message;
+}
+
+/**
+ * Return string with templates replaced with local storage data.
+ * The local storage data including API Key, table ID, and project Id.
+ */
+function replaceTemplate(template) {
+  var string;
+  string = template.replace(/{userAPIKey}/g, localStorage['APIKey']);
+  string = string.replace(/{userTableId}/g, localStorage['tableID']);
+  string = string.replace(/{userProjectId}/g, localStorage['projectID']);
+  return string;
 }
 
 /**
