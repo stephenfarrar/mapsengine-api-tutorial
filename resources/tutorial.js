@@ -333,10 +333,10 @@ Lesson.prototype.submit = function() {
   // Change URL Template to a real URL with some data in local storage.
   if (this.testingURLTemplate) {
     // Change if there is table ID in the template URL.
-    this.testingURL = this.testingURLTemplate.replace('{userTableId}', 
+    this.testingURL = this.testingURLTemplate.replace(/{userTableId}/g, 
         localStorage['tableID']);
     // Change if there is project ID in the template URL.
-    this.testingURL = this.testingURL.replace('{userProjectId}',
+    this.testingURL = this.testingURL.replace(/{userProjectId}/g,
         localStorage['projectID']);
   }
   // Check the correctness of user input.
@@ -361,13 +361,13 @@ Lesson.prototype.showAnswer = function() {
     var htmlAnswer = markdown.toHTML(this.answer);
     // Replace userAPIKey with the API Key stored in local storage.
     var htmlKey =  $('<span>').text(localStorage['APIKey']).html();
-    htmlAnswer = htmlAnswer.replace('{userAPIKey}', htmlKey);
+    htmlAnswer = htmlAnswer.replace(/{userAPIKey}/g, htmlKey);
     // Replace userTableId with World Famous Mountain table ID.
     var htmlTableId =  $('<span>').text(localStorage['tableID']).html();
-    htmlAnswer = htmlAnswer.replace('{userTableId}', htmlTableId);
+    htmlAnswer = htmlAnswer.replace(/{userTableId}/g, htmlTableId);
     // Replace userProjectId with the project ID they chose.
     var htmlProjectId =  $('<span>').text(localStorage['projectID']).html();
-    htmlAnswer = htmlAnswer.replace('{userProjectId}', htmlProjectId);
+    htmlAnswer = htmlAnswer.replace(/{userProjectId}/g, htmlProjectId);
     // Change the html of answer area.
     $('.answer').html(htmlAnswer);
     // Hide button once clicked.
@@ -388,13 +388,13 @@ Lesson.prototype.showAnswer = function() {
  * If the input is right, do the success responses.
  */
 Lesson.prototype.displaySuccessMessage = function() {
-  if (this.successMessage) {
+  if (this.successMessageTemplate) {
     // The lesson is completed. Display the success message.
     this.complete();
     // Replace any templates, such as PROJECT_ID and ASSET_ID.
-    this.successMessage = this.successMessage.replace('{PROJECT_ID}',
+    this.successMessage = this.successMessageTemplate.replace(/{userProjectId}/g,
         localStorage['projectID']);
-    this.successMessage = this.successMessage.replace('{ASSET_ID}',
+    this.successMessage = this.successMessage.replace(/{userTableId}/g,
         localStorage['tableID']);
     $('.message').html(markdown.toHTML(this.successMessage));
     // The submission has finished, update the submission status.
@@ -553,7 +553,7 @@ Lesson.prototype.loadSuccessMessage = function() {
   var filename = this.elementId + '-success.txt';
   tasksList.add(filename);
   $.get('resources/' + filename, function(response) {
-    me.successMessage = response;
+    me.successMessageTemplate = response;
     tasksList.remove(filename);
   });
 };
@@ -590,7 +590,7 @@ Lesson.prototype.loadBody = function() {
  * Update and display the url of lesson.
  */
 Lesson.prototype.displayUrl = function() {
-  this.url = this.urlTemplate.replace('{userTableId}', localStorage['tableID']);
+  this.url = this.urlTemplate.replace(/{userTableId}/g, localStorage['tableID']);
   this.inactiveInput.setInput(this.url);
 }
 
@@ -599,7 +599,10 @@ Lesson.prototype.displayUrl = function() {
  */
 Lesson.prototype.displayHeader = function() {
   this.header.Authorization = 'Bearer ' + userAuthorization;
-  var header = JSON.stringify(this.header, null, 1);
+  var header = JSON.stringify(this.header, null, 2);
+  // Style the header, removing the JSON format in it.
+  // Remove the first new line, remove {}, "", ,, and ''.
+  // Remove all the spaces except spaces after : and Bearer.
   header = header.replace('\n', '');
   header = header.replace('{', '');
   header = header.replace('}', '');
