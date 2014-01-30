@@ -593,12 +593,7 @@ Lesson.prototype.displayHeader = function() {
   // Remove the first new line, remove {}, "", ,, and ''.
   // Remove all the spaces except spaces after : and Bearer.
   header = header.replace('\n', '');
-  header = header.replace('{', '');
-  header = header.replace('}', '');
-  header = header.replace(',', '');
-  header = header.replace(/ /g, '');
-  header = header.replace(/"/g, '');
-  header = header.replace(/'/g, '');
+  header = header.replace(/[{}, "']/g, '');
   header = header.replace(/:/g, ': ');
   header = header.replace('Bearer', 'Bearer ');
   $('.header .input').text(header);
