@@ -332,12 +332,8 @@ Lesson.prototype.submit = function() {
   data.empty();
   // Change URL Template to a real URL with some data in local storage.
   if (this.testingURLTemplate) {
-    // Change if there is table ID in the template URL.
-    this.testingURL = this.testingURLTemplate.replace('{userTableId}', 
-        localStorage['tableID']);
-    // Change if there is project ID in the template URL.
-    this.testingURL = this.testingURL.replace('{userProjectId}',
-        localStorage['projectID']);
+    // Change if there is table ID/project ID/API Key in the template URL.
+    this.testingURL = replaceTemplate(this.testingURLTemplate);
   }
   // Check the correctness of user input.
   this.checkAnswer(input);
@@ -345,10 +341,13 @@ Lesson.prototype.submit = function() {
 
 /**
  * Display instruction if there is any.
+ * Replace any template in the instruction.
  */
 Lesson.prototype.displayInstructions = function() {
   if (this.instructions) {
-    $('.instructions').html(markdown.toHTML(this.instructions));
+    var instruction = markdown.toHTML(this.instructions);
+    instruction = replaceTemplate(instruction);
+    $('.instructions').html(instruction);
   }
 };
 
@@ -357,17 +356,9 @@ Lesson.prototype.displayInstructions = function() {
  */
 Lesson.prototype.showAnswer = function() {
   if (this.answer) {
-    // Change the markdown files to HTML and combined with the API Key.
+    // Change the markdown files to HTML and changed the template.
     var htmlAnswer = markdown.toHTML(this.answer);
-    // Replace userAPIKey with the API Key stored in local storage.
-    var htmlKey =  $('<span>').text(localStorage['APIKey']).html();
-    htmlAnswer = htmlAnswer.replace('{userAPIKey}', htmlKey);
-    // Replace userTableId with World Famous Mountain table ID.
-    var htmlTableId =  $('<span>').text(localStorage['tableID']).html();
-    htmlAnswer = htmlAnswer.replace('{userTableId}', htmlTableId);
-    // Replace userProjectId with the project ID they chose.
-    var htmlProjectId =  $('<span>').text(localStorage['projectID']).html();
-    htmlAnswer = htmlAnswer.replace('{userProjectId}', htmlProjectId);
+    htmlAnswer = replaceTemplate(htmlAnswer);
     // Change the html of answer area.
     $('.answer').html(htmlAnswer);
     // Hide button once clicked.
@@ -391,12 +382,10 @@ Lesson.prototype.displaySuccessMessage = function() {
   if (this.successMessage) {
     // The lesson is completed. Display the success message.
     this.complete();
-    // Replace any templates, such as PROJECT_ID and ASSET_ID.
-    this.successMessage = this.successMessage.replace('{PROJECT_ID}',
-        localStorage['projectID']);
-    this.successMessage = this.successMessage.replace('{ASSET_ID}',
-        localStorage['tableID']);
-    $('.message').html(markdown.toHTML(this.successMessage));
+    // Replace any templates, such as table/Project ID/API Key.
+    var message = markdown.toHTML(this.successMessage);
+    message = replaceTemplate(message);
+    $('.message').html(message);
     // The submission has finished, update the submission status.
     this.isSubmitting = false;
     // Remove the overlay.
@@ -590,7 +579,7 @@ Lesson.prototype.loadBody = function() {
  * Update and display the url of lesson.
  */
 Lesson.prototype.displayUrl = function() {
-  this.url = this.urlTemplate.replace('{userTableId}', localStorage['tableID']);
+  this.url = replaceTemplate(this.urlTemplate);
   this.inactiveInput.setInput(this.url);
 }
 
@@ -600,6 +589,13 @@ Lesson.prototype.displayUrl = function() {
 Lesson.prototype.displayHeader = function() {
   this.header.Authorization = 'Bearer ' + userAuthorization;
   var header = JSON.stringify(this.header, null, 2);
+  // Style the header, removing the JSON format in it.
+  // Remove the first new line, remove {}, "", ,, and ''.
+  // Remove all the spaces except spaces after : and Bearer.
+  header = header.replace('\n', '');
+  header = header.replace(/[{}, "']/g, '');
+  header = header.replace(/:/g, ': ');
+  header = header.replace('Bearer', 'Bearer ');
   $('.header .input').text(header);
   $('.header').show();
 }
@@ -656,7 +652,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
   chapters = [
     new Chapter('chapter0-intro', {title: 'Introduction', lessons: [
       new Lesson('lesson1-gmeapi', {
-        title: 'GME API',
+        title: 'Google Maps Engine API',
         checkAnswer: getText,
         activeInput: urlInput
       }),
@@ -723,10 +719,11 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           Lesson.prototype.update.call(this);
           $('.url').hide();
           if (userAuthorization) {
-            // Dectivate the 'Sign In' button.
-            $('.submit-button').attr('disabled', 'disabled');
-            // Make sure that the next lesson is always unlocked.
-            this.complete();
+            // Remove the 'Sign In' button.
+            $('.submit-button').hide();
+            // Show a helpful message to the user and make sure the next lesson
+            // is unlocked.
+            this.displaySuccessMessage();
           }
         }
       }),
@@ -1232,6 +1229,18 @@ function decideErrorMessage(errorMess, input) {
         'request to ensure that it is correct.';
   }
   return message;
+}
+
+/**
+ * Return string with templates replaced with local storage data.
+ * The local storage data including API Key, table ID, and project Id.
+ */
+function replaceTemplate(template) {
+  var string;
+  string = template.replace(/{userAPIKey}/g, localStorage['APIKey']);
+  string = string.replace(/{userTableId}/g, localStorage['tableID']);
+  string = string.replace(/{userProjectId}/g, localStorage['projectID']);
+  return string;
 }
 
 /**
