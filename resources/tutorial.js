@@ -719,10 +719,11 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           Lesson.prototype.update.call(this);
           $('.url').hide();
           if (userAuthorization) {
-            // Dectivate the 'Sign In' button.
-            $('.submit-button').attr('disabled', 'disabled');
-            // Make sure that the next lesson is always unlocked.
-            this.complete();
+            // Remove the 'Sign In' button.
+            $('.submit-button').hide();
+            // Show a helpful message to the user and make sure the next lesson
+            // is unlocked.
+            this.displaySuccessMessage();
           }
         }
       }),

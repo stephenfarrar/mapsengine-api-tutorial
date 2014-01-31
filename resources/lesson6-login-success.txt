@@ -1,1 +1,1 @@
-Congrats! You have successfully authorised this tutorial to make POST requests on your behalf. Click 'Next Lesson' to learn how to make these requests.
+You have successfully authorised this tutorial to make POST requests on your behalf. Click 'Next Lesson' to learn how to make these requests.
