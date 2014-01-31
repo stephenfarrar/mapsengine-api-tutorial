@@ -6,7 +6,7 @@ The body of the POST request to create a feature has to be in the JSON format, w
 	* `type`: The type of the geometry. Supported types are `Point`, `LineString`, `Polygon`, and `GeometryCollection`. To read more about these types, you can read the documentation [here](//developers.google.com/maps-engine/documentation/reference/v1/tables/features#geometry-objects).
 	* `coordinates`: The geographic position of the feature in the map. It might contain one or more positions. A `position` is an array containing a single longitude, a single latitude, and optionally a single altitude value, in that order. 
 * `properties`: Contains one or more entries which conform to the target table's schema. It must contain:
-	* `gx_id`: A unique identifier of each feature in the table. You can use any integer number for `gx_id` but make sure that no other feature in the table has the same number.
+	* `gx_id`: A unique identifier of each feature in the table. You can use any integer number for this but make sure that no other feature in the table has the same number.
 	* other properties in table's schema. String and integer values must be enclosed in double quotes ("), while float values must not be enclosed in quotes.
 
 ###Exercise###  
