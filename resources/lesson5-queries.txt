@@ -1,15 +1,15 @@
 ##Queries##  
-If you want to query a table for specific data, you can add additional parameters to a List Features request including:  
+If you want to query a table for specific data, you can add additional parameters to a List Features request including:
 
-* intersects: get features which intersect with a geometry (point, polygon, circle, linestring).
-* limit: create an upper bound of the number of features returned.
-* select: specifies which properties of the features will be shown in the result, equivalent to SQL projection clause. It can also be used to create a new property (column alias).
-* where: create a condition that must be fulfilled by the features returned. The supported operators are >, <, >=, <=, =, and <>. Equivalent to SQL predicate.
-* orderBy: specified the ordering of the features returned (ascending/descending). It is equivalent to SQL order and it is ascending by default. You also have to specify the limit if you want to use this parameter. 
+* `intersects`: Get features which intersect with a geometry (point, polygon, circle, linestring).
+* `limit`: Create an upper bound of the number of features returned.
+* `select`: Specifies which properties of the features will be shown in the result.
+* `where`: Create a condition that must be fulfilled by the features returned. The supported operators are >, <, >=, <=, =, and <>.
+* `orderBy`: Specify the ordering of the features returned (ascending/descending). It is ascending by default. You have to specify a `limit` of less than or equal to 75 if you want to use this parameter.
 
 For example, if you only want to find 'Paris' in the 'Famous Cities' table, and only display the `Name` property, you could request: `https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyA72mMb9IsfSDWA_7RVpCo3_LM_7P2hlXY&select=Name&where=Name='Paris'`.
 
-For more information regarding queries and a full list of available parameters, you can read the [GME API Documentation for list features](//developers.google.com/maps-engine/documentation/read).
+For more information regarding queries and a full list of available parameters, you can read the [Google Maps Engine API Documentation for list features](//developers.google.com/maps-engine/documentation/read).
 
 ###Exercise###  
 Try to query the 'Famous Cities' table to list cities whose `Population` is less than 2 million. Use the table ID `15474835347274181123-14495543923251622067` and your valid API Key for the URL, then click 'Get'.

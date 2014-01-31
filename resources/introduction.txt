@@ -1,5 +1,6 @@
 ##Welcome to the Google Maps Engine API tutorial!##  
-This tutorial will take you through getting set up as a Google developer and beginning to interact with Google Maps Engine using the API. You will learn to read public data from a Google Maps Engine project.  
+This tutorial will take you through getting set up as a Google developer and beginning to manage your data and interact with Google Maps Engine using the API. You will learn how to read public data from a Google Maps Engine project as well as create your own personal project and add data to it.
+
 Are you as poised and ready as this cat to begin the tutorial?
 
 [![introduction-cat-image](images/introduction-cat.png "Meow!")](//www.flickr.com/photos/12632039@N05/1373008133)  

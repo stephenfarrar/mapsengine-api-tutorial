@@ -1,1 +1,1 @@
-Congrats! You have successfully authorised this tutorial to make POST requests on your behalf. Click 'Next Lesson' to learn how to make these requests.
+You have successfully authorized this tutorial to make requests on your behalf. If you want more information on OAuth 2.0 and client-side authentication, go [here](//developers.google.com/maps-engine/documentation/oauth/clientside). Alternatively, to experiment with your own OAuth 2.0 token you can go to the (OAuth 2.0 Playground)[//developers.google.com/oauthplayground/]. When you are ready, click 'Next Lesson' to continue.

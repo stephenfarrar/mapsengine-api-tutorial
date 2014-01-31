@@ -1,8 +1,8 @@
 ##Congratulations! You have finished the tutorial!##  
-
-As a gift, here is a little present for you:
+As a gift, here is a little something for you:
 [![finish-cat-image](images/finish-cat.png "Excellent!")](//www.flickr.com/photos/26226522@N08/4143179870/)  
-_Underlying image by [Yumi Kimura](//www.flickr.com/people/26226522@N08) used under [CC-BY-SA-2.0](//creativecommons.org/licenses/by-sa/2.0)._  
+_Underlying image by [Yumi Kimura](//www.flickr.com/people/26226522@N08) used under [CC-BY-SA-2.0](//creativecommons.org/licenses/by-sa/2.0)._
 
-To go back to the tutorial, you can choose the lesson you want from the menu on the left hand side.  
+To go back to the tutorial, you can choose the lesson you want from the menu on the left hand side.
+
 To learn more about how to use the Google Maps Engine API, you can visit the documentation page by clicking the button below.

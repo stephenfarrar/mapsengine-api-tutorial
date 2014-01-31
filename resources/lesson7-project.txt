@@ -1,4 +1,4 @@
 ##Create a Free Project##  
-Now it's time to create your own personal Maps Engine project using your Google account. A project can contain multiple tables of data, however the free Maps Engine projects have certain limits. For information on these limits go [here](https://support.google.com/mapsengine/answer/3342103?hl=en).  
+It's time to create your own personal Maps Engine project using your Google account. Maps Engine offers free projects to get you started which are perfect for this tutorial. These free accounts are limited and information on these limits can be found [here](//support.google.com/mapsengine/answer/3342103?hl=en).
 
-If you already have a Maps Engine project, select it from the dropdown list below. Otherwise, create a free Maps Engine project [here](https://mapsengine.google.com/projects/new). Once you have created a project, return to the tutorial and select it from the dropdown list.
+If you already have a Maps Engine project, select it from the dropdown list below. Otherwise, create a free Maps Engine project [here](//mapsengine.google.com/projects/new). Once you have created a project, return to the tutorial and select it from the dropdown list. This project will be used to store tables created in the ensuing lessons of this tutorial.
