@@ -1,8 +1,6 @@
-##Login to Google##  
-Now you have learnt to read public tables, you are ready to learn how to create your own table and add data to it.  
-In order to do this, you will need an authorisation token, similar to the API Key from before.  
+##Login and Authorization##  
+Now you have learned to read public tables, you are ready to learn how to create your own table and add data to it. In order to manage data on behalf of a user, many Google APIs (including the Maps Engine API) use the OAuth 2.0 protocol which uses a _token_ to identify an application's permissions to read or modify data on behalf of a user.
 
-This authorisation token forms part of OAuth 2.0 and is an essential component of any application. If you've ever signed up or logged in to an application, whether on the web or your mobile, you may have seen a 'User Consent' form which asks for the app to have certain permissions. When you consent, the application receives your unique authorisation token and uses it to query for the information you have allowed it access to.  
+Permissions can be granted by a pop-up which displays what actions the application would like to take on a user's behalf. If a user chooses to 'Accept', the application then receives a unique authorization token and uses it to request only information that the user has allowed it access to.
 
-Similarly, if you want to create data using Google Maps Engine, you are required to send this token along with any requests relating to private data to verify that you have the appropriate permissions.   
-To demonstrate this, click on the 'Signin' button below.
+To demonstrate this process, and so that this tutorial can help you manage your private data, click on the 'Sign In' button below. You will only need to do this once, unless you sign out of your Google account.

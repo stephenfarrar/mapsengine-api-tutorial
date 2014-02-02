@@ -1,1 +1,1 @@
-You can see the response for the request in the box below. It will still return GeoJSON objects, but it only return features whose `Population` is less than 2 million, since you specified it in the query.
+You can see the response in the box below. It still contains GeoJSON objects, but it only returns information about features whose `Population` is less than 2 million, since this was specified in the query.

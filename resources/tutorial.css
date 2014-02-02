@@ -407,12 +407,11 @@ code {
 img[alt=introduction-cat-image], img[alt=finish-cat-image] {
   display: block;
   height: 300px;
-  margin-bottom: 20px;
   margin-top: 20px;
 }
 
 /* Table image */
-img[alt=table] {
+img[alt=table], img[alt=url-structure] {
   display: block;
   width: 650px;
 }

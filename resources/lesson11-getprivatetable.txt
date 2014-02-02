@@ -1,9 +1,13 @@
 ##Get Private Table##  
-The URL: `https://www.googleapis.com/mapsengine/v1/tables/{tableId}?version=published&key={yourAPIKey}` only can be used to get public table (tables with specification `publishedAccessList="Map Viewers"`. You will not be able to access private tables with this URL only. As an example, you can try to access your 'World Famous Mountains' table with the above URL. Copy and paste the URL into the address bar on a new tab in your browser, substituting the `{table ID}` and `{your API Key}` with the value provided in the helpful information box. You will get 'insufficientPermissions' error since the table cannot be accessed publicly.  
-To be able to access private tables, you have to create a GET request, and provide a header and URL for the request. The URL used for this request is:
-`https://www.googleapis.com/mapsengine/v1/tables/{tableId}`.  
-The header has to contain the OAuth 2.0 access token. This access token will authenticate you as 'Map Editors' and hence you will be able to access the private table. The format of the header is the same as the one for listing project, which is:
-`"Authorization": "Bearer {accessToken}"`
+The URL you learned in the 'Get Table' lesson:  
+`https://www.googleapis.com/mapsengine/v1/tables/{tableId}?version=published&key={APIKey}`  
+can only be used to GET a public table (tables with specification `"publishedAccessList": "Map Viewers"`). You will not be able to access private tables with this URL only. If you tried to access a private table in a new tab on your browser with this URL, you will get 'insufficientPermissions' error since the table cannot be accessed publicly.
+
+To be able to access private tables, you have to create a GET request, and provide a header and URL for the request. The URL used for this request is:  
+`https://www.googleapis.com/mapsengine/v1/tables/{tableId}`.
+
+The header has to contain the OAuth 2.0 access token. This access token will authenticate you as a member of the 'Access List' that has permission to view the table. The format of the header is the same as the one for listing project, which is:  
+`Authorization: Bearer {accessToken}`.
 
 ###Exercise###  
 Structure the URL to read the private table 'World Famous Mountains' in your project. Replace `{tableId}` with the table ID of the 'World Famous Mountains' table, which is provided in the helpful information box. We have already provided the header for you.

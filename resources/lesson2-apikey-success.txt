@@ -1,1 +1,1 @@
- Congrats! You now have a valid API key. This key is unique and you will need to include it in every request you send to the API, so keep it close by.
+Congrats! You now have a valid API key. This key is unique and you will need to include it in every request you send to the API, so keep it close by.
