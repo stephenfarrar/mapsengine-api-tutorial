@@ -307,7 +307,7 @@ Lesson.prototype.update = function() {
       // Disabled the inactive input.
       this.inactiveInput.disable();
       // Make the border black again.
-      this.activeInput.removeRedBorder();
+      this.inactiveInput.removeRedBorder();
     }
     if (this.activeInput) {
       // Enabled the specific input area for each lesson.
