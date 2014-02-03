@@ -1429,16 +1429,14 @@ function checkCreateRequest(input) {
                 }
                 me.displaySuccessMessage();
               } else {
-                if (me.body) {
-                  // The input is the url.
-                  // User might use wrong table Id.
-                  me.displayErrorMessage('Make sure that you use the table ' +
-                      'ID specified in the \'Helpful information\' box.');
+                if (resource3.tables) {
+                  // In create table lesson.
+                  me.displayErrorMessage ('We cannot find a new table in the ' +
+                      'project with ID = ' + localStorage['projectID'] + '.');
                 } else {
-                  // The input is the request body.
-                  // The user might use the wrong project id.
-                  me.displayErrorMessage('Make sure that you use the project ' +
-                      'ID specified in the \'Helpful information\' box.');
+                  // In create features lesson.
+                  me.displayErrorMessage ('We cannot find a new feature in ' +
+                      'the table with ID = ' + localStorage['tableID'] + '.');
                 }
               }
             }
