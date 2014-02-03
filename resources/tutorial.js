@@ -1436,7 +1436,6 @@ function checkCreateRequest(input) {
                   me.displayErrorMessage('Make sure that you use the project ' +
                       'ID specified in the \'Helpful information\' box.');
                 }
-                
               }
             }
           });
