@@ -741,7 +741,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           $('.url').hide();
           if (userAuthorization) {
             // Remove the 'Sign In' button.
-            $('.submit-button').hide();
+            $('.request').hide();
             // Show a helpful message to the user and make sure the next lesson
             // is unlocked.
             this.displaySuccessMessage();
