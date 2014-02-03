@@ -415,7 +415,9 @@ Lesson.prototype.displaySuccessMessage = function() {
     var successTop = $('.feedback').position().top;
     $('html, body').animate({scrollTop: successTop - 25}, 500);
     // Change border colour to black.
-    this.activeInput.removeRedBorder();
+    if (this.activeInput) {
+      this.activeInput.removeRedBorder();
+    }
     // Show the output if there is any.
     showResponse();
     // Display the next button.
@@ -458,7 +460,9 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   var errorTop = $('.feedback').position().top;
   $('html, body').animate({scrollTop: errorTop - 225}, 500);
   // Change border colour to red.
-  this.activeInput.addRedBorder();
+  if (this.activeInput) {
+    this.activeInput.addRedBorder();
+  }
   // Show the output if there is any.
   showResponse();
   // Set up analytics to indicate failure (how many times).
