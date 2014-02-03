@@ -737,7 +737,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           $('.url').hide();
           if (userAuthorization) {
             // Remove the 'Sign In' button.
-            $('.request').hide();
+            $('.submit-button').hide();
             // Show a helpful message to the user and make sure the next lesson
             // is unlocked.
             this.displaySuccessMessage();
@@ -1425,7 +1425,18 @@ function checkCreateRequest(input) {
                 }
                 me.displaySuccessMessage();
               } else {
-                me.displayErrorMessage('Make sure you enter the correct URL.');
+                if (me.body) {
+                  // The input is the url.
+                  // User might use wrong table Id.
+                  me.displayErrorMessage('Make sure that you use the table ' +
+                      'ID specified in the \'Helpful information\' box.');
+                } else {
+                  // The input is the request body.
+                  // The user might use the wrong project id.
+                  me.displayErrorMessage('Make sure that you use the project ' +
+                      'ID specified in the \'Helpful information\' box.');
+                }
+                
               }
             }
           });
