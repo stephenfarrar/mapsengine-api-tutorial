@@ -173,6 +173,21 @@ ResizingTextarea.prototype.blur = function() {
 }
 
 /**
+ * Make the border of the textarea becomes red.
+ * Indicates that the user entered the wrong input.
+ */
+ResizingTextarea.prototype.addRedBorder = function() {
+  this.textareaElement.addClass('alert');
+}
+
+/**
+ * Make the border of the textarea becomes black again.
+ */
+ResizingTextarea.prototype.removeRedBorder = function() {
+  this.textareaElement.removeClass('alert');
+}
+
+/**
  * Function to store input in local storage.
  */
 function storeInput(inputValue) {
@@ -273,8 +288,6 @@ Lesson.prototype.update = function() {
     } else {
       $('.inventory').hide();
     }
-    // Make the border black again.
-    $('.url .input').removeClass('alert');
     // Right aligned the green button.
     $('.next-button').addClass('lesson-button');
     // Make text on menu for active lesson red, and all others black.
@@ -293,6 +306,8 @@ Lesson.prototype.update = function() {
     if (this.inactiveInput) {
       // Disabled the inactive input.
       this.inactiveInput.disable();
+      // Make the border black again.
+      this.inactiveInput.removeRedBorder();
     }
     if (this.activeInput) {
       // Enabled the specific input area for each lesson.
@@ -300,6 +315,8 @@ Lesson.prototype.update = function() {
       // Update the input (placeholder/saved URL/saved body).
       var storedInput = retrieveInput();
       this.activeInput.setInput(storedInput || '');
+      // Make the border black again.
+      this.activeInput.removeRedBorder();
     }
   }
   // Set up analytics for the page visited by the user (number of times the page
@@ -398,7 +415,7 @@ Lesson.prototype.displaySuccessMessage = function() {
     var successTop = $('.feedback').position().top;
     $('html, body').animate({scrollTop: successTop - 25}, 500);
     // Change border colour to black.
-    $('.url .input').removeClass('alert');
+    this.activeInput.removeRedBorder();
     // Show the output if there is any.
     showResponse();
     // Display the next button.
@@ -441,7 +458,7 @@ Lesson.prototype.displayErrorMessage = function(errorMessage) {
   var errorTop = $('.feedback').position().top;
   $('html, body').animate({scrollTop: errorTop - 225}, 500);
   // Change border colour to red.
-  $('.url .input').addClass('alert');
+  this.activeInput.addRedBorder();
   // Show the output if there is any.
   showResponse();
   // Set up analytics to indicate failure (how many times).
