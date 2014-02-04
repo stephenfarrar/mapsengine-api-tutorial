@@ -2,7 +2,7 @@
 Now that you have created empty tables in your Google Maps Engine project, you can add features to the tables. To be able to do that, you need to send a POST request. The header of the POST request is the same as the header for the 'Create Table' request. However, this time you need to send the request to the URL:  
 `https://www.googleapis.com/mapsengine/v1/tables/{tableID}/features/batchInsert`.
 
-The body of the request specifies some basic information of the features.
+The body of the request specifies some basic information about the features.
 
 ###Exercise###  
-Below, you can see an incomplete POST request which will add a feature to a table in your Google Maps Engine project. We have created the header and the body of the request for you, and you don't need to modify them. We will explain more about the request body in the next lesson, but please read it carefully and try to understand the format. The request below does not have the URL to which the request will be sent. Copy the URL in the instruction above, and change the `{tableID}` with the ID of your 'World Famous Mountains' table, which is specified in the helpful information box.
+Below, you can see an incomplete POST request which will add a feature to a table in your Google Maps Engine project. We have created the header and the body of the request for you, and you don't need to modify them. We will explain more about the request body in the next lesson, but please read it carefully and try to understand the format. The request below does not have the URL to which the request will be sent. Copy the URL in the instruction above, and replace `{tableID}` with the ID of your 'World Famous Mountains' table, which is specified in the helpful information box.

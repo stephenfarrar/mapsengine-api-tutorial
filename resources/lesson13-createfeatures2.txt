@@ -10,7 +10,7 @@ The body of the POST request to create a feature has to be in the JSON format, w
 	* other properties in table's schema. String and integer values must be enclosed in double quotes ("), while float values must not be enclosed in quotes.
 
 ###Exercise###  
-Try to create a POST body request to insert *one* feature to your 'World Famous Mountains' table. We have created the URL and the header of the request for you so you do not need to modify them. The details of the feature is up to your liking, but remember that you have to follow the schema of the table. The body has to be a `features` array, with each feature containing:
+Try to create a POST request body to insert *one* feature to your 'World Famous Mountains' table. We have created the URL and the header of the request for you so you do not need to modify them. The details of the feature is up to your liking, but remember that you have to follow the schema of the table. The body has to be a `features` array, with each feature containing:
 
 * `type`
 * `geometry` (including `type` and `coordinates`)
