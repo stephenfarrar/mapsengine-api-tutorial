@@ -1,4 +1,4 @@
-Congratulations! You have just created an empty table in your project. You can view the details of the table you created at [this link](//mapsengine.google.com/admin/#RepositoryPlace:cid={userProjectId}&v=DETAIL_INFO&aid={userTableId}) , or view all of your tables [here](//mapsengine.google.com/admin/?#RepositoryPlace:cid={userProjectId}&v=THUMBNAIL).
+Congratulations! You have just created an empty table in your project. You can view the details of the table you created at [this link](//mapsengine.google.com/admin/#RepositoryPlace:cid={userProjectId}&v=DETAIL_INFO&aid={userTableId}) , or view all of your tables by selecting 'Data Sources' from the left-hand menu of the Maps Engine interface.
 
 When you created your Maps Engine project, some default Access Lists were added. Access Lists allow you to group together people who are allowed to access and manage different aspects of the account. You can view and edit these lists [here](//mapsengine.google.com/admin/#AclPlace:cid={userProjectId}&v=LIST).
 

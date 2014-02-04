@@ -1,4 +1,4 @@
-Congratulations, you are now able to access a private table! The response you got is almost the same as the one you will get by accessing public table using your API Key. It will still return `id`, `projectId`, `name`, `description`, and `schema`. However, there might be some additional parameters, such as:
+Congratulations, you are now able to access a private table! The response you got is almost the same as the one you will get by accessing a public table using your API Key. It will still return `id`, `projectId`, `name`, `description`, and `schema`. However, there might be some additional parameters, such as:
 
 * `tags`: An array of tags of the table.
 * `sourceEncoding`: The encoding method used.

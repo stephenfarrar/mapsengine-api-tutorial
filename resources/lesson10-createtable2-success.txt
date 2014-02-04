@@ -1,4 +1,4 @@
-Congratulations! You have successfully created a body for 'Create Table' request.
+Congratulations! You have successfully created a body for a 'Create Table' request.
 
 Below, you can see the response given by the server of your successful request. The response contains:
 
@@ -9,4 +9,4 @@ Below, you can see the response given by the server of your successful request. 
 * `schema`: Your table schema + `gx_id`(a unique identifier for each feature in the table).
 * `description` and/or `tags` (if any).  
 
-You can view the details of the table you created at [this link](//mapsengine.google.com/admin/#RepositoryPlace:cid={userProjectId}&v=DETAIL_INFO&aid={userTableId}) , or view all of your tables [here](//mapsengine.google.com/admin/?#RepositoryPlace:cid={userProjectId}&v=THUMBNAIL). You can also view your table's ID by selecting the table and clicking the 'Access links' button on the upper right hand corner of the page.
+You can view the details of the table you created at [this link](//mapsengine.google.com/admin/#RepositoryPlace:cid={userProjectId}&v=DETAIL_INFO&aid={userTableId}) , or view all of your tables by selecting 'Data Sources' from the left-hand menu of the Maps Engine interface. You can also view your table's ID by selecting the table and clicking the 'Access links' button on the upper right hand corner of the page.
