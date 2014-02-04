@@ -1397,8 +1397,7 @@ function checkCreateTable(input) {
         $('.response-content').text(responseString); 
       }
       // Check if they create a table in the right project.
-      if (resource.projectId &&
-          resource.projectId == localStorage['projectID']) {
+      if (resource && resource.projectId == localStorage['projectID']) {
         // Store the table ID in local storage if it is the World Famous
         // Mountains table (lesson9-createtable1).
         if (me.elementId == 'lesson9-createtable1') {
