@@ -798,14 +798,12 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
     new Chapter('chapter2-table', {title: 'Making a Table', lessons: [
       new Lesson('lesson9-createtable1', {
         title: 'Create Table I',
-        checkAnswer: checkCreateRequest,
+        checkAnswer: checkCreateTable,
         submitButtonValue: 'Post',
         activeInput: urlInput,
         inactiveInput: bodyInput,
         hasBodyFile: true,
         header: HEADER_FOR_POST,
-        testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/tables?' +
-            'projectId={userProjectId}',
         update: function() {
           Lesson.prototype.update.call(this);
           this.displayHeader();
@@ -817,14 +815,12 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         inventoryContents: [{
           label: USER_PROJECT_ID
         }],
-        checkAnswer: checkCreateRequest,
+        checkAnswer: checkCreateTable,
         submitButtonValue: 'Post',
         activeInput: bodyInput,
         inactiveInput: urlInput,
         urlTemplate: TABLES_URL,
         header: HEADER_FOR_POST,
-        testingURLTemplate:'https://www.googleapis.com/mapsengine/v1/tables?' +
-            'projectId={userProjectId}',
         update: function() {
           Lesson.prototype.update.call(this);
           this.displayUrl();
@@ -854,7 +850,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         inventoryContents: [{
           label: USER_TABLE_ID
         }],
-        checkAnswer: checkCreateRequest,
+        checkAnswer: checkCreateFeatures,
         submitButtonValue: 'Post',
         activeInput: urlInput,
         inactiveInput: bodyInput,
@@ -870,7 +866,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       }),
       new Lesson('lesson13-createfeatures2', {
         title: 'Create Features II',
-        checkAnswer: checkCreateRequest,
+        checkAnswer: checkCreateFeatures,
         submitButtonValue: 'Post',
         activeInput: bodyInput,
         inactiveInput: urlInput,
@@ -1384,21 +1380,57 @@ function storeProjectID() {
 }
 
 /**
- * Check whether a new table/feature has been created or not.
+ * Check whether a new table has been created or not.
  */
-function checkCreateRequest(input) {
+function checkCreateTable(input) {
   var me = this;
-  // Find out the number of tables/features the user has.
+  $.ajax({
+    headers: me.header,
+    type: 'POST',
+    url: me.url || input,
+    data: JSON.stringify(me.body) || input,
+    dataType: 'json',
+    success: function(resource){
+      // If the request returns a valid object, show the output.
+      if (typeof resource == 'object') {
+        var responseString = JSON.stringify(resource, null, 2);
+        $('.response-content').text(responseString); 
+      }
+      // Check if they create a table in the right project.
+      if (resource && resource.projectId == localStorage['projectID']) {
+        // Store the table ID in local storage if it is the World Famous
+        // Mountains table (lesson9-createtable1).
+        if (me.elementId == 'lesson9-createtable1') {
+          localStorage['tableID'] = resource.id;
+        }
+        me.displaySuccessMessage();
+      } else {
+        me.displayErrorMessage ('We cannot find a new table in the ' +
+            'project with ID = ' + localStorage['projectID'] + '.');     
+      }
+    },
+    error: function(response){
+      handleErrorResponse(response, input);
+    }
+  });
+}
+  
+/**
+ * Check whether a new feature has been created or not.
+ */
+function checkCreateFeatures(input) {
+  var me = this;
+  // Find out the number of features the user has.
   $.ajax({
     headers: {'Authorization': 'Bearer ' + userAuthorization},
     type: 'GET',
     url: me.testingURL,
     // This request should always be successful.
     success: function(resource) {
-      // Store the number of tables/features the user has.
-      var initialArray = resource.tables || resource.features;
+      // Store the number of features the user has.
+      var initialArray = resource.features;
       var initialCount = initialArray.length;
-      // Attempt to create a table with user's input.
+      // Attempt to create a feature with user's input.
       $.ajax({
         headers: me.header,
         type: 'POST',
@@ -1411,33 +1443,21 @@ function checkCreateRequest(input) {
             var responseString = JSON.stringify(resource2, null, 2);
             $('.response-content').text(responseString); 
           }
-          // Find out the number of tables/features after the create request.
+          // Find out the number of features after the create request.
           $.ajax({
             headers: {'Authorization': 'Bearer ' + userAuthorization},
             type: 'GET',
             url: me.testingURL,
             success: function(resource3) {
-              // Count the final number of tables/features.
-              var finalArray = resource3.tables || resource3.features;
+              // Count the final number of features.
+              var finalArray = resource3.features;
               var finalCount = finalArray.length;
-              // If the number of table/feature increase, the user is right.
+              // If the number of feature increase, the user is right.
               if (finalCount > initialCount) {
-                // Store the table ID in local storage if it is the World
-                // Famous Mountains table (lesson9-createtable1).
-                if (me.elementId == 'lesson9-createtable1') {
-                  localStorage['tableID'] = resource2.id;
-                }
                 me.displaySuccessMessage();
               } else {
-                if (resource3.tables) {
-                  // In create table lesson.
-                  me.displayErrorMessage ('We cannot find a new table in the ' +
-                      'project with ID = ' + localStorage['projectID'] + '.');
-                } else {
-                  // In create features lesson.
-                  me.displayErrorMessage ('We cannot find a new feature in ' +
-                      'the table with ID = ' + localStorage['tableID'] + '.');
-                }
+                me.displayErrorMessage ('We cannot find a new feature in ' +
+                    'the table with ID = ' + localStorage['tableID'] + '.');
               }
             }
           });
