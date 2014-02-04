@@ -1429,7 +1429,15 @@ function checkCreateRequest(input) {
                 }
                 me.displaySuccessMessage();
               } else {
-                me.displayErrorMessage('Make sure you enter the correct URL.');
+                if (resource3.tables) {
+                  // In create table lesson.
+                  me.displayErrorMessage ('We cannot find a new table in the ' +
+                      'project with ID = ' + localStorage['projectID'] + '.');
+                } else {
+                  // In create features lesson.
+                  me.displayErrorMessage ('We cannot find a new feature in ' +
+                      'the table with ID = ' + localStorage['tableID'] + '.');
+                }
               }
             }
           });
