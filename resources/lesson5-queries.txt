@@ -7,7 +7,10 @@ If you want to query a table for specific data, you can add additional parameter
 * `where`: Create a condition that must be fulfilled by the features returned. The supported operators are >, <, >=, <=, =, and <>.
 * `orderBy`: Specify the ordering of the features returned (ascending/descending). It is ascending by default. You have to specify a `limit` of less than or equal to 75 if you want to use this parameter.
 
-For example, if you only want to find 'Paris' in the 'Famous Cities' table, and only display the `Name` property, you could request: `https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key=AIzaSyA72mMb9IsfSDWA_7RVpCo3_LM_7P2hlXY&select=Name&where=Name='Paris'`.
+For example, if you only want to find 'Paris' in the 'Famous Cities' table, and only display the `Name` property, you could request:  
+`https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-`  
+`14495543923251622067/features?version=published&key=`  
+`AIzaSyA72mMb9IsfSDWA_7RVpCo3_LM_7P2hlXY&select=Name&where=Name='Paris'`.
 
 For more information regarding queries and a full list of available parameters, you can read the [Google Maps Engine API Documentation for list features](//developers.google.com/maps-engine/documentation/read).
 
