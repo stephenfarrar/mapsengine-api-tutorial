@@ -759,26 +759,28 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           $('.submit-button').removeAttr('disabled');
           var getProjects = function() {
             gapi.client.request({
-            path: '/mapsengine/v1/projects/',
-            method: 'GET',
-            callback: function(jsonBody) {
-              var list = $('.project-list')
-              list.empty();
-              jsonBody.projects.forEach(function(project) {
-                var listItem = $('<option>').attr('value', project.id)
-                    .text(project.name);
-                list.append(listItem);
-              });
-            }
-          });
+              path: '/mapsengine/v1/projects/',
+              method: 'GET',
+              callback: function(jsonBody) {
+                var list = $('.project-list')
+                list.empty();
+                jsonBody.projects.forEach(function(project) {
+                  var listItem = $('<option>').attr('value', project.id)
+                      .text(project.name);
+                  list.append(listItem);
+                });
+              }
+            });
           }
           // List the projects once initially, then refresh every five seconds.
           getProjects();
           (function loop(){
-            setTimeout(function(){
-              getProjects();
-              loop();
-            }, 5000);
+            if (activeLesson.elementId == 'lesson7-project') {
+              setTimeout(function(){
+                getProjects();
+                loop();
+              }, 5000);
+            }
           })();
         }
       }), 
