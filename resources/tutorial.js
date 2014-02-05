@@ -1083,7 +1083,7 @@ function loadState() {
   // The user has started previously.
   // If the user left at the final page at v1, bring them to the sign in page.
   if (activeLessonId == 'finish') {
-    activeLessonId == 'lesson6-login';
+    activeLessonId = 'lesson6-login';
   }
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
