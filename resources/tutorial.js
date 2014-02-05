@@ -930,8 +930,6 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       // go to documentation button.
       $('.menu-area').show();
       $('.documentation-button').show();
-      // Store the current lesson (the finish page).
-      localStorage['currentLesson'] = activeLesson.elementId;
       // Make text on menu for active lesson red, and all others black.
       chapters.forEach(function(chapter) {
         chapter.lessons.forEach(function(lesson) {
@@ -1082,6 +1080,11 @@ function loadState() {
   chapters[0].lessons[0].unlock();
   // Make the active lesson the last opened page/default to introduction page.
   var activeLessonId = localStorage['currentLesson'] || 'introduction';
+  // The user has started previously.
+  // If the user left at the final page at v1, bring them to the sign in page.
+  if (activeLessonId == 'finish') {
+    activeLessonId == 'lesson6-login';
+  }
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
       // Restore user completion information.
@@ -1099,12 +1102,6 @@ function loadState() {
     // If the user has not started yet.
     introduction.update();
   } else {
-    // The user has started previously.
-    // If the user left at the final page.
-    if (activeLessonId == 'finish') {
-      resume.next = finish;
-      signin.next = finish;
-    }
     // If the user has completed the Sign In page but has no token,
     // i.e. if the user has logged out, return them to a signin page.
     if (localStorage['lesson6-login'] && !userAuthorization) {
@@ -1201,11 +1198,7 @@ function decideErrorMessage(errorMess, input) {
             'surrounding the table ID in your URL.';
       } else {
         message = 'The table ID used in the URL is invalid. Check whether ' +
-            'you have given the right table ID and make sure that the table ' +
-            'has been made public. To make your table public, you can follow ' +
-            'the instructions in <a href=' +
-            '"//support.google.com/mapsengine/answer/3164737?hl=en"' +
-            '>this link</a>.';
+            'you have given the right table ID.';
       }
     }
   } else if (errorMess.reason == 'required') {
