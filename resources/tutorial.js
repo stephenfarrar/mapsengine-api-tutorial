@@ -1198,7 +1198,11 @@ function decideErrorMessage(errorMess, input) {
             'surrounding the table ID in your URL.';
       } else {
         message = 'The table ID used in the URL is invalid. Check whether ' +
-            'you have given the right table ID.';
+            'you have given the right table ID and make sure that the table ' +
+            'has been made public. To make your table public, you can follow ' +
+            'the instructions in <a href=' +
+            '"//support.google.com/mapsengine/answer/3164737?hl=en"' +
+            '>this link</a>.';
       }
     }
   } else if (errorMess.reason == 'required') {
