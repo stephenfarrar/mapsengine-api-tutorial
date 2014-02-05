@@ -757,7 +757,8 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
           $('.url').hide();
           $('.project-menu').show();
           $('.submit-button').removeAttr('disabled');
-          var getProjects = function() {
+          // List the projects once initially, then refresh every five seconds.
+          (function loop() {
             gapi.client.request({
               path: '/mapsengine/v1/projects/',
               method: 'GET',
@@ -769,18 +770,12 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
                       .text(project.name);
                   list.append(listItem);
                 });
+                // Stop looping when the user changes lesson.
+                if (activeLesson.elementId == 'lesson7-project') {
+                  setTimeout(loop, 5000);
+                }
               }
             });
-          }
-          // List the projects once initially, then refresh every five seconds.
-          getProjects();
-          (function loop(){
-            if (activeLesson.elementId == 'lesson7-project') {
-              setTimeout(function(){
-                getProjects();
-                loop();
-              }, 5000);
-            }
           })();
         }
       }), 
