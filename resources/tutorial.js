@@ -1081,7 +1081,7 @@ function loadState() {
   // Make the active lesson the last opened page/default to introduction page.
   var activeLessonId = localStorage['currentLesson'] || 'introduction';
   // The user has started previously.
-  // If the user left at the final page at v1, bring them to the sign in page.
+  // If the user left at the final page at v1, bring them to the login page.
   if (activeLessonId == 'finish') {
     activeLessonId = 'lesson6-login';
   }
