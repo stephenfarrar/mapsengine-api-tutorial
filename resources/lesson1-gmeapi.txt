@@ -5,7 +5,7 @@ The two most commonly used HTTP methods for a request-response between a client 
 
 In order to read data from Maps Engine, you send a standard HTTP GET request. This takes the form of a structured URL that uses paths and parameters, just the same as you would enter into your browser. The information requested is then returned to you in the HTTP response.
 
-This is a breakdown of the structure of a URL  
+This is a breakdown of the structure of a URL:  
 ![url-structure](images/url-structure.png)
  
 If you want to learn several ways to send an HTTP request, you can read the documentation in [this link](//developers.google.com/maps-engine/documentation/hello-world).
