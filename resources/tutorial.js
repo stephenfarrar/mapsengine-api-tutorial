@@ -930,8 +930,6 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
       // go to documentation button.
       $('.menu-area').show();
       $('.documentation-button').show();
-      // Store the current lesson (the finish page).
-      localStorage['currentLesson'] = activeLesson.elementId;
       // Make text on menu for active lesson red, and all others black.
       chapters.forEach(function(chapter) {
         chapter.lessons.forEach(function(lesson) {
@@ -1082,6 +1080,11 @@ function loadState() {
   chapters[0].lessons[0].unlock();
   // Make the active lesson the last opened page/default to introduction page.
   var activeLessonId = localStorage['currentLesson'] || 'introduction';
+  // The user has started previously.
+  // If the user left at the final page at v1, bring them to the login page.
+  if (activeLessonId == 'finish') {
+    activeLessonId = 'lesson6-login';
+  }
   chapters.forEach(function(chapter) {
     chapter.lessons.forEach(function(lesson) {
       // Restore user completion information.
@@ -1098,23 +1101,15 @@ function loadState() {
   if (activeLessonId == 'introduction') {
     // If the user has not started yet.
     introduction.update();
-  } else {
-    // The user has started previously.
-    // If the user left at the final page.
-    if (activeLessonId == 'finish') {
-      resume.next = finish;
-      signin.next = finish;
-    }
+  } else if (localStorage['lesson6-login'] && !userAuthorization) {
     // If the user has completed the Sign In page but has no token,
     // i.e. if the user has logged out, return them to a signin page.
-    if (localStorage['lesson6-login'] && !userAuthorization) {
-      signin.unlock();
-      signin.update();
+    signin.unlock();
+    signin.update();
+  } else {
     // Otherwise, resume as normal.
-    } else {
-      resume.unlock();
-      resume.update();
-    }
+    resume.unlock();
+    resume.update();
   }
 }
 
