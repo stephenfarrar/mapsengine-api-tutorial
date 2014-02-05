@@ -1101,17 +1101,15 @@ function loadState() {
   if (activeLessonId == 'introduction') {
     // If the user has not started yet.
     introduction.update();
-  } else {
+  } else if (localStorage['lesson6-login'] && !userAuthorization) {
     // If the user has completed the Sign In page but has no token,
     // i.e. if the user has logged out, return them to a signin page.
-    if (localStorage['lesson6-login'] && !userAuthorization) {
-      signin.unlock();
-      signin.update();
+    signin.unlock();
+    signin.update();
+  } else {
     // Otherwise, resume as normal.
-    } else {
-      resume.unlock();
-      resume.update();
-    }
+    resume.unlock();
+    resume.update();
   }
 }
 
