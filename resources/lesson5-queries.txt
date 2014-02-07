@@ -1,5 +1,8 @@
 ##Queries##  
-If you want to query a table for specific data, you can add additional parameters to a List Features request including:
+If you want to query a table for specific data, you can add additional parameters to a List Features request. Each parameter requires a value which can be an integer, string or condition. The diagram below illustrates how these parameters fit into the structure of a HTTP request.  
+![query-structure](images/query-structure.png)
+
+Some common query parameters include:
 
 * `intersects`: Get features which intersect with a geometry (point, polygon, circle, linestring).
 * `limit`: Create an upper bound of the number of features returned.
