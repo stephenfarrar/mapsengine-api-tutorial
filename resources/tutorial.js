@@ -792,7 +792,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         }
       })
     ]}),
-    new Chapter('chapter2-table', {title: 'Making a Table', lessons: [
+    new Chapter('chapter3-table', {title: 'Making a Table', lessons: [
       new Lesson('lesson9-createtable1', {
         title: 'Create Table I',
         checkAnswer: checkCreateTable,
@@ -841,7 +841,7 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         }
       })
     ]}),
-    new Chapter('chapter3-features', {title: 'Adding Features', lessons: [
+    new Chapter('chapter4-features', {title: 'Adding Features', lessons: [
       new Lesson('lesson12-createfeatures1', {
         title: 'Create Features I',
         inventoryContents: [{
