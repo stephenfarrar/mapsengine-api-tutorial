@@ -411,7 +411,7 @@ img[alt=introduction-cat-image], img[alt=finish-cat-image] {
 }
 
 /* Table image */
-img[alt=table], img[alt=url-structure] {
+img[alt=table], img[alt=url-structure], img[alt=query-structure], img[alt=query-example] {
   display: block;
   width: 650px;
 }
