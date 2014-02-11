@@ -1174,7 +1174,7 @@ function decideErrorMessage(errorMess, input) {
           'surrounding the API Key in your URL.';
     } else {
       message = 'The API Key used in the URL is invalid. Make sure that ' +
-          'you entered your API Key correctly.';
+          'you have created a browser key and entered it correctly.';
     }
   } else if (errorMess.reason == 'dailyLimitExceededUnreg') {
     message = 'There might be something wrong with your \'key\' parameter. ' +
@@ -1223,9 +1223,10 @@ function decideErrorMessage(errorMess, input) {
   } else if (errorMess.reason == 'requestTooLarge') {
     message = 'This request contains too many features and/or vertices.';
   } else if (errorMess.reason == 'accessNotConfigured') {
-    message = 'There is a per-IP or per-Referer restriction configured on ' +
-        'the API Key and the request does not match these restrictions, or ' +
-        'the Maps Engine API is not activated on the project ID.';
+    message = 'The API key you have created is not properly configured. You may have ' + 
+        'a per-IP or per-Referer restriction configured on the API Key which does not ' + 
+        'match the *.appspot domain on which this application is hosted, or ' +
+        'the Maps Engine API has not been activated for this project.';
   } else if (errorMess.reason == 'parseError') {
     message = 'The body you entered is not a valid JSON object. Make sure ' +
         'that you format your data correctly.';
@@ -1292,8 +1293,9 @@ function testAPIKey(userKey) {
       me.displaySuccessMessage();
     },
     error: function(response) {
-      me.displayErrorMessage('Make sure that you have created a browser key ' +
-          'and copied it correctly.');
+      response = JSON.parse(response.responseText);
+      var errorMess = response.error.errors[0];
+      me.displayErrorMessage(decideErrorMessage(errorMess, ''));
     }
   })
 ;}
