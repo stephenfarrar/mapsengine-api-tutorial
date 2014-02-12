@@ -5,4 +5,5 @@ The basic URL to request a features list is:
 `https://www.googleapis.com/mapsengine/v1/tables/{tableId}/features?version=published&key={APIkey}`.
 
 ###Exercise###  
-Try to modify the URL above to list the features in the 'Famous Cities' table. Use the table ID `15474835347274181123-14495543923251622067` and your valid API Key for the URL, then click 'Get'.
+Try to modify the URL above to list the features in the 'Famous Cities' table.
+Use the table ID `{publicTableId}` and your valid API Key for the URL, then click 'Get'.

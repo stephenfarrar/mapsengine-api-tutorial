@@ -16,4 +16,5 @@ For example, if you only want to find 'Paris' in the 'Famous Cities' table, and 
 For more information regarding queries and a full list of available parameters, you can read the [Google Maps Engine API Documentation for list features](//developers.google.com/maps-engine/documentation/read).
 
 ###Exercise###  
-Try to query the 'Famous Cities' table to list cities whose `Population` is less than 2 million. Use the table ID `15474835347274181123-14495543923251622067` and your valid API Key for the URL, then click 'Get'.
+Try to query the 'Famous Cities' table to list cities whose `Population` is
+less than 2 million. Use the table ID `{publicTableId}` and your valid API Key for the URL, then click 'Get'.

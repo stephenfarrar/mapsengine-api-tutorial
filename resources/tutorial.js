@@ -26,6 +26,8 @@ var TABLES_URL = 'https://www.googleapis.com/mapsengine/v1/tables';
  * @const {string}
  */
 var BATCH_INSERT_URL = TABLES_URL + '/{userTableId}/features/batchInsert';
+/** @const {string} Famous Cities Table ID. */
+var FAMOUS_CITIES_TABLE_ID = '14137585153106784136-16071188762309719429';
 /**
  * Header for GET request.
  * @const {Object}
@@ -690,45 +692,47 @@ function makeChaptersAndLessons(urlInput, bodyInput) {
         title: 'Get Table',
         inventoryContents: [{
           label: 'Table ID: ',
-          information: '15474835347274181123-14495543923251622067'
+          information: FAMOUS_CITIES_TABLE_ID
         }, {
           label: API_KEY_LABEL
         }],
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
-        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/tables/' + 
-                '15474835347274181123-14495543923251622067?' +
-                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco'       
+        testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/tables/' +
+            FAMOUS_CITIES_TABLE_ID +
+            '?version=published' +
+            '&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco'
       }),
       new Lesson('lesson4-listfeatures', {
         title: 'List Features',
         inventoryContents: [{
           label: 'Table ID: ',
-          information: '15474835347274181123-14495543923251622067'
+          information: FAMOUS_CITIES_TABLE_ID
         }, {
           label: API_KEY_LABEL
         }],
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
         testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/tables/' +
-                '15474835347274181123-14495543923251622067/features?' +
-                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1v' +
-                'pHQdco'
+            FAMOUS_CITIES_TABLE_ID + '/features' +
+            '?version=published' +
+            '&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco'
       }),
       new Lesson('lesson5-queries', {
         title: 'Queries',
         inventoryContents: [{
           label: 'Table ID: ',
-          information: '15474835347274181123-14495543923251622067'
+          information: FAMOUS_CITIES_TABLE_ID
         }, {
           label: API_KEY_LABEL
         }],
         checkAnswer: checkCorrectness,
         activeInput: urlInput,
         testingURLTemplate: 'https://www.googleapis.com/mapsengine/v1/tables/' +
-                '15474835347274181123-14495543923251622067/features?'+ 
-                'version=published&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1v' +
-                'pHQdco&where=Population<2000000'
+            FAMOUS_CITIES_TABLE_ID + '/features' +
+            '?version=published' +
+            '&key=AIzaSyCXONe59phR2Id4yP-Im3E_AHN1vpHQdco' +
+            '&where=Population<2000000'
       })
     ]}),
     new Chapter('chapter2-private', {title: 'Accessing Private Data', lessons: [
@@ -1246,6 +1250,7 @@ function replaceTemplate(template) {
   string = template.replace(/{userAPIKey}/g, localStorage['APIKey']);
   string = string.replace(/{userTableId}/g, localStorage['tableID']);
   string = string.replace(/{userProjectId}/g, localStorage['projectID']);
+  string = string.replace(/{publicTableId}/g, FAMOUS_CITIES_TABLE_ID);
   return string;
 }
 
@@ -1285,8 +1290,9 @@ function testAPIKey(userKey) {
   // If it works then it is a valid API Key.
   $.ajax({
     url: 'https://www.googleapis.com/mapsengine/v1/tables/' +
-        '15474835347274181123-14495543923251622067/features?' +
-        'version=published&key=' + userKey,
+        FAMOUS_CITIES_TABLE_ID + '/features' +
+        '?version=published' +
+        '&key=' + userKey,
     dataType: 'json',
     success: function(resource) {
       localStorage['APIKey'] = userKey;
