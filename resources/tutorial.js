@@ -1294,6 +1294,7 @@ function testAPIKey(userKey) {
         '?version=published' +
         '&key=' + userKey,
     dataType: 'json',
+    jsonp: false,
     success: function(resource) {
       localStorage['APIKey'] = userKey;
       me.displaySuccessMessage();
@@ -1324,6 +1325,7 @@ function checkCorrectness(address) {
         url: address,
         headers: me.header,
         dataType: 'json',
+        jsonp: false,
         success: function(resource2) {
           var resourceString = JSON.stringify(resource2, null, 2);
           $('.response-content').text(resourceString);
@@ -1386,6 +1388,7 @@ function checkCreateTable(input) {
     url: me.url || input,
     data: JSON.stringify(me.body) || input,
     dataType: 'json',
+    jsonp: false,
     success: function(resource){
       // If the request returns a valid object, show the output.
       if (typeof resource == 'object') {
@@ -1433,6 +1436,7 @@ function checkCreateFeatures(input) {
         url: me.url || input,
         data: JSON.stringify(me.body) || input,
         dataType: 'json',
+        jsonp: false,
         success: function(resource2){
           // If the request returns a valid object, show the output.
           if (typeof resource2 == 'object') {
