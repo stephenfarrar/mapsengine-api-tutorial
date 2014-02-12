@@ -1,25 +1,13 @@
-##Get Table##
-Google Maps Engine stores data in tables, like the one below, where each
-column represents an attribute (Name, Country, Rating) and each row represents
-a feature. The attributes each have a name and a type which indicates what
-form the data takes (string, integer etc.). This information is stored in a
-_schema_, an example of which can be seen next to the table.
+##Get Table##  
+Google Maps Engine stores data in tables, like the one below, where each column represents an attribute (Name, Country, Rating) and each row represents a feature. The attributes each have a name and a type which indicates what form the data takes (string, integer etc.). This information is stored in a _schema_, an example of which can be seen next to the table.
 
 ![table](images/table.png)
 
-To see information about a table, including its schema, you can use a 'Get
-Table' request. The basic URL to make a 'Get Table' request for public data
-is:
+To see information about a table, including its schema, you can use a 'Get Table' request. The basic URL to make a 'Get Table' request for public data is:   
 `https://www.googleapis.com/mapsengine/v1/tables/{tableID}?version=published&key={APIkey}`.
 
-The parameter `version=published` is required to specify that a table is
-publicly accessible. If you have a table and wish to make it public, you can
-follow the instructions in
-[this link](//support.google.com/mapsengine/answer/3164737?hl=en).
-The parameter `key={APIkey}` is compulsory as a form of authentication in any
-public data request.
+The parameter `version=published` is required to specify that a table is publicly accessible. If you have a table and wish to make it public, you can follow the instructions in [this link](//support.google.com/mapsengine/answer/3164737?hl=en). The parameter `key={APIkey}` is compulsory as a form of authentication in any public data request.
 
-###Exercise###
+###Exercise###  
 Copy the above URL into the input box below and replace `{tableID}` with this
-ID from an existing table: `{publicTableId}` and `{APIkey}` with your API Key
-from the previous lesson.
+ID from an existing table: `{publicTableId}` and `{APIkey}` with your API Key from the previous lesson.
