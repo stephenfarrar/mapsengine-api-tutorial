@@ -1,2 +1,2 @@
 ###Answer###  
-`https://www.googleapis.com/mapsengine/v1/tables/15474835347274181123-14495543923251622067/features?version=published&key={userAPIKey}&where=Population<2000000`
+`https://www.googleapis.com/mapsengine/v1/tables/{publicTableId}/features?version=published&key={userAPIKey}&where=Population<2000000`
